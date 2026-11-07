@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 21:40 · една стена</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 21:50 · скосяване в Детайли</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -952,7 +952,7 @@ function buildRaw(k){
     return{parts:all,warn:[...ra.warn,...rb.warn],Dk}}
   if(k.type==='wpanel'){ // панел на стената (облицовка, декоративен)
     const tt=+mat(k.mf).t||18,h=Math.max(20,+k.fpH||700),fc=fcutOf(k,W,h),cut=Object.values(fc).some(q=>q.x>0&&q.y>0);
-    add(cut?'Панел на стената (скосен)':'Панел на стената',h,W,k.mf,[1,1,1,1],[0,W,0,tt,c,c+h],'');parts.at(-1).L=r1(h);parts.at(-1).Wd=r1(W);
+    add('Панел на стената',h,W,k.mf,[1,1,1,1],[0,W,0,tt,c,c+h],'');parts.at(-1).L=r1(h);parts.at(-1).Wd=r1(W);
     if(cut){const{TL,TR,BL,BR}=fc,fp=[[BL.x,c],[W-BR.x,c],[W,c+BR.y],[W,c+h-TR.y],[W-TR.x,c+h],[TL.x,c+h],[0,c+h-TL.y],[0,c+BL.y]];
       parts.at(-1).fp=fp.filter((q,i)=>{const n=fp[(i+1)%fp.length];return Math.abs(q[0]-n[0])>0.01||Math.abs(q[1]-n[1])>0.01});
       warn.push(`Панел ${Math.round(W)} × ${Math.round(h)} — скосявания: `+FCN.filter(([key])=>fc[key].x>0&&fc[key].y>0).map(([key,nm])=>`${nm} ${fmt(fc[key].x)} по хоризонтала × ${fmt(fc[key].y)} по вертикала (${fcAng(fc[key])}°)`).join('; ')+'.')}
@@ -1200,7 +1200,7 @@ function rows(list,forTable,withAlu){
   for(const k of list){for(const p of build(k).parts){
     if(p.kind==='hw'||p.kind==='appl'||p.kind==='vis'||p.kind==='virt')continue;if((p.kind==='alu'||p.kind==='glass')&&!forTable&&!withAlu)continue; // профил и стъкло — не за разкроя на плоскости
     const tag=forTable&&scope==='cab'&&p.sd?' ('+(p.sd==='L'?'лява':'дясна')+')':'',ovKey=tag?p.name+'|'+p.sd:p.name;
-    const type=(P.settings.cabInType&&scope==='all'?k.name+' ':'')+p.name+tag;
+    const type=(P.settings.cabInType&&scope==='all'?k.name+' ':'')+p.name+(p.fp&&k.type==='wpanel'?' (скосен)':'')+tag;
     const key=[type,p.L,p.Wd,p.e.join(''),p.m].join('|');
     if(map.has(key)) map.get(key).n++; else map.set(key,{...p,type,ovKey,n:1});
   }}
@@ -1271,7 +1271,7 @@ function renderList(){
     <span style="grid-column:1/-1">${c.wall!==null?'стена '+(c.wall+1):'свободен'} · ${c.type==='wpanel'?'панел '+Math.round(c.W)+' × '+Math.round(+c.fpH||700):c.type==='wshelf'?'рафт на стената '+Math.round(c.W):c.type==='ubottom'?'цяло дъно '+Math.round(c.W):c.type==='splash'?'гръб '+Math.round(c.W)+' × '+Math.round(c.H-c.c):c.type==='top'?'плот '+Math.round(c.W)+' × '+c.D:c.type==='endPanel'?'завършваща страница':c.type==='wardrobe'?'гардероб · '+wSecs(c).length+' секции':c.type==='endShelf'?'крайна етажерка · '+c.sh+' рафт':c.type==='plinthRun'?'цокъл '+Math.round(c.W)+' мм':c.type==='filler'?'пълнеж':c.type==='cornerL'?'ъглов Г · рамо Б '+(c.armB||900):c.type==='fridge'?'хладилник':c.type==='col'?'колона фурна'+(+c.mwH>0?' + микров.':'')+' · на '+c.c:c.type==='dw'?'съдомиялна':c.type==='oven'?'фурна + чекм.':c.type==='drawers'?(c.dr+' чекм.'):c.open?('етажерка · '+c.sh+' рафт/секц.'):(c.doors+' вр. · '+c.div+' дел. · '+c.sh+' рафт/секц.')}</span></div>`}).join('')||`<div class="li" style="cursor:default;color:var(--muted)">${lq?'Няма шкаф с това име.':'Още няма шкафове.'}</div>`;
 }
 const FIELDS=[
-  ['name','Име','text','full'],['note','Забележка (излиза и в PDF-а)','note','full'],['W','Ширина, мм','num'],['fpH','Височина на панела, мм','num'],['fsD','Дълбочина на рафта, мм','num'],['fsN','Брой рафтове','num'],['fsG','Разстояние между рафтовете, мм','num'],['armB','Рамо Б (по съседната стена), мм','num'],['H','Височина без цокъла, мм','num'],['D','Дълбочина с вратата, мм','num'],['c','Цокъл, мм','num'],['fcut','Скосявания','fcut'],
+  ['name','Име','text','full'],['note','Забележка (излиза и в PDF-а)','note','full'],['W','Ширина, мм','num'],['fpH','Височина на панела, мм','num'],['fsD','Дълбочина на рафта, мм','num'],['fsN','Брой рафтове','num'],['fsG','Разстояние между рафтовете, мм','num'],['armB','Рамо Б (по съседната стена), мм','num'],['H','Височина без цокъла, мм','num'],['D','Дълбочина с вратата, мм','num'],['c','Цокъл, мм','num'],
   ['floor','Страница до пода','sel',[['none','Няма'],['L','Лява'],['R','Дясна'],['both','Двете']]],
   ['upper','Горен шкаф (виси на стената)','chk','full'],['plinth','Цокъл панел отпред','chk','full'],
   ['_','Вътрешност','sub'],['type','Тип','sel',[['doors','С врати'],['cornerL','Ъглов Г'],['endShelf','Крайна етажерка'],['wardrobe','Гардероб'],['drawers','С чекмеджета'],['oven','Фурна + чекмедже'],['dw','Съдомиялна за вграждане'],['col','Колона фурна + микровълнова'],['fridge','Шкаф за хладилник']]],
@@ -1307,7 +1307,7 @@ function renderEditor(){
   ed.innerHTML=FIELDS.map(([f,l,t,x])=>{
     if(t==='note')return `<label class="full">${l}<textarea id="f_note" data-f="note" rows="2" placeholder="напр. Push панти, без дръжка…" style="font:inherit;resize:vertical;height:54px;min-height:34px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--fg)">${esc(k.note||'')}</textarea><span style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${NOTE_CHIPS.map(c=>`<button type="button" class="btn sm" data-nchip="${esc(c)}" style="padding:2px 8px;font-size:11px">+ ${esc(c)}</button>`).join('')}</span></label>`;
     if(k.type==='filler'&&!FILL_OK.includes(f))return '';
-    if(k.type==='wpanel'){if(!['_','name','note','W','fpH','fcut','c','mf','wall','off'].includes(f))return '';if(f==='c')l='От пода (долният ръб), мм';if(f==='mf')l='Материал'}
+    if(k.type==='wpanel'){if(!['_','name','note','W','fpH','c','mf','wall','off'].includes(f))return '';if(f==='c')l='От пода (долният ръб), мм';if(f==='mf')l='Материал'}
     else if(k.type==='wshelf'){if(!['_','name','note','W','fsD','c','fsN','fsG','mf','wall','off'].includes(f))return '';if(f==='W')l='Дължина, мм';if(f==='c')l='Височина от пода (първият рафт), мм';if(f==='mf')l='Материал'}
     else if(k.type==='ubottom'){if(!['_','name','note','W','D','c','mf','wall','off'].includes(f))return '';if(f==='W')l='Дължина, мм';if(f==='D')l='Дълбочина, мм';if(f==='c')l='От пода (долу), мм';if(f==='mf')l='Материал'}
     else if(k.type==='splash'){if(!['_','name','W','H','mf','wall','off'].includes(f))return '';if(f==='W')l='Дължина, мм';if(f==='H')l='Височина на гърба, мм';if(f==='mf')l='Материал'}
@@ -1331,10 +1331,6 @@ function renderEditor(){
     if(t==='bh'){if(slideOf(k).kind==='metal')return '';const sl=slideOf(k),fh=frontHeights(k),bs=i=>k.bh&&k.bh[i]!=null&&k.bh[i]!==''&&+k.bh[i]>0;
       return `<label>Височина на кутиите (за всички), мм<input id="f_bhAll" data-bh="all" type="number" step="1" placeholder="чело − ${sl.hOff}" value="${+k.bhAll>0?k.bhAll:''}"></label>
         <div class="full" style="grid-column:1/-1;display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)">Отделно за всяко чекмедже (отгоре надолу), мм<div style="display:grid;grid-template-columns:repeat(${Math.min(4,Math.max(1,k.dr|0))},1fr);gap:6px">${fh.hs.map((h,i)=>`<input id="f_bh${i}" data-bh="${i}" type="number" step="1" placeholder="${fmt(+k.bhAll>0?+k.bhAll:Math.max(50,h-sl.hOff))}" value="${bs(i)?k.bh[i]:''}" aria-label="Кутия ${i+1}">`).join('')}</div><span>Празно поле взима общата височина, а ако и тя е празна — челото − ${sl.hOff} мм.</span></div>`}
-    if(t==='fcut'){const fc=k.fcut||{},inp=(key,c,ph)=>`<input type="number" min="0" step="1" data-fc="${key}" data-fk="${c}" placeholder="${ph}" value="${fc[key]&&+fc[key][c]>0?+fc[key][c]:''}" style="width:100%">`;
-      return `<div class="full" style="grid-column:1/-1;display:flex;flex-direction:column;gap:4px"><div class="sub" style="margin:4px 0 0">Скосявания (от всеки ъгъл)</div><div style="font-size:12px;color:var(--muted)">Колко навътре по хоризонталния ръб и колко по вертикалния — оттам до там се реже. Ъгълът се смята сам, може и да го зададеш (пази хоризонталата).</div>
-        <div style="display:grid;grid-template-columns:auto 1fr 1fr 74px;gap:4px 6px;align-items:center;font-size:12px"><span></span><span style="color:var(--muted)">по хоризонтала</span><span style="color:var(--muted)">по вертикала</span><span style="color:var(--muted)">ъгъл °</span>
-        ${FCN.map(([key,nm])=>`<span>${nm}</span>${inp(key,'x','0')}${inp(key,'y','0')}<input type="number" min="0" max="90" step="0.5" data-fc="${key}" data-fk="a" id="fca_${key}" placeholder="—" value="${fc[key]?fcAng({x:+fc[key].x||0,y:+fc[key].y||0}):''}" style="width:100%">`).join('')}</div></div>`}
     if(t==='liftInfo')return `<div id="liftInfo" class="full" style="grid-column:1/-1;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:2px">${liftInfoHtml(k)}</div>`;
     if(t==='slideW'){const cur=(P.settings.slides.find(q=>q.id===k.wSlide)||P.settings.slides.find(q=>q.kind==='side')||P.settings.slides[0]||{}).id;return `<label>${l}<select id="${id}" data-f="wSlide">${P.settings.slides.map(q=>`<option value="${q.id}" ${q.id===cur?'selected':''}>${esc(q.name)}</option>`).join('')}</select></label>`}
     if(t==='wsecs'){const wkey=f==='wsecsB'?'secsB':'secs',sc=wSecs(k,wkey);return `<div class="full" data-wsk="${wkey}" style="grid-column:1/-1;display:flex;flex-direction:column;gap:6px"><div class="sub" style="margin:4px 0 0">${wkey==='secsB'?'Секции — рамо Б (от ъгъла навън)':k.wCorner?'Секции — рамо А (от ъгъла навън)':'Секции (отляво надясно)'}</div>${sc.map((q,i)=>`<div style="display:grid;grid-template-columns:auto .9fr 2.2fr .75fr .75fr auto;gap:4px;align-items:end;font-size:12px"><b style="padding-bottom:8px">${i+1}</b>
@@ -1388,10 +1384,6 @@ $('#ed').addEventListener('input',e=>{
     for(let j=0;j<(k.div|0);j++){const inp=$('#f_dp'+j);if(inp)inp.placeholder='авто '+divAuto(k,j)}P.example=false;changed(false);return}
   if(e.target.dataset.dh!==undefined){const k=cab(sel),i=+e.target.dataset.dh;k.dh=k.dh||[];const v=e.target.value;k.dh[i]=v===''?null:+v;
     const fh=frontHeights(k),sl=slideOf(k);const r=$('#dhReal');if(r)r.textContent='Челата в детайлите: '+fh.hs.map(fmt).join(' · ');fh.hs.forEach((h,j)=>{const inp=$('#f_dh'+j);if(inp)inp.placeholder='авто '+fmt(fh.nom[j]);const b=$('#f_bh'+j);if(b)b.placeholder=fmt(+k.bhAll>0?+k.bhAll:Math.max(50,h-sl.hOff))});P.example=false;changed(false);return}
-  if(e.target.dataset.fc!==undefined){const k=cab(sel);if(!k)return;const key=e.target.dataset.fc,c=e.target.dataset.fk,v=e.target.value;k.fcut=JSON.parse(JSON.stringify(k.fcut||{}));const q=k.fcut[key]=k.fcut[key]||{};
-    if(c==='a'){const a=+v;if(v!==''&&a>0&&a<90){if(!(+q.x>0))q.x=100;q.y=Math.round(+q.x*Math.tan(a*Math.PI/180)*10)/10;const yi=$(`[data-fc="${key}"][data-fk="y"]`),xi=$(`[data-fc="${key}"][data-fk="x"]`);if(yi)yi.value=q.y;if(xi)xi.value=q.x}}
-    else{q[c]=v===''?0:Math.max(0,+v);const ai=$('#fca_'+key);if(ai)ai.value=fcAng({x:+q.x||0,y:+q.y||0})}
-    P.example=false;changed(false);return}
   if(e.target.dataset.bh==='all'){const k=cab(sel);k.bhAll=e.target.value===''?0:+e.target.value;const sl=slideOf(k),fh=frontHeights(k);
     fh.hs.forEach((h,j)=>{const b=$('#f_bh'+j);if(b)b.placeholder=fmt(+k.bhAll>0?+k.bhAll:Math.max(50,h-sl.hOff))});P.example=false;changed(false);return}
   if(e.target.dataset.bh!==undefined){const k=cab(sel),i=+e.target.dataset.bh;k.bh=k.bh||[];const v=e.target.value;k.bh[i]=v===''?null:+v;P.example=false;changed(false);return}
@@ -2886,7 +2878,7 @@ for(const id of['#v3','#vp','#vw'])$(id).addEventListener('click',()=>{if(measOn
 /* ---------- Редактор на детайлите: панел вдясно ---------- */
 let pedHelp=false,pedK=null,pedSel=null,pedMulti=new Set(),pedCells=[],pedZ={},pedPanned=false; // pedZ — зум/местене на чертежите // pedCells — избрани свободни секции {cx,cz}
 let pedDoors=true;
-function openPed(id){const k=cab(id);if(!k||isAcc(k))return;pedK=id;if(sel!==id)select(id);pedSel=null;pedMulti=new Set();pedCells=[];$('#ped').hidden=false;$('#pedOv').hidden=false;renderPed();rebuild3D()}
+function openPed(id){const k=cab(id);if(!k||isAcc(k))return;pedK=id;if(sel!==id)select(id);pedSel=null;pedMulti=new Set();pedCells=[];if(k.type==='wpanel'){const p0=pedParts(k)[0];if(p0){pedSel=p0.key;pedMulti=new Set([p0.key])}} /* панелът — веднага маркиран, за скосяванията */$('#ped').hidden=false;$('#pedOv').hidden=false;renderPed();rebuild3D()}
 function closePed(){pedK=null;pedSel=null;pedMulti=new Set();pedCells=[];pedZ={};$('#ped').hidden=true;$('#pedOv').hidden=true;rebuild3D()}
 $('#pedOv').onclick=()=>closePed();
 function pedParts(k){return build({...k,_showHidden:true}).parts.filter(p=>p.kind!=='appl')}
@@ -2902,7 +2894,8 @@ function pedSvg(k,ps,view){ // чертеж: front (x–z), side (y–z, отл�
   for(const p of order){const b=p.box,x0=b[ax[0]],x1=b[ax[0]+1],y0=b[ax[1]],y1=b[ax[1]+1],on=p.key===pedSel||pedMulti.has(p.key),dr=!p.gsh&&(p.kind==='door'||p.kind==='alu'||p.kind==='glass');
     const col=on?'#f0b429':p.kind==='back'?'#c9a27a':dr?mat(p.m).color:p.kind==='drawer'?'#e4ddd0':'#d8d2c7';
     const st=p.kind==='virt'?`fill:none;stroke:${on?'#b4472c':'#2f7fc1'};stroke-width:${on?3:2};stroke-dasharray:7 5;vector-effect:non-scaling-stroke;cursor:pointer`:`fill:${col};fill-opacity:${on?(dr?.5:.9):dr?.55:.9};stroke:${on?'#b4472c':'#4a555c'};stroke-width:${on?2.5:1};vector-effect:non-scaling-stroke;cursor:pointer`;
-    if(view==='top'&&p.pl)g+=`<polygon data-pk="${esc(p.key)}" points="${p.pl.map(([x,y])=>x+','+y).join(' ')}" style="${st}"><title>${esc(p.name)} ${fmt(p.L)} × ${fmt(p.Wd)}</title></polygon>`;
+    if(view==='front'&&p.fp)g+=`<polygon data-pk="${esc(p.key)}" points="${p.fp.map(([u,v])=>u+','+Y(v)).join(' ')}" style="${st}"><title>${esc(p.name)} ${fmt(p.L)} × ${fmt(p.Wd)}</title></polygon>`;
+    else if(view==='top'&&p.pl)g+=`<polygon data-pk="${esc(p.key)}" points="${p.pl.map(([x,y])=>x+','+y).join(' ')}" style="${st}"><title>${esc(p.name)} ${fmt(p.L)} × ${fmt(p.Wd)}</title></polygon>`;
     else g+=`<rect data-pk="${esc(p.key)}" x="${x0}" y="${Math.min(Y(y0),Y(y1))}" width="${Math.max(.5,x1-x0)}" height="${Math.max(.5,y1-y0)}" style="${st}"><title>${esc(p.name)} ${fmt(p.L)} × ${fmt(p.Wd)}</title></rect>`+
       (p.kind==='virt'?`<rect data-pk="${esc(p.key)}" x="${x0}" y="${Math.min(Y(y0),Y(y1))}" width="${Math.max(.5,x1-x0)}" height="${Math.max(.5,y1-y0)}" style="fill:none;stroke:#000;stroke-opacity:0;stroke-width:16;vector-effect:non-scaling-stroke;pointer-events:stroke;cursor:pointer"><title>${esc(p.name)}</title></rect>`:'')}
   if(view==='front')for(const c of pedCells){const r=pedCell(k,ps,c.cx,c.cz);if(!r)continue;const f2=fs*.8;
@@ -2920,6 +2913,10 @@ function renderPed(){const sc=[$('#pedList')?.scrollTop||0,$('#pedCol')?.scrollT
 function pedLinkKeys(k){ // старите умни рафтове/чекмеджета — запомнят между кои страници/делители са
   if(!(k.pAdd||[]).some(a=>(a.smart===true||a.smart==='drs'||a.smart==='dor')&&!a.lk))return;const ps=pedParts(k);
   (k.pAdd||[]).forEach((a,i)=>{if(!(a.smart===true||a.smart==='drs'||a.smart==='dor')||a.lk)return;const p=ps.find(q=>q.key==='+#'+i);if(!p)return;const zc=a.smart==='drs'?+a.cz:(p.box[4]+p.box[5])/2,xc=a.smart==='drs'?+a.cx:(p.box[0]+p.box[1])/2,r=pedCell(k,ps.filter(q=>q.grp!==i),xc,zc);if(r){a.lk=r.L.key;a.rk=r.R.key}})}
+function fcutHtml(k){const fc=k.fcut||{},inp=(key,c,ph)=>`<input class="f" type="number" min="0" step="1" data-fc="${key}" data-fk="${c}" placeholder="${ph}" value="${fc[key]&&+fc[key][c]>0?+fc[key][c]:''}" style="width:100%;font-family:var(--f-mono)">`;
+  return `<div style="padding:10px 12px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px"><b style="font-size:13px" title="Колко навътре по хоризонталния ръб и колко по вертикалния — оттам до там се реже. Ъгълът се смята сам; ако го зададеш, хоризонталата остава, вертикалата се сменя.">Скосявания (от всеки ъгъл) <span style="color:var(--muted);font-weight:400;cursor:help">ⓘ</span></b>
+    <div style="display:grid;grid-template-columns:auto 1fr 1fr 70px;gap:4px 6px;align-items:center;font-size:12px"><span></span><span style="color:var(--muted)">по хоризонтала</span><span style="color:var(--muted)">по вертикала</span><span style="color:var(--muted)">ъгъл °</span>
+    ${FCN.map(([key,nm])=>`<span>${nm}</span>${inp(key,'x','0')}${inp(key,'y','0')}<input class="f" type="number" min="0" max="90" step="0.5" data-fc="${key}" data-fk="a" placeholder="—" value="${fc[key]?fcAng({x:+fc[key].x||0,y:+fc[key].y||0}):''}" style="width:100%;font-family:var(--f-mono)">`).join('')}</div></div>`}
 function renderPed0(){const k=cab(pedK),el=$('#ped');if(!k){closePed();return}pedLinkKeys(k);const ps=pedParts(k),p=ps.find(q=>q.key===pedSel),o=(k.pOv||{})[pedSel]||{};
   const f=(lbl,id,v,ex='')=>`<label style="display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--muted)">${lbl}<input class="f" type="number" data-pe="${id}" value="${v}" ${ex} style="font-family:var(--f-mono)"></label>`;
   let form='';
@@ -2957,6 +2954,7 @@ function renderPed0(){const k=cab(pedK),el=$('#ped');if(!k){closePed();return}pe
       ${a&&(a.smart==='dv'||a.smart===true&&a.hd)?`<label class="tog" style="grid-column:1/-1;color:var(--fg)"><input type="checkbox" data-pe="virt" ${a.virt?'checked':''}> Виртуален — само помощна линия (0 мм, не влиза в разкроя)</label>`:''}
       <div style="grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap">${a?'':`<button class="btn sm" data-pa="reset" ${pedSel&&(k.pOv||{})[pedSel]?'':'disabled'}>↺ Върни</button>`}${a&&(a.smart==='drs'||a.smart==='dor')?'':a&&a.smart===true?'<button class="btn sm primary" data-pa="copy" title="Нов над този — светлото се мери от него">'+(a.hd?'+ Делител над него':'+ Рафт над него')+'</button>':'<button class="btn sm" data-pa="copy">Копие (+100 нагоре)</button>'}${a||!o.hide?'<button class="btn sm sure" data-pa="del" title="Delete">Изтрий</button>':''}</div></div>`}
   if(pedMulti.size>1)form=`<div style="margin:8px 12px 0;padding:6px 10px;border-radius:6px;background:var(--field);font-size:12.5px"><b>Маркирани ${pedMulti.size} детайла</b> — промените важат за всички (Ctrl + клик добавя/маха)</div>`+form;
+  if(k.type==='wpanel'&&!pedCells.length&&p&&!p.added)form+=fcutHtml(k); // скосяванията на панела — само тук
   el.innerHTML=`<div id="pedHd" title="Хвани и влачи, за да преместиш прозореца" style="position:relative;display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap;cursor:move;user-select:none;background:var(--field)"><b>⠿</b><b style="font-family:var(--f-display);font-size:16px">Детайли · ${esc(k.name)}</b><button class="btn sm" data-pa="help" title="Пояснения" aria-expanded="${pedHelp}" style="width:26px;height:26px;padding:0;border-radius:50%;font-weight:700;${pedHelp?'background:var(--accent);color:#fff;border-color:var(--accent)':''}">?</button><div id="pedHelp" ${pedHelp?'':'hidden'} style="position:absolute;top:calc(100% - 4px);left:40px;z-index:20;max-width:min(560px,80vw);background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:10px 14px;font-size:13px;line-height:1.5;cursor:auto;user-select:text"><ul style="margin:0;padding-left:18px"><li>Кликни детайл в чертежа или в списъка (Ctrl + клик — няколко детайла наведнъж).</li><li>Кликни празното в секция (отметката „Врати“ махната), за да я избереш — Ctrl + клик за много секции.</li><li>Delete трие маркирания детайл.</li><li>Колелцето — зум, влачене — местене, двоен клик — целия чертеж.</li></ul></div>
       <label class="tog" style="margin-left:auto"><input type="checkbox" id="pedDr" ${pedDoors?'checked':''}> Врати</label><button class="btn sm" data-pa="close">Затвори</button></div>
     <div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) min(380px,40vw);">
@@ -3020,7 +3018,10 @@ function pedEdit(k,f,v){ // една промяна върху маркиран�
     if(f==='L')o.dL=+v-b.L;else if(f==='Wd')o.dW=+v-b.Wd;else if(f==='name')o.name=v&&v!==b.name?v:undefined;else if(f==='m')o.m=v!==b.m?v:undefined;else if(f==='hide')o.hide=v||undefined;else o[f]=+v||undefined;
     for(const q in o)if(o[q]===undefined||o[q]===0)delete o[q];if(Object.keys(o).length)k.pOv[pedSel]=o;else delete k.pOv[pedSel];}
 }
-$('#ped').addEventListener('change',e=>{const k=cab(pedK),t=e.target;if(t.id==='pedDr')return;if(!k||!t.dataset.pe||!pedSel)return;const f=t.dataset.pe,v=t.type==='checkbox'?t.checked:t.value;pushUndo();
+$('#ped').addEventListener('change',e=>{const k=cab(pedK),t=e.target;if(t.id==='pedDr')return;
+  if(k&&t.dataset.fc){const key=t.dataset.fc,c=t.dataset.fk,v=t.value;pushUndo();k.fcut=JSON.parse(JSON.stringify(k.fcut||{}));const q=k.fcut[key]=k.fcut[key]||{}; // скосяване на панела
+    if(c==='a'){const a=+v;if(v!==''&&a>0&&a<90){if(!(+q.x>0))q.x=100;q.y=Math.round(+q.x*Math.tan(a*Math.PI/180)*10)/10}else if(v===''||a<=0){q.x=0;q.y=0}}else q[c]=v===''?0:Math.max(0,+v);
+    P.example=false;changed(false);renderPed();rebuild3D();return}if(!k||!t.dataset.pe||!pedSel)return;const f=t.dataset.pe,v=t.type==='checkbox'?t.checked:t.value;pushUndo();
   const keys=pedMulti.size>1?[...pedMulti]:[pedSel],cur=pedSel;for(const key of keys){pedSel=key;pedEdit(k,f,v)}pedSel=cur; // маркирани няколко — промяната важи за всички
   P.example=false;changed(false);renderPed();renderEditor()});
 { // зум с колелцето (към курсора), местене с влачене (ляв/десен/среден бутон), двоен клик — целия чертеж
