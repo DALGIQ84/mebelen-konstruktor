@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 20:45 · гръб под прозореца</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 20:55 · гръб цял, зарязва се</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -941,9 +941,10 @@ function buildRaw(k){
   if(k.type==='splash'){ // гръб на кухнята — панел на стената над плота
     const tt=+mat(k.mf).t||10,off=+k.off||0,wins=k.wall!=null?exItems(P.room.items).filter(it=>it.wall===k.wall&&it.type==='window'&&it.z<H-1&&it.off<off+W&&it.off+it.w>off).map(it=>[clamp(it.off-off,0,W),clamp(it.off+it.w-off,0,W),Math.max(c,it.z)]):[]; // под прозореца гърбът е по-нисък
     if(!wins.length)add('Гръб кухня',W,H-c,k.mf,[1,0,0,0],[0,W,0,tt,c,H],'top');
-    else{const xs=[...new Set([0,W,...wins.flatMap(w=>[w[0],w[1]])])].sort((a,b)=>a-b);let cut=0;
-      for(let i=0;i+1<xs.length;i++){const a0=xs[i],a1=xs[i+1];if(a1-a0<1)continue;const m=(a0+a1)/2,top=Math.min(H,...wins.filter(w=>w[0]<=m&&w[1]>=m).map(w=>w[2]));if(top<H)cut++;if(top-c<20)continue;add('Гръб кухня',a1-a0,top-c,k.mf,[1,0,0,0],[a0,a1,0,tt,c,top],'top')}
-      if(cut)warn.push('Гърбът е изрязан под прозореца — на парчета: под прозореца е до парапета.')}
+    else{add('Гръб кухня',W,H-c,k.mf,[1,0,0,0],[0,W,0,tt,c,H],'top');parts.at(-1).noDraw=true; // в разкроя — цяло парче (зарязва се на място)
+      const xs=[...new Set([0,W,...wins.flatMap(w=>[w[0],w[1]])])].sort((a,b)=>a-b);
+      for(let i=0;i+1<xs.length;i++){const a0=xs[i],a1=xs[i+1];if(a1-a0<1)continue;const m=(a0+a1)/2,top=Math.min(H,...wins.filter(w=>w[0]<=m&&w[1]>=m).map(w=>w[2]));if(top-c<20)continue;add('Гръб кухня',a1-a0,top-c,k.mf,[0,0,0,0],[a0,a1,0,tt,c,top],'vis')} // в картинката — изрязан под прозореца
+      warn.push(`Гърбът е цяло парче ${Math.round(W)} × ${Math.round(H-c)} — под прозореца се зарязва на място (в картинката е показан изрязан).`)}
     finishParts(k,parts);return{parts,warn,Dk};
   }
   if(k.type==='top'){ // плот — върху шкафовете, от стената навън
@@ -1681,7 +1682,7 @@ function rebuild3D(){
       if(p.kind==='appl'){applFront(g,p,M,k.id);continue}
       if((!showDoors||(k.hideD&&!noHideD))&&(p.kind==='door'||p.kind==='alu'||p.kind==='glass')&&!p.gsh)continue; // скрити врати — само за картинката
       const [x0,x1,y0,y1,z0,z1]=p.box;
-      if(p.kind==='virt')continue; // виртуален делител — само помощна линия
+      if(p.kind==='virt'||p.noDraw)continue; // виртуален делител — само помощна линия; цял гръб, показан изрязан
       const gc=p.kind==='glass'?GLCOL[p.glc||String(p.m).replace('__glass_','')]:null,pm=gc&&p.glc&&p.glc!=='clear'?{...mat(p.m),color:gc[1]}:mat(p.m),op=p.kind==='glass'?(gc?gc[2]:.3):1,tx=p.kind!=='hw'&&!p.fr&&!p.pl&&pm.tex;
       let mesh;
       if(p.pl){const sh=new THREE.Shape(p.pl.map(([u,v])=>new THREE.Vector2(u*M,v*M)));mesh=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:(z1-z0)*M,bevelEnabled:false}),meshMat(pm.texAvg||pm.color,op));mesh.rotation.x=Math.PI/2;mesh.position.set(0,z1*M,0);g.add(mesh)} // скосен детайл — многоъгълник в плана
@@ -2101,7 +2102,7 @@ function wallSvg(){
         b.parts.filter(p=>p.name==='Страница до пода').map(p=>`<rect x="${k.off+p.box[0]}" y="${-k.c}" width="${p.box[1]-p.box[0]}" height="${k.c}" style="fill:${mat(k.mc).color};stroke:var(--fg);stroke-width:1;vector-effect:non-scaling-stroke"/>`).join('')+
         `<rect x="${k.off}" y="${-k.H}" width="${k.W}" height="${k.H-k.c}" style="fill:${mat(k.mc).color};filter:brightness(.72)"/>`; // вътрешността (сянка)
       // корпусът детайл по детайл — вижда се, където няма врати (делители, рафтове, дъно, бленди…); отзад напред
-      for(const p of b.parts.filter(p=>p.kind!=='door'&&p.kind!=='hw'&&p.name!=='Страница до пода').sort((a,c)=>a.box[3]-c.box[3])){const[x0,x1,y0,y1,z0,z1]=p.box;if(x1-x0<=0||z1-z0<=0)continue;
+      for(const p of b.parts.filter(p=>p.kind!=='door'&&p.kind!=='hw'&&!p.noDraw&&p.name!=='Страница до пода').sort((a,c)=>a.box[3]-c.box[3])){const[x0,x1,y0,y1,z0,z1]=p.box;if(x1-x0<=0||z1-z0<=0)continue;
         if(p.kind==='appl'){s+=`<rect x="${k.off+x0}" y="${-z1}" width="${x1-x0}" height="${z1-z0}" style="fill:#2a2e31;stroke:var(--fg);stroke-width:.8;vector-effect:non-scaling-stroke"/>`+(p.ap==='oven'?`<rect x="${k.off+x0+15}" y="${-z1+Math.min(95,(z1-z0)*.18)+15}" width="${x1-x0-30}" height="${(z1-z0)-Math.min(95,(z1-z0)*.18)-30}" style="fill:#16191b;stroke:#8a959b;stroke-width:.6;vector-effect:non-scaling-stroke"/><line x1="${k.off+x0+(x1-x0)*.12}" y1="${-z1+Math.min(95,(z1-z0)*.18)+28}" x2="${k.off+x1-(x1-x0)*.12}" y2="${-z1+Math.min(95,(z1-z0)*.18)+28}" style="stroke:#c5cacd;stroke-width:3;vector-effect:non-scaling-stroke"/>`:`<rect x="${k.off+x1-Math.min(120,(x1-x0)*.22)}" y="${-z1}" width="${Math.min(120,(x1-x0)*.22)}" height="${z1-z0}" style="fill:#c5cacd"/>`)+`<text x="${k.off+(x0+x1)/2}" y="${-(z0+z1)/2}" dy=".35em" text-anchor="middle" font-size="${fs*0.45}" font-family="IBM Plex Sans,sans-serif" style="fill:#fff">${p.ap==='oven'?'фурна':'микровълнова'}</text>`;continue}
         if(p.fr){s+=`<polygon points="${miterPts(p.fr).map(([u,v])=>(k.off+u)+','+(-v)).join(' ')}" style="fill:${mat(p.m).color};stroke:var(--fg);stroke-width:.6;vector-effect:non-scaling-stroke"/>`;continue}
         const back=/Гръб/.test(p.name);s+=`<rect x="${k.off+x0}" y="${-z1}" width="${x1-x0}" height="${z1-z0}" style="fill:${p.kind==='glass'&&p.glc&&p.glc!=='clear'&&GLCOL[p.glc]?GLCOL[p.glc][1]:mat(p.m).color};${p.kind==='glass'?'fill-opacity:'+(!p.glc||p.glc==='clear'?.35:.75)+';':''}${back?'filter:brightness(.8);':''}stroke:var(--fg);stroke-width:.6;stroke-opacity:.7;vector-effect:non-scaling-stroke"/>`}
