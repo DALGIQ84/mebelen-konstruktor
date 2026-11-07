@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 20:35 · без подпрозоречна дъска</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 20:45 · гръб под прозореца</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -939,7 +939,11 @@ function buildRaw(k){
     if(cornerMirror(k))for(const p of all){const[x0,x1,...r]=p.box;p.box=[W-x1,W-x0,...r];if(p.sd)p.sd=p.sd==='L'?'R':'L'} // огледален — рамо Б отдясно
     return{parts:all,warn:[...ra.warn,...rb.warn],Dk}}
   if(k.type==='splash'){ // гръб на кухнята — панел на стената над плота
-    const tt=+mat(k.mf).t||10;add('Гръб кухня',W,H-c,k.mf,[1,0,0,0],[0,W,0,tt,c,H],'top');
+    const tt=+mat(k.mf).t||10,off=+k.off||0,wins=k.wall!=null?exItems(P.room.items).filter(it=>it.wall===k.wall&&it.type==='window'&&it.z<H-1&&it.off<off+W&&it.off+it.w>off).map(it=>[clamp(it.off-off,0,W),clamp(it.off+it.w-off,0,W),Math.max(c,it.z)]):[]; // под прозореца гърбът е по-нисък
+    if(!wins.length)add('Гръб кухня',W,H-c,k.mf,[1,0,0,0],[0,W,0,tt,c,H],'top');
+    else{const xs=[...new Set([0,W,...wins.flatMap(w=>[w[0],w[1]])])].sort((a,b)=>a-b);let cut=0;
+      for(let i=0;i+1<xs.length;i++){const a0=xs[i],a1=xs[i+1];if(a1-a0<1)continue;const m=(a0+a1)/2,top=Math.min(H,...wins.filter(w=>w[0]<=m&&w[1]>=m).map(w=>w[2]));if(top<H)cut++;if(top-c<20)continue;add('Гръб кухня',a1-a0,top-c,k.mf,[1,0,0,0],[a0,a1,0,tt,c,top],'top')}
+      if(cut)warn.push('Гърбът е изрязан под прозореца — на парчета: под прозореца е до парапета.')}
     finishParts(k,parts);return{parts,warn,Dk};
   }
   if(k.type==='top'){ // плот — върху шкафовете, от стената навън
