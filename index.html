@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 23:25 · нощно шкафче — гръб</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 23:35 · нощно шкафче — кутии</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1205,7 +1205,7 @@ function parts_hw(add,name,box){add(name,0,0,'k2',[0,0,0,0],box,'hw')}
 
 /* ---------- Списък детайли ---------- */
 
-const NS_T=[['dr','Чекмедже'],['door','Врата'],['open','Ниша (отворено)'],['flap','Падаща клапа']];
+const NS_T=[['dr','Чекмедже'],['door','Врата'],['open','Ниша'],['flap','Клапа']];
 const nsSecs=k=>Array.isArray(k.nsSecs)&&k.nsSecs.length?k.nsSecs:[{t:'dr'},{t:'dr'}];
 function nsGeom(k){ // нощно шкафче: къде е корпусът
   const T=+mat(k.mc).t||18,H=+k.H,mt=k.nsMount||'legs',z0=Math.max(0,+(k.nsLeg??(mt==='wall'?400:mt==='plinth'?80:100)));
@@ -1235,7 +1235,7 @@ function buildNstand(k){const S=P.settings,parts=[],warn=[],add=(name,L,Wd,m,e,b
   sc.forEach((q,i)=>{const[zb,zt2]=bnd[i],f0=zb+fu/2,f1=zt2-fu/2,hh=f1-f0;if(hh<40&&q.t!=='open'){warn.push(`Секция ${i+1} е твърде ниска.`);return}
     if(q.t==='door'){add('Врата',hh,W-fu,k.mf,[1,1,1,1],[fu/2,W-fu/2,yF,yF+tF,f0,f1],'door');parts.at(-1).hg=k.nsHinge||'L';nDoor++}
     else if(q.t==='flap'){add('Клапа',hh,W-fu,k.mf,[1,1,1,1],[fu/2,W-fu/2,yF,yF+tF,f0,f1],'door');warn.push(`Секция ${i+1}: падаща клапа — панти и механизъм (ограничител) за клапа.`)}
-    else if(q.t==='dr'){const iz=inner(i),cc=sc[i+1]&&sc[i+1].t==='dr'?zb:iz.lo;buildDrawers(k,{S,T,tF,W,H,c:Math.max(iz.lo,cc)-T,Dk,bIn,Wi:W-2*T,add,warn},{hs:[hh],z1:f1,zMax:sc[i-1]&&sc[i-1].t==='dr'?zt2:iz.hi});nDr++}});
+    else if(q.t==='dr'){const iz=inner(i),cc=sc[i+1]&&sc[i+1].t==='dr'?zb:iz.lo,kk={...k,bh:[+q.bh>0?+q.bh:null],bhAll:0};buildDrawers(kk,{S,T,tF,W,H,c:Math.max(iz.lo,cc)-T,Dk,bIn,Wi:W-2*T,add,warn},{hs:[hh],z1:f1,zMax:sc[i-1]&&sc[i-1].t==='dr'?zt2:iz.hi});nDr++}});
   if(nDoor)warn.push(`Вратата е с панти ${(k.nsHinge||'L')==='L'?'отляво':'отдясно'}.`);
   finishParts(k,parts);return{parts,warn,Dk}}
 function bedDims(k){ // размерите на леглото от матрака — W, D и H на обекта се смятат сами
@@ -1393,7 +1393,8 @@ function renderEditor(){
       return `<label>Височина на кутиите (за всички), мм<input id="f_bhAll" data-bh="all" type="number" step="1" placeholder="чело − ${sl.hOff}" value="${+k.bhAll>0?k.bhAll:''}"></label>
         <div class="full" style="grid-column:1/-1;display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)">Отделно за всяко чекмедже (отгоре надолу), мм<div style="display:grid;grid-template-columns:repeat(${Math.min(4,Math.max(1,k.dr|0))},1fr);gap:6px">${fh.hs.map((h,i)=>`<input id="f_bh${i}" data-bh="${i}" type="number" step="1" placeholder="${fmt(+k.bhAll>0?+k.bhAll:Math.max(50,h-sl.hOff))}" value="${bs(i)?k.bh[i]:''}" aria-label="Кутия ${i+1}">`).join('')}</div><span>Празно поле взима общата височина, а ако и тя е празна — челото − ${sl.hOff} мм.</span></div>`}
     if(t==='nssecs'){const sc=nsSecs(k);return `<div class="full" style="grid-column:1/-1;display:flex;flex-direction:column;gap:5px"><div class="sub" style="margin:4px 0 0">${l}</div>
-      ${sc.map((q,i)=>`<div style="display:grid;grid-template-columns:22px 1fr 96px 30px;gap:6px;align-items:center"><span style="color:var(--muted);font-size:12px">${i+1}.</span><select data-nss="${i}" data-nsk="t">${NS_T.map(([v,tt])=>`<option value="${v}" ${q.t===v?'selected':''}>${tt}</option>`).join('')}</select><input type="number" min="0" data-nss="${i}" data-nsk="h" value="${+q.h>0?+q.h:''}" placeholder="равно" title="Височина на секцията (с фугата), мм — празно = равно"><button class="btn sm" data-nsdel="${i}" title="Махни секцията" ${sc.length<2?'disabled':''}>×</button></div>`).join('')}
+      <div style="display:grid;grid-template-columns:16px minmax(0,1fr) 72px 72px 26px;gap:6px;font-size:11px;color:var(--muted)"><span></span><span>секция</span><span>височина</span><span>${sc.some(q=>q.t==='dr')?'кутия (вътр.)':''}</span><span></span></div>
+      ${sc.map((q,i)=>`<div style="display:grid;grid-template-columns:16px minmax(0,1fr) 72px 72px 26px;gap:6px;align-items:center"><span style="color:var(--muted);font-size:12px">${i+1}.</span><select data-nss="${i}" data-nsk="t">${NS_T.map(([v,tt])=>`<option value="${v}" ${q.t===v?'selected':''}>${tt}</option>`).join('')}</select><input type="number" min="0" data-nss="${i}" data-nsk="h" value="${+q.h>0?+q.h:''}" placeholder="равно" title="Височина на секцията (с фугата), мм — празно = равно">${q.t==='dr'?`<input type="number" min="0" data-nss="${i}" data-nsk="bh" value="${+q.bh>0?+q.bh:''}" placeholder="авто" title="Височина на кутията (вътрешната част) на чекмеджето, мм — празно = авто (чело − отстъпа на водачите)">`:'<span></span>'}<button class="btn sm" data-nsdel="${i}" title="Махни секцията" ${sc.length<2?'disabled':''}>×</button></div>`).join('')}
       <div><button class="btn sm" data-nsadd="1">+ Секция</button> <span style="font-size:11.5px;color:var(--muted)">височина празно = равно разпределена</span></div></div>`}
     if(t==='liftInfo')return `<div id="liftInfo" class="full" style="grid-column:1/-1;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:2px">${liftInfoHtml(k)}</div>`;
     if(t==='slideW'){const cur=(P.settings.slides.find(q=>q.id===k.wSlide)||P.settings.slides.find(q=>q.kind==='side')||P.settings.slides[0]||{}).id;return `<label>${l}<select id="${id}" data-f="wSlide">${P.settings.slides.map(q=>`<option value="${q.id}" ${q.id===cur?'selected':''}>${esc(q.name)}</option>`).join('')}</select></label>`}
@@ -1449,7 +1450,7 @@ $('#ed').addEventListener('input',e=>{
   if(e.target.dataset.dh!==undefined){const k=cab(sel),i=+e.target.dataset.dh;k.dh=k.dh||[];const v=e.target.value;k.dh[i]=v===''?null:+v;
     const fh=frontHeights(k),sl=slideOf(k);const r=$('#dhReal');if(r)r.textContent='Челата в детайлите: '+fh.hs.map(fmt).join(' · ');fh.hs.forEach((h,j)=>{const inp=$('#f_dh'+j);if(inp)inp.placeholder='авто '+fmt(fh.nom[j]);const b=$('#f_bh'+j);if(b)b.placeholder=fmt(+k.bhAll>0?+k.bhAll:Math.max(50,h-sl.hOff))});P.example=false;changed(false);return}
   if(e.target.dataset.nss!==undefined){const k=cab(sel);if(!k)return;k.nsSecs=nsSecs(k).map(q=>({...q}));const q=k.nsSecs[+e.target.dataset.nss],key=e.target.dataset.nsk,v=e.target.value;
-    if(key==='t'){pushUndo();q.t=v;P.example=false;changed(true);return}q.h=v===''?0:Math.max(0,+v);P.example=false;changed(false);return}
+    if(key==='t'){pushUndo();q.t=v;P.example=false;changed(true);return}q[key]=v===''?0:Math.max(0,+v);P.example=false;changed(false);return}
   if(e.target.dataset.bh==='all'){const k=cab(sel);k.bhAll=e.target.value===''?0:+e.target.value;const sl=slideOf(k),fh=frontHeights(k);
     fh.hs.forEach((h,j)=>{const b=$('#f_bh'+j);if(b)b.placeholder=fmt(+k.bhAll>0?+k.bhAll:Math.max(50,h-sl.hOff))});P.example=false;changed(false);return}
   if(e.target.dataset.bh!==undefined){const k=cab(sel),i=+e.target.dataset.bh;k.bh=k.bh||[];const v=e.target.value;k.bh[i]=v===''?null:+v;P.example=false;changed(false);return}
