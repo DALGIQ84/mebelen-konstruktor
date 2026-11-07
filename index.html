@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 19:55 · покажи вратата</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 20:05 · прозорец</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1534,7 +1534,7 @@ function renderItems(){
       <label>${pt?'От началото до центъра':'От началото'}, мм<input id="i_o_${it.id}" data-k="off" type="number" value="${pt?it.off+it.w/2:it.off}"></label>`+
       (pt?`<label>От пода до центъра, мм<input id="i_z_${it.id}" data-k="z" type="number" value="${it.z}"></label>`:
        `<label>Ширина, мм<input id="i_ww_${it.id}" data-k="w" type="number" value="${it.w}"></label>`)+
-      (it.type==='window'?`<label>Височина, мм<input id="i_h_${it.id}" data-k="h" type="number" value="${it.h}"></label><label>Парапет, мм<input id="i_z_${it.id}" data-k="z" type="number" value="${it.z}"></label>`:'')+
+      (it.type==='window'?`<label>Височина, мм<input id="i_h_${it.id}" data-k="h" type="number" value="${it.h}"></label><label>Парапет, мм<input id="i_z_${it.id}" data-k="z" type="number" value="${it.z}"></label><label style="flex-direction:row;align-items:center;gap:6px;display:flex"><input type="checkbox" data-k="leaf" ${it.leaf===false?'':'checked'}> Рамка и стъкло</label><label>Цвят на рамката<input type="color" data-k="col" value="${it.col||'#f4f2ec'}" style="height:32px;padding:2px"></label>`:'')+
       (it.type==='door'?`<label>Височина, мм<input id="i_h_${it.id}" data-k="h" type="number" value="${it.h}"></label><label>Панти<select id="i_hi_${it.id}" data-k="hinge"><option value="L" ${it.hinge==='L'?'selected':''}>от началото</option><option value="R" ${it.hinge==='R'?'selected':''}>от края</option></select></label><label style="flex-direction:row;align-items:center;gap:6px;display:flex"><input type="checkbox" data-k="leaf" ${it.leaf===false?'':'checked'}> Крило и каса</label><label>Цвят<input type="color" data-k="col" value="${it.col||'#c9b28f'}" style="height:32px;padding:2px"></label>`:'')+
       (it.type==='duct'?`<label>Диаметър Ф, мм<input id="i_dd_${it.id}" data-k="dia" type="number" value="${it.w}"></label>`:'')+
       (isBox(it.type)?`<label>Височина, мм<input id="i_h_${it.id}" data-k="h" type="number" value="${it.h}"></label><label>От пода, мм<input id="i_z_${it.id}" data-k="z" type="number" value="${it.z}"></label><label>Дълбочина, мм<input id="i_d_${it.id}" data-k="d" type="number" value="${it.d}"></label>`:'')+
@@ -1631,7 +1631,12 @@ function rebuild3D(){
     const wmi=wallMat(i,wm),wo=wtex(i);
     const piece=(a,b,z0,z1)=>{if(b-a>1&&z1-z0>1){const ms=boxAt(g,(b-a)*M,(z1-z0)*M,t,(a+b)/2*M,(z0+z1)/2*M,-t/2,wmi);if(wo&&wo.tex)wallUV(ms.geometry,0,0,0,wo,(a+b)/2,(z0+z1)/2)}};
     for(const o of ops){piece(s,o.s0,0,R.h);piece(o.s0,o.s1,0,o.z);piece(o.s0,o.s1,o.z+o.h,R.h);
-      if(o.type==='window')boxAt(g,(o.s1-o.s0)*M,o.h*M,0.006,(o.s0+o.s1)/2*M,(o.z+o.h/2)*M,-t/2,glass);
+      if(o.type==='window'&&o.leaf!==false){const fw=70,ww=o.s1-o.s0,fm=meshMat(o.col||'#f4f2ec'),cx=(o.s0+o.s1)/2,fr=[]; // рамка (PVC/дърво) + стъкло; при широк прозорец — среден профил
+        const gl=boxAt(g,ww*M,o.h*M,0.006,cx*M,(o.z+o.h/2)*M,-t/2,glass);gl.userData.rdoor=o.id;
+        fr.push([o.s0+fw/2,fw,o.h,o.z+o.h/2],[o.s1-fw/2,fw,o.h,o.z+o.h/2],[cx,ww,fw,o.z+fw/2],[cx,ww,fw,o.z+o.h-fw/2]);if(ww>900)fr.push([cx,fw,o.h,o.z+o.h/2]);
+        for(const[x,w2,h2,z]of fr){const m=boxAt(g,w2*M,h2*M,0.07,x*M,z*M,-t/2,fm);m.userData.rdoor=o.id}
+        const sl=boxAt(g,(ww+60)*M,0.02,Math.min(300,t/2+60)*M,cx*M,(o.z-10)*M,(Math.min(300,t/2+60)/2-t/2+20)*M,meshMat(o.scol||'#f4f2ec'));sl.userData.rdoor=o.id}
+      if(o.type==='window'&&o.leaf===false){const hm=boxAt(g,(o.s1-o.s0)*M,o.h*M,0.01,(o.s0+o.s1)/2*M,(o.z+o.h/2)*M,-t/2,new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hm.userData.rdoor=o.id}
       if(o.type==='door'&&o.leaf!==false){const dc=o.col||'#c9b28f',fw=60,ww=o.s1-o.s0,lm=meshMat(dc),fm=meshMat(o.fcol||dc); // крило + каса (обков) от вътрешната страна
         const leaf=boxAt(g,(ww-20)*M,(o.h-10)*M,0.04,(o.s0+o.s1)/2*M,(o.h-10)/2*M,-0.02,lm);leaf.userData.rdoor=o.id;
         for(const[cx,wd,hh,cy]of[[o.s0-fw/2+5,fw,o.h+fw-5,(o.h+fw-5)/2],[o.s1+fw/2-5,fw,o.h+fw-5,(o.h+fw-5)/2],[(o.s0+o.s1)/2,ww+2*fw-10,fw,o.h+fw/2-5]]){const m=boxAt(g,wd*M,hh*M,0.012,cx*M,cy*M,0.006,fm);m.userData.rdoor=o.id}
@@ -1901,12 +1906,13 @@ function groupGaps(g){ // общ пълнеж за няколко шкафа н�
   for(const[a,b]of iv){if(b<=a0+1&&b>L){L=b;lW=false}if(a>=a1-1&&a<R){R=a;rW=false}}
   return{l:a0-L,lAt:L,lWall:lW,r:R-a1,rAt:a1,rWall:rW}}
 const DOORCOL=[['#c9b28f','дъб светъл'],['#8a6440','орех'],['#5b3d2a','венге'],['#f4f2ec','бяла'],['#9aa0a3','сива'],['#2f3437','антрацит']];
-function openDoorCtx(itId,x,y){const it=P.room.items.find(q=>q.id===itId);if(!it)return;
-  ctx.innerHTML=`<div class="gh" style="padding:6px 8px;font-weight:600">Врата на стаята</div>`+
-    `<button class="item" data-dctx="tog"><span>${it.leaf===false?'Покажи вратата':'Скрий вратата'}</span><small>${it.leaf===false?'крилото и касата':'остава само отворът'}</small></button>`+
-    `<div style="padding:6px 8px 4px;font-size:12px;color:var(--muted)">Цвят</div><div style="display:flex;gap:6px;flex-wrap:wrap;padding:0 8px 8px">`+
-    DOORCOL.map(([c,n])=>`<button data-dcol="${c}" title="${n}" style="width:26px;height:26px;border-radius:6px;border:2px solid ${(it.col||'#c9b28f')===c?'var(--mark)':'var(--line)'};background:${c};cursor:pointer"></button>`).join('')+
-    `<label title="друг цвят" style="width:26px;height:26px;border-radius:6px;border:2px solid var(--line);overflow:hidden;cursor:pointer;display:inline-block"><input type="color" data-dcolp value="${it.col||'#c9b28f'}" style="width:40px;height:40px;margin:-6px;border:0;padding:0;cursor:pointer"></label></div>`;
+const WINCOL=[['#f4f2ec','бял'],['#3a3f42','антрацит'],['#b98a4e','златен дъб'],['#7a5232','орех'],['#1e2022','черен'],['#9aa0a3','сив']];
+function openDoorCtx(itId,x,y){const it=P.room.items.find(q=>q.id===itId);if(!it)return;const win=it.type==='window',PAL=win?WINCOL:DOORCOL,dc=win?'#f4f2ec':'#c9b28f';
+  ctx.innerHTML=`<div class="gh" style="padding:6px 8px;font-weight:600">${win?'Прозорец':'Врата на стаята'}</div>`+
+    `<button class="item" data-dctx="tog"><span>${it.leaf===false?(win?'Покажи прозореца':'Покажи вратата'):(win?'Скрий прозореца':'Скрий вратата')}</span><small>${it.leaf===false?(win?'рамката и стъклото':'крилото и касата'):'остава само отворът'}</small></button>`+
+    `<div style="padding:6px 8px 4px;font-size:12px;color:var(--muted)">${win?'Цвят на рамката':'Цвят'}</div><div style="display:flex;gap:6px;flex-wrap:wrap;padding:0 8px 8px">`+
+    PAL.map(([c,n])=>`<button data-dcol="${c}" title="${n}" style="width:26px;height:26px;border-radius:6px;border:2px solid ${(it.col||dc)===c?'var(--mark)':'var(--line)'};background:${c};cursor:pointer"></button>`).join('')+
+    `<label title="друг цвят" style="width:26px;height:26px;border-radius:6px;border:2px solid var(--line);overflow:hidden;cursor:pointer;display:inline-block"><input type="color" data-dcolp value="${it.col||dc}" style="width:40px;height:40px;margin:-6px;border:0;padding:0;cursor:pointer"></label></div>`;
   ctx.hidden=false;const w=ctx.offsetWidth,h=ctx.offsetHeight;ctx.style.left=Math.min(x,innerWidth-w-8)+'px';ctx.style.top=Math.min(y,innerHeight-h-8)+'px';ctx.dataset.id='';ctx.dataset.door=itId}
 const setDoor=(f)=>{const it=P.room.items.find(q=>q.id===ctx.dataset.door);if(!it)return;pushUndo();f(it);P.example=false;save();rebuild3D();renderPlan();if(typeof renderItems==='function')try{renderItems()}catch(e){}};
 ctx.addEventListener('click',e=>{const b=e.target.closest('[data-dctx],[data-dcol]');if(!b||!ctx.dataset.door)return;e.stopPropagation();
