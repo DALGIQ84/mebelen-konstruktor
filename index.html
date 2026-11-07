@@ -147,7 +147,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 19:15 · записване в папка</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 19:25 · меню Файл</span></small></div>
   <div class="dd" id="ddKit"><button class="btn primary" id="bKit" aria-haspopup="true" aria-expanded="false">Кухни ▾</button><div class="ddm" id="kitMenu" hidden></div></div><div class="dd" id="ddWard"><button class="btn primary" id="bWard" aria-haspopup="true" aria-expanded="false">Гардероби ▾</button></div>
   <div class="dd"><button class="btn" id="bCut" aria-haspopup="true" aria-expanded="false">Разкрой ▾</button>
     <div class="ddm" id="cutMenu" hidden style="left:auto;right:0">
@@ -160,14 +160,15 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
-      <label class="item" style="cursor:pointer"><span>Отвори проект…</span><small>.json файл от компютъра</small><input type="file" id="openFile" accept=".json,.txt,application/json" hidden></label>
-      <button class="item" id="bSave"><span>Запази проекта <kbd style="font-size:10px;opacity:.6">Ctrl+S</kbd></span><small id="bSaveSm">като файл на компютъра</small></button>
-      <button class="item" id="bSaveAs" hidden><span>Запази като…</span><small>нов файл / друга папка</small></button>
+      <label class="item" id="lOpen" style="cursor:pointer"><span>Отвори проект…<kbd style="font-size:10px;opacity:.6;margin-left:6px">Ctrl+O</kbd></span><small>файл от компютъра</small><input type="file" id="openFile" accept=".json,.txt,application/json" hidden></label>
+      <button class="item" id="bSave"><span>Запази<kbd style="font-size:10px;opacity:.6;margin-left:6px">Ctrl+S</kbd></span><small id="bSaveSm">като файл на компютъра</small></button>
+      <button class="item" id="bSaveAs" hidden><span>Запази като…<kbd style="font-size:10px;opacity:.6;margin-left:6px">Ctrl+Shift+S</kbd></span><small>нов файл / друга папка</small></button>
       <div style="border-top:1px solid var(--line);margin:4px 0"></div>
-      <button class="item" id="fPdf"><span>Запази като PDF</span><small>3D, отгоре, стени, шкафове с детайлите</small></button>
-      <button class="item" id="fInst"><span>Мерителен лист (ВиК и ел.)</span><small>PDF: стаята и точките, без шкафовете</small></button>
+      <button class="item" id="fPdf"><span>PDF за клиента</span><small>3D, отгоре, стени, шкафове с детайлите</small></button>
+      <button class="item" id="fInst"><span>Мерителен лист</span><small>PDF за ВиК и ел.: стаята и точките, без шкафовете</small></button>
       <div style="border-top:1px solid var(--line);margin:4px 0"></div>
-      <button class="item" id="bProj"><span>Име на проекта и пренос</span><small>име на клиента, проект като текст</small></button>
+      <button class="item" id="fName"><span>Име на проекта / клиента</span><small id="fNameSm">излиза на картинките и в PDF-а</small></button>
+      <button class="item" id="bProj"><span>Пренос като текст</span><small>за имейл или за друг компютър</small></button>
       <button class="item" id="fSample"><span>Примерна кухня</span><small>зарежда примера на мястото на текущия</small></button>
     </div></div>
   <button class="btn" id="bUndoAll" title="Назад (Ctrl+Z)" aria-label="Назад">↶</button><button class="btn" id="bRedoAll" title="Напред (Ctrl+Y)" aria-label="Напред">↷</button>
@@ -2951,6 +2952,8 @@ async function saveProj(as){const name=projBase()+'.json',data=JSON.stringify(P)
   if(OFFLINE){plainDownload(name,data);toast('Запазено в „Изтеглени“: '+name);return true}
   return false}
 $('#bSaveAs').onclick=()=>{toggleFile(false);saveProj(true)};
+$('#fName').onclick=()=>{$('#bProj').click();setTimeout(()=>{const n=$('#pjName');if(n){n.focus();n.select()}},50)};
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.code==='KeyO'&&!e.target.matches('input,select,textarea')){e.preventDefault();$('#lOpen').click()}});
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.code==='KeyS'){e.preventDefault();if(OFFLINE)saveProj(e.shiftKey);else $('#bSave').click()}});
 $('#openFile').closest('label').addEventListener('click',async e=>{if(!(FSA&&window.showOpenFilePicker))return;e.preventDefault();toggleFile(false);
   try{const[h]=await showOpenFilePicker({types:pjTypes,id:'mebeli-proj',startIn:'documents'});const t=await (await h.getFile()).text();loadProject(t);projFH=h;$('#bSaveSm').textContent=h.name}catch(err){if(err&&err.name!=='AbortError')toast('Не можах да отворя файла')}});
