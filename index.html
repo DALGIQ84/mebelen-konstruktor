@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 22:20 · скосени панели: PDF, надмярка, DXF</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 22:25 · DXF само скосени</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -172,7 +172,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
       <button class="item" data-cut="csv"><span>Запази като CSV</span><small>отваря се в Excel и се импортира в OptiCut</small></button>
       <button class="item" data-cut="txt"><span>Запази като текст (.txt)</span><small>колони с табулация, като копирането</small></button>
       <div style="border-top:1px solid var(--line);margin:4px 0"></div>
-      <button class="item" data-cut="dxf"><span>DXF за CNC рутера</span><small>контурите на панелите на стената (скосените) · отваря се в AutoCAD и CAM</small></button>
+      <button class="item" data-cut="dxf"><span>DXF за CNC рутера</span><small>само скосените панели · за Aspire и други CAM</small></button>
     </div></div>
   <div class="dd" id="ddKit"><button class="btn primary" id="bKit" aria-haspopup="true" aria-expanded="false">Кухни ▾</button><div class="ddm" id="kitMenu" hidden></div></div><div class="dd" id="ddWard"><button class="btn primary" id="bWard" aria-haspopup="true" aria-expanded="false">Гардероби ▾</button></div>
   <button class="btn" id="bUndoAll" title="Назад (Ctrl+Z)" aria-label="Назад">↶</button><button class="btn" id="bRedoAll" title="Напред (Ctrl+Y)" aria-label="Напред">↷</button>
@@ -2468,7 +2468,7 @@ function cutPanelPages(){const L=cutPanels(),out=[];
   return out}
 const TRL={а:'a',б:'b',в:'v',г:'g',д:'d',е:'e',ж:'zh',з:'z',и:'i',й:'y',к:'k',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'h',ц:'ts',ч:'ch',ш:'sh',щ:'sht',ъ:'a',ь:'y',ю:'yu',я:'ya'};
 const latin=t=>String(t).replace(/[а-яА-Я]/g,ch=>{const l=TRL[ch.toLowerCase()]||'';return ch===ch.toLowerCase()?l:l.charAt(0).toUpperCase()+l.slice(1)}).replace(/[^\x20-\x7e]/g,'');
-function panelsDXF(){const L=P.cabinets.filter(k=>k.type==='wpanel').map(k=>cutPanels().find(o=>o.k===k)||{k,W:+k.W,h:Math.max(20,+k.fpH||700),fp:[[0,0],[+k.W,0],[+k.W,Math.max(20,+k.fpH||700)],[0,Math.max(20,+k.fpH||700)]],ov:0});
+function panelsDXF(){const L=cutPanels().filter(o=>o.cut); // само скосените — правите се режат на циркуляра
   if(!L.length)return '';const e=[],r=v=>Math.round(v*1000)/1000,pl=(lay,pts)=>{e.push('0','POLYLINE','8',lay,'66','1','70','1','10','0','20','0','30','0');for(const[x,y]of pts)e.push('0','VERTEX','8',lay,'10',r(x),'20',r(y),'30','0');e.push('0','SEQEND','8',lay)},
     tx=(x,y,hh,t)=>e.push('0','TEXT','8','TEXT','10',r(x),'20',r(y),'30','0','40',r(hh),'1',latin(t));
   let x=0;for(const o of L){const ox=x+o.ov,oy=o.ov;pl('KONTUR',o.fp.map(([u,v])=>[ox+u,oy+v]));if(o.ov>0)pl('NADMIARKA',[[x,0],[x+o.W+2*o.ov,0],[x+o.W+2*o.ov,o.h+2*o.ov],[x,o.h+2*o.ov]]);
@@ -2840,7 +2840,7 @@ $('#cutMenu').addEventListener('click',async e=>{e.stopPropagation();const b=e.t
   if(a==='copy-all'||a==='copy-cab'){const t=exportText(a==='copy-all'?'all':'cab');if(!t){toast('Няма детайли');return}copyText(t,'Копирано — постави в разкроя');return}
   if(!P.cabinets.length){toast('Няма детайли');return}
   const date=new Date().toISOString().slice(0,10);
-  if(a==='dxf'){const d=panelsDXF();if(!d){toast('Няма панели на стената');return}await saveFile(`${projBase()} CNC ${date}.dxf`,new Blob([d],{type:'application/dxf'}));return}
+  if(a==='dxf'){const d=panelsDXF();if(!d){toast('Няма скосени панели — правите се режат на циркуляра');return}await saveFile(`${projBase()} CNC ${date}.dxf`,new Blob([d],{type:'application/dxf'}));return}
   const ok=a==='csv'?await saveFile(`${projBase()} разкрой ${date}.csv`,exportCSV('all')):await saveFile(`${projBase()} разкрой ${date}.txt`,exportText('all'));
   if(!ok){copyText(exportText('all'),'Запазването на файл не е позволено тук — детайлите са копирани')}});
 function newProject(){projFH=null;$('#bSaveSm').textContent='като файл на компютъра';P={room:{h:P.room.h,t:P.room.t,pts:SHAPES.rect(3600,3000),shape:{kind:'rect',W:3600,L:3000,a:1200,b:1000},items:[]},settings:{...P.settings},materials:P.materials,cabinets:[]};afterLoad()}
