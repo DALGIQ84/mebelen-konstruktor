@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 21:55 · размери на скосяванията</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 22:00 · прозорец „Скосявания“</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2884,10 +2884,11 @@ $('#pedOv').onclick=()=>closePed();
 function pedParts(k){return build({...k,_showHidden:true}).parts.filter(p=>p.kind!=='appl')}
 function pedBase(k,key){const ov={...(k.pOv||{})};delete ov[key];return build({...k,pOv:ov,_showHidden:true}).parts.find(p=>p.key===key)}
 function pedSvg(k,ps,view){ // чертеж: front (x–z), side (y–z, отляво), top (x–y, отгоре)
-  const vis=ps.filter(p=>!p.hidden&&(pedDoors||p.gsh||(p.kind!=='door'&&p.kind!=='alu'&&p.kind!=='glass'))&&p.kind!=='hw'||p.key===pedSel&&!p.hidden);
+  const vis=view==='cuts'?ps.filter(p=>p.fp&&!p.hidden):ps.filter(p=>!p.hidden&&(pedDoors||p.gsh||(p.kind!=='door'&&p.kind!=='alu'&&p.kind!=='glass'))&&p.kind!=='hw'||p.key===pedSel&&!p.hidden);
+  const CU=view==='cuts';if(CU)view='front'; // „Скосявания“ — същият изглед отпред, но само с размерите на срезовете
   const ax=view==='front'?[0,4,2]:view==='side'?[2,4,0]:[0,2,4]; // [хоризонтална, вертикална, дълбочина]
   if(!ps.length)return'';const bb=[1e9,-1e9,1e9,-1e9];for(const p of ps){const b=p.box;bb[0]=Math.min(bb[0],b[ax[0]]);bb[1]=Math.max(bb[1],b[ax[0]+1]);bb[2]=Math.min(bb[2],b[ax[1]]);bb[3]=Math.max(bb[3],b[ax[1]+1])}
-  const zm=pedZ[view]||{k:1,dx:0,dy:0},flipY=view!=='top',w=bb[1]-bb[0],h=bb[3]-bb[2],pad=Math.max(w,h)*0.12,fs=Math.max(w,h)*0.035/Math.sqrt(zm.k);
+  const zm=pedZ[CU?'cuts':view]||{k:1,dx:0,dy:0},flipY=view!=='top',w=bb[1]-bb[0],h=bb[3]-bb[2],pad=Math.max(w,h)*0.12,fs=Math.max(w,h)*0.035/Math.sqrt(zm.k);
   const Y=v=>flipY?-v:v,vb0=[bb[0]-pad,(flipY?-bb[3]:bb[2])-pad,w+2*pad,h+2*pad],vb=[vb0[0]+vb0[2]/2+zm.dx-vb0[2]/zm.k/2,vb0[1]+vb0[3]/2+zm.dy-vb0[3]/zm.k/2,vb0[2]/zm.k,vb0[3]/zm.k]; // зум и местене на чертежа
   const order=[...vis].sort((a,b)=>view==='top'?a.box[5]-b.box[5]:view==='front'?a.box[3]-b.box[3]:b.box[0]-a.box[0]);
   let g='';
@@ -2898,16 +2899,16 @@ function pedSvg(k,ps,view){ // чертеж: front (x–z), side (y–z, отл�
     else if(view==='top'&&p.pl)g+=`<polygon data-pk="${esc(p.key)}" points="${p.pl.map(([x,y])=>x+','+y).join(' ')}" style="${st}"><title>${esc(p.name)} ${fmt(p.L)} × ${fmt(p.Wd)}</title></polygon>`;
     else g+=`<rect data-pk="${esc(p.key)}" x="${x0}" y="${Math.min(Y(y0),Y(y1))}" width="${Math.max(.5,x1-x0)}" height="${Math.max(.5,y1-y0)}" style="${st}"><title>${esc(p.name)} ${fmt(p.L)} × ${fmt(p.Wd)}</title></rect>`+
       (p.kind==='virt'?`<rect data-pk="${esc(p.key)}" x="${x0}" y="${Math.min(Y(y0),Y(y1))}" width="${Math.max(.5,x1-x0)}" height="${Math.max(.5,y1-y0)}" style="fill:none;stroke:#000;stroke-opacity:0;stroke-width:16;vector-effect:non-scaling-stroke;pointer-events:stroke;cursor:pointer"><title>${esc(p.name)}</title></rect>`:'')}
-  if(view==='front')for(const c of pedCells){const r=pedCell(k,ps,c.cx,c.cz);if(!r)continue;const f2=fs*.8;
+  if(view==='front'&&!CU)for(const c of pedCells){const r=pedCell(k,ps,c.cx,c.cz);if(!r)continue;const f2=fs*.8;
     g+=`<rect x="${r.x0}" y="${-r.z1}" width="${r.x1-r.x0}" height="${r.z1-r.z0}" style="fill:#2f7fc1;fill-opacity:.28;stroke:#2f7fc1;stroke-width:2.5;stroke-dasharray:6 4;vector-effect:non-scaling-stroke;pointer-events:none"/><text x="${(r.x0+r.x1)/2}" y="${-(r.z0+r.z1)/2}" text-anchor="middle" font-size="${f2}" font-family="IBM Plex Mono,monospace" font-weight="600" style="fill:#1d5a8c;pointer-events:none;paint-order:stroke;stroke:#fff;stroke-width:${f2/4}px">${Math.round(r.x1-r.x0)} × ${Math.round(r.z1-r.z0)}</text>`}
-  const sp=ps.find(p=>p.key===pedSel);
+  const sp=CU?null:ps.find(p=>p.key===pedSel);
   if(sp){const b=sp.box,x0=b[ax[0]],x1=b[ax[0]+1],y0=b[ax[1]],y1=b[ax[1]+1],dm=`stroke:#b4472c;stroke-width:1.2;vector-effect:non-scaling-stroke`,tx=(x,y,t,r)=>`<text x="${x}" y="${y}" ${r?`transform="rotate(-90 ${x} ${y})"`:''} text-anchor="middle" font-size="${fs}" font-family="IBM Plex Mono,monospace" font-weight="600" style="fill:#b4472c;paint-order:stroke;stroke:var(--panel);stroke-width:${fs/4}px">${t}</text>`;
     const yt=Y(Math.max(y0,y1))-pad*0.35,xl=bb[0]-pad*0.35;
     g+=`<line x1="${x0}" y1="${yt}" x2="${x1}" y2="${yt}" style="${dm}"/>`+tx((x0+x1)/2,yt-fs*.4,Math.round(x1-x0));
     g+=`<line x1="${xl}" y1="${Y(y0)}" x2="${xl}" y2="${Y(y1)}" style="${dm}"/>`+tx(xl-fs*.4,(Y(y0)+Y(y1))/2,Math.round(y1-y0),1);
     const bl=view!=='top'&&b[5]-b[4]<=40?pedBelow(ps,sp,(b[0]+b[1])/2,b[4]):null,z0=bl?bl.box[5]:bb[2]; // за рафт — светлото до детайла под него
     g+=`<line x1="${x0}" y1="${Y(y0)}" x2="${x0}" y2="${Y(z0)}" style="${dm};stroke-dasharray:4 3"/>`+(Math.abs(y0-z0)>1?tx(x0+fs*1.4,(Y(y0)+Y(z0))/2,'↕'+Math.round(y0-z0)):'')}
-  if(view==='front'&&k.type==='wpanel')for(const p of vis.filter(q=>q.fp)){ // размерите на скосяванията — с по-малки цифри
+  if(CU)for(const p of vis.filter(q=>q.fp)){ // размерите на скосяванията — с по-малки цифри
     const b=p.box,W=b[1]-b[0],h=b[5]-b[4],fc=fcutOf(k,W,h),f2=fs*0.6,o=fs*0.7,cs='stroke:#2f7fc1;stroke-width:1;vector-effect:non-scaling-stroke',
       t2=(x,y,t,r,anc='middle')=>`<text x="${x}" y="${y}" ${r?`transform="rotate(-90 ${x} ${y})"`:''} text-anchor="${anc}" dy=".35em" font-size="${f2}" font-family="IBM Plex Mono,monospace" font-weight="600" style="fill:#2f7fc1;paint-order:stroke;stroke:#f5f7f8;stroke-width:${f2/4}px">${t}</text>`,
       hd=(xa,xb,z,up)=>{const y=Y(z)+(up?-o:o);return `<line x1="${xa}" y1="${y}" x2="${xb}" y2="${y}" style="${cs}"/><line x1="${xa}" y1="${y-f2*.4}" x2="${xa}" y2="${y+f2*.4}" style="${cs}"/><line x1="${xb}" y1="${y-f2*.4}" x2="${xb}" y2="${y+f2*.4}" style="${cs}"/>`+t2((xa+xb)/2,y+(up?-f2*.75:f2*.75),fmt(Math.abs(xb-xa)))},
@@ -2915,8 +2916,8 @@ function pedSvg(k,ps,view){ // чертеж: front (x–z), side (y–z, отл�
     for(const[key]of FCN){const q=fc[key];if(!(q.x>0&&q.y>0))continue;const top=key[0]==='T',lf=key[1]==='L',xe=lf?b[0]:b[1],ze=top?b[5]:b[4],xi=lf?xe+q.x:xe-q.x,zi=top?ze-q.y:ze+q.y;
       g+=hd(xe,xi,ze,top)+vd(xe,ze,zi,lf);
       const mx=(xi+xe)/2,mz=(ze+zi)/2;g+=t2(mx+(lf?f2*1.2:-f2*1.2),Y(mz)+(top?f2*1.1:-f2*1.1),fcAng(q)+'°',0,lf?'start':'end')}}
-  const ttl={front:'Отпред',side:'Отляво',top:'Отгоре'}[view];
-  return`<div style="display:flex;flex-direction:column;min-width:0;min-height:0"><div style="font:600 12px var(--f-display);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:2px 4px">${ttl}</div><svg data-view="${view}" data-base="${vb0.join(',')}" viewBox="${vb.join(' ')}" style="touch-action:none;width:100%;height:100%;min-height:0;flex:1;background:var(--field);border:1px solid var(--line);border-radius:6px">${g}</svg></div>`}
+  const ttl=CU?'Скосявания':{front:'Отпред',side:'Отляво',top:'Отгоре'}[view];
+  return`<div style="display:flex;flex-direction:column;min-width:0;min-height:0"><div style="font:600 12px var(--f-display);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:2px 4px">${ttl}</div><svg data-view="${CU?'cuts':view}" data-base="${vb0.join(',')}" viewBox="${vb.join(' ')}" style="touch-action:none;width:100%;height:100%;min-height:0;flex:1;background:var(--field);border:1px solid var(--line);border-radius:6px">${g}</svg></div>`}
 function renderPed(){const sc=[$('#pedList')?.scrollTop||0,$('#pedCol')?.scrollTop||0];renderPed0();const a=$('#pedList'),b=$('#pedCol');if(a)a.scrollTop=sc[0];if(b)b.scrollTop=sc[1]} // пази мястото в списъка
 function pedLinkKeys(k){ // старите умни рафтове/чекмеджета — запомнят между кои страници/делители са
   if(!(k.pAdd||[]).some(a=>(a.smart===true||a.smart==='drs'||a.smart==='dor')&&!a.lk))return;const ps=pedParts(k);
@@ -2966,8 +2967,8 @@ function renderPed0(){const k=cab(pedK),el=$('#ped');if(!k){closePed();return}pe
   el.innerHTML=`<div id="pedHd" title="Хвани и влачи, за да преместиш прозореца" style="position:relative;display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap;cursor:move;user-select:none;background:var(--field)"><b>⠿</b><b style="font-family:var(--f-display);font-size:16px">Детайли · ${esc(k.name)}</b><button class="btn sm" data-pa="help" title="Пояснения" aria-expanded="${pedHelp}" style="width:26px;height:26px;padding:0;border-radius:50%;font-weight:700;${pedHelp?'background:var(--accent);color:#fff;border-color:var(--accent)':''}">?</button><div id="pedHelp" ${pedHelp?'':'hidden'} style="position:absolute;top:calc(100% - 4px);left:40px;z-index:20;max-width:min(560px,80vw);background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:10px 14px;font-size:13px;line-height:1.5;cursor:auto;user-select:text"><ul style="margin:0;padding-left:18px"><li>Кликни детайл в чертежа или в списъка (Ctrl + клик — няколко детайла наведнъж).</li><li>Кликни празното в секция (отметката „Врати“ махната), за да я избереш — Ctrl + клик за много секции.</li><li>Delete трие маркирания детайл.</li><li>Колелцето — зум, влачене — местене, двоен клик — целия чертеж.</li></ul></div>
       <label class="tog" style="margin-left:auto"><input type="checkbox" id="pedDr" ${pedDoors?'checked':''}> Врати</label><button class="btn sm" data-pa="close">Затвори</button></div>
     <div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) min(380px,40vw);">
-    <div style="min-height:0;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,1fr);gap:8px;padding:10px">
-      <div style="grid-row:1/3;display:flex;min-height:0">${pedSvg(k,ps,'front')}</div><div style="display:flex;min-height:0">${pedSvg(k,ps,'side')}</div><div style="display:flex;min-height:0">${pedSvg(k,ps,'top')}</div></div>
+    <div style="min-height:0;display:grid;grid-template-columns:${ps.some(q=>q.fp&&!q.hidden)?'minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)':'minmax(0,1.6fr) minmax(0,1fr)'};grid-template-rows:minmax(0,1fr) minmax(0,1fr);gap:8px;padding:10px">
+      <div style="grid-row:1/3;display:flex;min-height:0">${pedSvg(k,ps,'front')}</div>${ps.some(q=>q.fp&&!q.hidden)?`<div style="grid-row:1/3;display:flex;min-height:0">${pedSvg(k,ps,'cuts')}</div>`:''}<div style="display:flex;min-height:0">${pedSvg(k,ps,'side')}</div><div style="display:flex;min-height:0">${pedSvg(k,ps,'top')}</div></div>
     <div id="pedCol" style="border-left:1px solid var(--line);overflow:auto;min-height:0">
     <div id="pedList" style="max-height:34vh;overflow:auto">${ps.filter(q=>!q.hidden).map(q=>`<div data-pk="${esc(q.key)}" style="display:flex;gap:8px;padding:5px 12px;cursor:pointer;border-left:3px solid ${q.key===pedSel||pedMulti.has(q.key)?'var(--mark)':'transparent'};background:${q.key===pedSel||pedMulti.has(q.key)?'var(--field)':'transparent'};${q.hidden?'opacity:.45;text-decoration:line-through;':''}font-size:13px"><span style="flex:1">${esc(q.name)}${q.ov||q.added?' <span style="color:var(--mark)">✎</span>':''}</span><span style="font-family:var(--f-mono);font-size:12px;color:var(--muted)">${fmt(q.L)} × ${fmt(q.Wd)}</span></div>`).join('')}</div>
     ${form}<div style="padding:10px 12px;border-top:1px solid var(--line);display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm" data-pa="add">+ Нов детайл</button>${(()=>{const n=Object.values(k.pOv||{}).filter(o=>o.hide).length;return n?`<button class="btn sm" data-pa="unhide" title="Връща всички изтрити детайли на програмата">↺ Върни изтритите (${n})</button>`:''})()}<button class="btn sm" data-pa="resetAll" ${Object.keys(k.pOv||{}).length||(k.pAdd||[]).length?'':'disabled'}>↺ Върни всички</button></div></div></div>`}
