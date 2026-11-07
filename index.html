@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 20:30 · размер на вратата отляво</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 20:35 · без подпрозоречна дъска</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1541,7 +1541,7 @@ function renderItems(){
       <label>${pt?'От началото до центъра':'От началото'}, мм<input id="i_o_${it.id}" data-k="off" type="number" value="${pt?it.off+it.w/2:it.off}"></label>`+
       (pt?`<label>От пода до центъра, мм<input id="i_z_${it.id}" data-k="z" type="number" value="${it.z}"></label>`:
        `<label>Ширина, мм<input id="i_ww_${it.id}" data-k="w" type="number" value="${it.w}"></label>`)+
-      (it.type==='window'?`<label>Височина, мм<input id="i_h_${it.id}" data-k="h" type="number" value="${it.h}"></label><label>Парапет, мм<input id="i_z_${it.id}" data-k="z" type="number" value="${it.z}"></label><label style="flex-direction:row;align-items:center;gap:6px;display:flex"><input type="checkbox" data-k="leaf" ${it.leaf===false?'':'checked'}> Рамка и стъкло</label><label>Цвят на рамката<input type="color" data-k="col" value="${it.col||'#f4f2ec'}" style="height:32px;padding:2px"></label>`:'')+
+      (it.type==='window'?`<label>Височина, мм<input id="i_h_${it.id}" data-k="h" type="number" value="${it.h}"></label><label>Парапет, мм<input id="i_z_${it.id}" data-k="z" type="number" value="${it.z}"></label><label style="flex-direction:row;align-items:center;gap:6px;display:flex"><input type="checkbox" data-k="leaf" ${it.leaf===false?'':'checked'}> Рамка и стъкло</label><label style="flex-direction:row;align-items:center;gap:6px;display:flex"><input type="checkbox" data-k="sill" ${it.sill?'checked':''}> Подпрозоречна дъска</label><label>Цвят на рамката<input type="color" data-k="col" value="${it.col||'#f4f2ec'}" style="height:32px;padding:2px"></label>`:'')+
       (it.type==='door'?`<label>Височина, мм<input id="i_h_${it.id}" data-k="h" type="number" value="${it.h}"></label><label>Панти<select id="i_hi_${it.id}" data-k="hinge"><option value="L" ${it.hinge==='L'?'selected':''}>от началото</option><option value="R" ${it.hinge==='R'?'selected':''}>от края</option></select></label><label style="flex-direction:row;align-items:center;gap:6px;display:flex"><input type="checkbox" data-k="leaf" ${it.leaf===false?'':'checked'}> Крило и каса</label><label>Цвят<input type="color" data-k="col" value="${it.col||'#c9b28f'}" style="height:32px;padding:2px"></label>`:'')+
       (it.type==='balcony'?`<label>Височина (горе), мм<input id="i_h_${it.id}" data-k="h" type="number" value="${it.h}"></label><label>Парапет на прозореца, мм<input id="i_z_${it.id}" data-k="z" type="number" value="${it.z}"></label><label>Ширина на вратата, мм<input id="i_dw_${it.id}" data-k="dw" type="number" value="${it.dw||800}"></label><label>Вратата е<select data-k="ds"><option value="L" ${it.ds!=='R'?'selected':''}>отляво</option><option value="R" ${it.ds==='R'?'selected':''}>отдясно</option></select></label><label>Панти<select data-k="hinge"><option value="L" ${it.hinge==='L'?'selected':''}>от началото</option><option value="R" ${it.hinge==='R'?'selected':''}>от края</option></select></label><label style="flex-direction:row;align-items:center;gap:6px;display:flex"><input type="checkbox" data-k="leaf" ${it.leaf===false?'':'checked'}> Рамка и стъкло</label><label>Цвят на рамката<input type="color" data-k="col" value="${it.col||'#f4f2ec'}" style="height:32px;padding:2px"></label>`:'')+
       (it.type==='duct'?`<label>Диаметър Ф, мм<input id="i_dd_${it.id}" data-k="dia" type="number" value="${it.w}"></label>`:'')+
@@ -1575,7 +1575,7 @@ $('#itemsForm').addEventListener('click',e=>{const b=e.target.closest('button');
 $('#itemsForm').addEventListener('input',e=>{const bb=e.target.closest('[data-blk]');if(bb){const o=(P.room.blocks||[]).find(q=>q.id===bb.dataset.blk),k=e.target.dataset.bk;
     if(!o||!k)return;const v=e.target.value===''&&(k==='h'||k==='z')?0:+e.target.value;if(!isFinite(v))return;if((k==='w'||k==='d')&&v<20)return;o[k]=v;P.example=false;save();rebuild3D();renderPlan();return}
   const box=e.target.closest('.it');if(!box)return;const it=P.room.items.find(i=>i.id===box.dataset.id),k=e.target.dataset.k;
-  if(k==='hinge'||k==='ds'){it[k]=e.target.value}else if(k==='leaf'){it.leaf=e.target.checked?undefined:false}else if(k==='col'){it.col=e.target.value}else{const v=+e.target.value;if(!isFinite(v))return;
+  if(k==='hinge'||k==='ds'){it[k]=e.target.value}else if(k==='leaf'){it.leaf=e.target.checked?undefined:false}else if(k==='sill'){it.sill=e.target.checked||undefined}else if(k==='col'){it.col=e.target.value}else{const v=+e.target.value;if(!isFinite(v))return;
     if(k==='dia'){const c=it.off+it.w/2;it.w=it.h=Math.max(20,v);it.off=c-it.w/2}
     else if(k==='off'&&isPt(it.type))it.off=v-it.w/2;else it[k]=v}
   P.example=false;roomChanged(false)});
@@ -1643,7 +1643,7 @@ function rebuild3D(){
         const gl=boxAt(g,ww*M,o.h*M,0.006,cx*M,(o.z+o.h/2)*M,-t/2,glass);gl.userData.rdoor=o.id;
         fr.push([o.s0+fw/2,fw,o.h,o.z+o.h/2],[o.s1-fw/2,fw,o.h,o.z+o.h/2],[cx,ww,fw,o.z+fw/2],[cx,ww,fw,o.z+o.h-fw/2]);if(ww>900)fr.push([cx,fw,o.h,o.z+o.h/2]);
         for(const[x,w2,h2,z]of fr){const m=boxAt(g,w2*M,h2*M,0.07,x*M,z*M,-t/2,fm);m.userData.rdoor=o.id}
-        const sl=boxAt(g,(ww+60)*M,0.02,Math.min(300,t/2+60)*M,cx*M,(o.z-10)*M,(Math.min(300,t/2+60)/2-t/2+20)*M,meshMat(o.scol||'#f4f2ec'));sl.userData.rdoor=o.id}
+        if(o.sill&&!o.src){const sl=boxAt(g,(ww+60)*M,0.02,Math.min(300,t/2+60)*M,cx*M,(o.z-10)*M,(Math.min(300,t/2+60)/2-t/2+20)*M,meshMat(o.scol||'#f4f2ec'));sl.userData.rdoor=o.id}} // подпрозоречна дъска — само ако е отметната
       if(o.type==='window'&&o.leaf===false){const hm=boxAt(g,(o.s1-o.s0)*M,o.h*M,0.01,(o.s0+o.s1)/2*M,(o.z+o.h/2)*M,-t/2,new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hm.userData.rdoor=o.id}
       if(o.type==='door'&&o.glz&&o.leaf!==false){const fw=70,ww=o.s1-o.s0,fm=meshMat(o.col||'#f4f2ec'),cx=(o.s0+o.s1)/2; // остъклената врата на вратопрозореца
         const gl=boxAt(g,ww*M,o.h*M,0.006,cx*M,o.h/2*M,-t/2,glass);gl.userData.rdoor=o.id;
