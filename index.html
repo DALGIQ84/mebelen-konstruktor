@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 00:20 · име KRAFTPLAN</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 00:45 · Детайли: един детайл — маркиран веднага</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -3007,7 +3007,7 @@ for(const id of['#v3','#vp','#vw'])$(id).addEventListener('click',()=>{if(measOn
 /* ---------- Редактор на детайлите: панел вдясно ---------- */
 let pedHelp=false,pedK=null,pedSel=null,pedMulti=new Set(),pedCells=[],pedZ={},pedPanned=false; // pedZ — зум/местене на чертежите // pedCells — избрани свободни секции {cx,cz}
 let pedDoors=true;
-function openPed(id){const k=cab(id);if(!k||isAcc(k))return;pedK=id;if(sel!==id)select(id);pedSel=null;pedMulti=new Set();pedCells=[];if(k.type==='wpanel'){const p0=pedParts(k)[0];if(p0){pedSel=p0.key;pedMulti=new Set([p0.key])}} /* панелът — веднага маркиран, за скосяванията */$('#ped').hidden=false;$('#pedOv').hidden=false;renderPed();rebuild3D()}
+function openPed(id){const k=cab(id);if(!k||isAcc(k))return;pedK=id;if(sel!==id)select(id);pedSel=null;pedMulti=new Set();pedCells=[];{const vis=pedParts(k).filter(q=>!q.hidden&&q.kind!=='hw');if(k.type==='wpanel'||vis.length===1){const p0=vis[0];if(p0){pedSel=p0.key;pedMulti=new Set([p0.key])}}} /* един детайл (панел, завършваща страница, пълнеж, плот…) — маркиран веднага */ /* панелът — веднага маркиран, за скосяванията */$('#ped').hidden=false;$('#pedOv').hidden=false;renderPed();rebuild3D()}
 function closePed(){pedK=null;pedSel=null;pedMulti=new Set();pedCells=[];pedZ={};$('#ped').hidden=true;$('#pedOv').hidden=true;rebuild3D()}
 $('#pedOv').onclick=()=>closePed();
 function pedParts(k){return build({...k,_showHidden:true}).parts.filter(p=>p.kind!=='appl')}
