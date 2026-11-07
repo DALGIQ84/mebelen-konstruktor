@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 01:15 · поправка: ъгловите при подравняване</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 01:20 · поправка: шкаф не става сам ъглов</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -445,7 +445,7 @@ function applySnap(str){const tex={};for(const m of P.materials)if(m.tex)tex[m.i
   for(const m of o.materials){const t=tex[m.id];if(t){m.tex=t.tex;m.texAR=t.texAR;m.texAvg=t.texAvg}}
   if(o.room&&o.room.ftex&&o.room.ftex.ar&&!o.room.ftex.tex&&P.room.ftex&&P.room.ftex.tex)o.room.ftex.tex=P.room.ftex.tex;
   const ow=P.room.wtex||{};if(o.room&&o.room.wtex)for(const i in o.room.wtex){const e=o.room.wtex[i];if(e.ar&&!e.tex&&ow[i]&&ow[i].tex)e.tex=ow[i].tex}
-  P=o;histLock=true;try{migrate();if(!cab(sel))sel=P.cabinets[0]?.id||null;save()}finally{histLock=false}lastSnap=snapP();
+  P=o;histLock=true;try{P.mcDone=true;migrate();if(!cab(sel))sel=P.cabinets[0]?.id||null;save()}finally{histLock=false}lastSnap=snapP();
   renderList();renderEditor();renderTable();if(tab==='room')renderRoom();rebuild3D();renderPlan()}
 function pedAfterUndo(){if(!pedK)return;const k=cab(pedK);if(!k){closePed();return}const ps=pedParts(k);if(pedSel&&!ps.some(q=>q.key===pedSel))pedSel=null;pedCells=[];renderPed();rebuild3D()} // „Детайли“ се опреснява веднага след Ctrl+Z / Ctrl+Y
 function undoAll(){if(!hist.length){toast('Няма какво да се върне');return}redoH.push(snapP());applySnap(hist.pop());toast('Върнато назад');pedAfterUndo()}
@@ -465,9 +465,11 @@ const mat=id=>PSEUDO[id]||P.materials.find(m=>m.id===id)||P.materials[0];
 const cab=id=>P.cabinets.find(c=>c.id===id);
 
 /* ---------- Стаята: многоъгълник по часовника, вътрешността е отдясно на всяка стена ---------- */
-function mergeCorners(){ // старите „ъгъл А“ + „ъгъл Б“ (две отделни) → един шкаф „Ъглов Г“
+function mergeCorners(){ // старите „ъгъл А“ + „ъгъл Б“ (две отделни) → един шкаф „Ъглов Г“ — само веднъж при отваряне на стар проект и само ако са един до друг в ъгъла
+  if(P.mcDone)return 0;P.mcDone=true;
+  const near=(a,b)=>{try{const ca=corners(a),cb=corners(b);return Math.min(...ca.flatMap(p=>cb.map(q=>Math.hypot(p[0]-q[0],p[1]-q[1]))))<150}catch(e){return false}};
   let n=0;for(const A of [...P.cabinets]){if(A.type!=='doors'||!A.deadOpen||(A.deadSide||'none')==='none')continue;
-    const B=P.cabinets.find(q=>q!==A&&q.type==='doors'&&(q.half==='L'||q.half==='R'));if(!B)continue;
+    const B=P.cabinets.find(q=>q!==A&&q.type==='doors'&&(q.half==='L'||q.half==='R')&&q.wall!==A.wall&&near(A,q));if(!B)continue;
     const tF=+mat(A.mf).t,Dk=+A.D-P.settings.doorGap-tF;
     Object.assign(A,{type:'cornerL',armB:Math.round(+B.W+Dk),deadOpen:false,deadSide:'none',half:null,name:String(A.name).replace(/ ъгъл А$/,' ъглов')});
     P.cabinets=P.cabinets.filter(q=>q!==B);n++}
