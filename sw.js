@@ -1,5 +1,5 @@
 // Мебелен конструктор — офлайн работа. Винаги първо мрежата (нова версия веднага), без интернет — последната свалена.
-const C='mebeli-'+'d13309c771';
+const C='mebeli-'+'20c14a1b2f';
 const FILES=['./','index.html','manifest.webmanifest','libs/three.min.js','libs/OrbitControls.js','libs/jspdf.umd.min.js','icons/kraftplan-192.png','icons/kraftplan-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(FILES)));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim()});
