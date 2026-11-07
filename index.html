@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 20:05 · прозорец</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 20:20 · вратопрозорец</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -351,6 +351,7 @@ const SETTINGS={slides:SLIDES,fuga:3,drFuga:5,wDrSd:2,wDrIns:32,wDrFw:7,wDrGrip:
 const ITEM={
   window:{name:'Прозорец',color:'#5aa9d6',w:1200,h:1300,z:950},
   door:{name:'Врата',color:'#9b7b5a',w:900,h:2050,z:0,hinge:'L'},
+  balcony:{name:'Вратопрозорец',color:'#5aa9d6',w:1700,h:2200,z:900,hinge:'L',dw:800,ds:'L'},
   column:{name:'Колона',color:'#7d878d',w:400,h:0,z:0,d:300},
   water:{name:'Вода',color:'#2f7fd0',w:80,h:80,z:500,mark:'В'},
   power:{name:'Контакт',color:'#d0582f',w:80,h:80,z:1100,mark:'Т'},
@@ -382,7 +383,13 @@ const GASN=[60,80,100,120]; // газови амортисьори с плавн
 const isPt=t=>t==='water'||t==='power'||t==='gas'||t==='duct'; // точкови елементи — мерят се до центъра
 const isBox=t=>t==='radiator'||t==='panel'; // елементи с габарит по стената
 const cabDef=o=>Object.assign({apShow:true,eFloor:true,id:uid(),name:'Шкаф',x:0,y:0,rot:0,wall:null,off:0,gap:0,W:600,H:860,D:580,c:100,plinth:false,floor:'none',backPos:'out',bRails:2,ovenH:600,mwOn:true,over:0,toFloor:true,pc:100,lowType:'drawers',lowH:760,mwH:380,topSh:1,fridgeH:1800,frDoors:1,frLow:720,divShort:50,grooveD:8,grooveY:10,colTopPos:'in',deadSide:'none',deadW:600,fgrain:'v',type:'doors',dr:3,dh:[],bh:[],nl:0,slide:'s1',mx:'k1',mxb:'hdf',div:0,sh:1,doors:1,top:'rails',mc:'k1',mf:'l1',mb:'hdf'},o);
-const itemDef=(type,o)=>{const d=ITEM[type];return Object.assign({id:uid(),type,wall:0,off:0,w:d.w,h:d.h,z:d.z,d:d.d||0,hinge:d.hinge||'L'},o)};
+const itemDef=(type,o)=>{const d=ITEM[type];return Object.assign({id:uid(),type,wall:0,off:0,w:d.w,h:d.h,z:d.z,d:d.d||0,hinge:d.hinge||'L'},d.dw?{dw:d.dw,ds:d.ds}:{},o)};
+function exItems(list){ // вратопрозорецът = остъклена врата (до пода) + прозорец до нея; горе са наравно
+  const out=[];for(const it of list){if(it.type!=='balcony'){out.push(it);continue}
+    const dw=clamp(+it.dw||800,300,it.w-200),dl=it.ds!=='R',top=+it.h||2200,z=clamp(+it.z||900,0,top-200);
+    out.push({...it,type:'door',glz:true,off:dl?it.off:it.off+it.w-dw,w:dw,h:top,z:0,src:it});
+    out.push({...it,type:'window',off:dl?it.off+dw:it.off,w:it.w-dw,h:top-z,z,src:it})}
+  return out}
 const SHAPES={
   rect:(W,L)=>[[0,0],[W,0],[W,L],[0,L]],
   L:(W,L,a,b)=>[[0,0],[W,0],[W,L-b],[W-a,L-b],[W-a,L],[0,L]],
@@ -1536,6 +1543,7 @@ function renderItems(){
        `<label>Ширина, мм<input id="i_ww_${it.id}" data-k="w" type="number" value="${it.w}"></label>`)+
       (it.type==='window'?`<label>Височина, мм<input id="i_h_${it.id}" data-k="h" type="number" value="${it.h}"></label><label>Парапет, мм<input id="i_z_${it.id}" data-k="z" type="number" value="${it.z}"></label><label style="flex-direction:row;align-items:center;gap:6px;display:flex"><input type="checkbox" data-k="leaf" ${it.leaf===false?'':'checked'}> Рамка и стъкло</label><label>Цвят на рамката<input type="color" data-k="col" value="${it.col||'#f4f2ec'}" style="height:32px;padding:2px"></label>`:'')+
       (it.type==='door'?`<label>Височина, мм<input id="i_h_${it.id}" data-k="h" type="number" value="${it.h}"></label><label>Панти<select id="i_hi_${it.id}" data-k="hinge"><option value="L" ${it.hinge==='L'?'selected':''}>от началото</option><option value="R" ${it.hinge==='R'?'selected':''}>от края</option></select></label><label style="flex-direction:row;align-items:center;gap:6px;display:flex"><input type="checkbox" data-k="leaf" ${it.leaf===false?'':'checked'}> Крило и каса</label><label>Цвят<input type="color" data-k="col" value="${it.col||'#c9b28f'}" style="height:32px;padding:2px"></label>`:'')+
+      (it.type==='balcony'?`<label>Височина (горе), мм<input id="i_h_${it.id}" data-k="h" type="number" value="${it.h}"></label><label>Парапет на прозореца, мм<input id="i_z_${it.id}" data-k="z" type="number" value="${it.z}"></label><label>Ширина на вратата, мм<input id="i_dw_${it.id}" data-k="dw" type="number" value="${it.dw||800}"></label><label>Вратата е<select data-k="ds"><option value="L" ${it.ds!=='R'?'selected':''}>отляво</option><option value="R" ${it.ds==='R'?'selected':''}>отдясно</option></select></label><label>Панти<select data-k="hinge"><option value="L" ${it.hinge==='L'?'selected':''}>от началото</option><option value="R" ${it.hinge==='R'?'selected':''}>от края</option></select></label><label style="flex-direction:row;align-items:center;gap:6px;display:flex"><input type="checkbox" data-k="leaf" ${it.leaf===false?'':'checked'}> Рамка и стъкло</label><label>Цвят на рамката<input type="color" data-k="col" value="${it.col||'#f4f2ec'}" style="height:32px;padding:2px"></label>`:'')+
       (it.type==='duct'?`<label>Диаметър Ф, мм<input id="i_dd_${it.id}" data-k="dia" type="number" value="${it.w}"></label>`:'')+
       (isBox(it.type)?`<label>Височина, мм<input id="i_h_${it.id}" data-k="h" type="number" value="${it.h}"></label><label>От пода, мм<input id="i_z_${it.id}" data-k="z" type="number" value="${it.z}"></label><label>Дълбочина, мм<input id="i_d_${it.id}" data-k="d" type="number" value="${it.d}"></label>`:'')+
       (it.type==='column'?`<label>Издадена, мм<input id="i_d_${it.id}" data-k="d" type="number" value="${it.d}"></label>`:'')+`</div>`}
@@ -1567,7 +1575,7 @@ $('#itemsForm').addEventListener('click',e=>{const b=e.target.closest('button');
 $('#itemsForm').addEventListener('input',e=>{const bb=e.target.closest('[data-blk]');if(bb){const o=(P.room.blocks||[]).find(q=>q.id===bb.dataset.blk),k=e.target.dataset.bk;
     if(!o||!k)return;const v=e.target.value===''&&(k==='h'||k==='z')?0:+e.target.value;if(!isFinite(v))return;if((k==='w'||k==='d')&&v<20)return;o[k]=v;P.example=false;save();rebuild3D();renderPlan();return}
   const box=e.target.closest('.it');if(!box)return;const it=P.room.items.find(i=>i.id===box.dataset.id),k=e.target.dataset.k;
-  if(k==='hinge'){it.hinge=e.target.value}else if(k==='leaf'){it.leaf=e.target.checked?undefined:false}else if(k==='col'){it.col=e.target.value}else{const v=+e.target.value;if(!isFinite(v))return;
+  if(k==='hinge'||k==='ds'){it[k]=e.target.value}else if(k==='leaf'){it.leaf=e.target.checked?undefined:false}else if(k==='col'){it.col=e.target.value}else{const v=+e.target.value;if(!isFinite(v))return;
     if(k==='dia'){const c=it.off+it.w/2;it.w=it.h=Math.max(20,v);it.off=c-it.w/2}
     else if(k==='off'&&isPt(it.type))it.off=v-it.w/2;else it[k]=v}
   P.example=false;roomChanged(false)});
@@ -1626,7 +1634,7 @@ function rebuild3D(){
     const w=wallInfo(i),g=new THREE.Group();
     g.position.set(w.A[0]*M,0,w.A[1]*M);g.rotation.y=-w.ang;
     const e0=interior(i)<180?R.t:0,e1=interior((i+1)%N())<180?R.t:0;
-    const ops=R.items.filter(it=>it.wall===i&&(it.type==='window'||it.type==='door')).map(it=>({...it,s0:clamp(it.off,0,w.len),s1:clamp(it.off+it.w,0,w.len)})).sort((a,b)=>a.s0-b.s0);
+    const ops=exItems(R.items).filter(it=>it.wall===i&&(it.type==='window'||it.type==='door')).map(it=>({...it,s0:clamp(it.off,0,w.len),s1:clamp(it.off+it.w,0,w.len)})).sort((a,b)=>a.s0-b.s0);
     let s=-e0;
     const wmi=wallMat(i,wm),wo=wtex(i);
     const piece=(a,b,z0,z1)=>{if(b-a>1&&z1-z0>1){const ms=boxAt(g,(b-a)*M,(z1-z0)*M,t,(a+b)/2*M,(z0+z1)/2*M,-t/2,wmi);if(wo&&wo.tex)wallUV(ms.geometry,0,0,0,wo,(a+b)/2,(z0+z1)/2)}};
@@ -1637,14 +1645,18 @@ function rebuild3D(){
         for(const[x,w2,h2,z]of fr){const m=boxAt(g,w2*M,h2*M,0.07,x*M,z*M,-t/2,fm);m.userData.rdoor=o.id}
         const sl=boxAt(g,(ww+60)*M,0.02,Math.min(300,t/2+60)*M,cx*M,(o.z-10)*M,(Math.min(300,t/2+60)/2-t/2+20)*M,meshMat(o.scol||'#f4f2ec'));sl.userData.rdoor=o.id}
       if(o.type==='window'&&o.leaf===false){const hm=boxAt(g,(o.s1-o.s0)*M,o.h*M,0.01,(o.s0+o.s1)/2*M,(o.z+o.h/2)*M,-t/2,new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hm.userData.rdoor=o.id}
-      if(o.type==='door'&&o.leaf!==false){const dc=o.col||'#c9b28f',fw=60,ww=o.s1-o.s0,lm=meshMat(dc),fm=meshMat(o.fcol||dc); // крило + каса (обков) от вътрешната страна
+      if(o.type==='door'&&o.glz&&o.leaf!==false){const fw=70,ww=o.s1-o.s0,fm=meshMat(o.col||'#f4f2ec'),cx=(o.s0+o.s1)/2; // остъклената врата на вратопрозореца
+        const gl=boxAt(g,ww*M,o.h*M,0.006,cx*M,o.h/2*M,-t/2,glass);gl.userData.rdoor=o.id;
+        for(const[x,w2,h2,z]of[[o.s0+fw/2,fw,o.h,o.h/2],[o.s1-fw/2,fw,o.h,o.h/2],[cx,ww,fw,fw/2],[cx,ww,fw,o.h-fw/2],[cx,ww,fw,Math.min(900,o.h/2)]]){const m=boxAt(g,w2*M,h2*M,0.07,x*M,z*M,-t/2,fm);m.userData.rdoor=o.id}
+        const hk=o.hinge==='L'?o.s1-fw-30:o.s0+fw+30,hm=boxAt(g,0.02,0.14,0.05,hk*M,1050*M,0.025,meshMat('#9aa3a8'));hm.userData.rdoor=o.id}
+      else if(o.type==='door'&&o.leaf!==false){const dc=o.col||'#c9b28f',fw=60,ww=o.s1-o.s0,lm=meshMat(dc),fm=meshMat(o.fcol||dc); // крило + каса (обков) от вътрешната страна
         const leaf=boxAt(g,(ww-20)*M,(o.h-10)*M,0.04,(o.s0+o.s1)/2*M,(o.h-10)/2*M,-0.02,lm);leaf.userData.rdoor=o.id;
         for(const[cx,wd,hh,cy]of[[o.s0-fw/2+5,fw,o.h+fw-5,(o.h+fw-5)/2],[o.s1+fw/2-5,fw,o.h+fw-5,(o.h+fw-5)/2],[(o.s0+o.s1)/2,ww+2*fw-10,fw,o.h+fw/2-5]]){const m=boxAt(g,wd*M,hh*M,0.012,cx*M,cy*M,0.006,fm);m.userData.rdoor=o.id}
         const hk=o.hinge==='L'?o.s1-90:o.s0+90,hm=boxAt(g,0.14,0.02,0.05,hk*M,1050*M,0.025,meshMat('#9aa3a8'));hm.userData.rdoor=o.id}
       if(o.type==='door'&&o.leaf===false){const hm=boxAt(g,(o.s1-o.s0)*M,o.h*M,0.01,(o.s0+o.s1)/2*M,o.h/2*M,-t/2,new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hm.userData.rdoor=o.id} // невидима „мишена“ в отвора — десен бутон я показва пак
       s=Math.max(s,o.s1)}
     piece(s,w.len+e1,0,R.h);
-    for(const it of R.items.filter(it=>it.wall===i&&it.type!=='window'&&it.type!=='door')){
+    for(const it of R.items.filter(it=>it.wall===i&&it.type!=='window'&&it.type!=='door'&&it.type!=='balcony')){
       const c=it.off+it.w/2;
       if(it.type==='column')boxAt(g,it.w*M,Hh,it.d*M,c*M,Hh/2,it.d*M/2,wm);
       else if(isBox(it.type)){const dd=Math.max(20,+it.d||100);boxAt(g,it.w*M,it.h*M,dd*M,c*M,(it.z+it.h/2)*M,dd*M/2,boxTexMat(it.type))}
@@ -1907,8 +1919,8 @@ function groupGaps(g){ // общ пълнеж за няколко шкафа н�
   return{l:a0-L,lAt:L,lWall:lW,r:R-a1,rAt:a1,rWall:rW}}
 const DOORCOL=[['#c9b28f','дъб светъл'],['#8a6440','орех'],['#5b3d2a','венге'],['#f4f2ec','бяла'],['#9aa0a3','сива'],['#2f3437','антрацит']];
 const WINCOL=[['#f4f2ec','бял'],['#3a3f42','антрацит'],['#b98a4e','златен дъб'],['#7a5232','орех'],['#1e2022','черен'],['#9aa0a3','сив']];
-function openDoorCtx(itId,x,y){const it=P.room.items.find(q=>q.id===itId);if(!it)return;const win=it.type==='window',PAL=win?WINCOL:DOORCOL,dc=win?'#f4f2ec':'#c9b28f';
-  ctx.innerHTML=`<div class="gh" style="padding:6px 8px;font-weight:600">${win?'Прозорец':'Врата на стаята'}</div>`+
+function openDoorCtx(itId,x,y){const it=P.room.items.find(q=>q.id===itId);if(!it)return;const win=it.type==='window'||it.type==='balcony',PAL=win?WINCOL:DOORCOL,dc=win?'#f4f2ec':'#c9b28f';
+  ctx.innerHTML=`<div class="gh" style="padding:6px 8px;font-weight:600">${it.type==='balcony'?'Вратопрозорец':win?'Прозорец':'Врата на стаята'}</div>`+
     `<button class="item" data-dctx="tog"><span>${it.leaf===false?(win?'Покажи прозореца':'Покажи вратата'):(win?'Скрий прозореца':'Скрий вратата')}</span><small>${it.leaf===false?(win?'рамката и стъклото':'крилото и касата'):'остава само отворът'}</small></button>`+
     `<div style="padding:6px 8px 4px;font-size:12px;color:var(--muted)">${win?'Цвят на рамката':'Цвят'}</div><div style="display:flex;gap:6px;flex-wrap:wrap;padding:0 8px 8px">`+
     PAL.map(([c,n])=>`<button data-dcol="${c}" title="${n}" style="width:26px;height:26px;border-radius:6px;border:2px solid ${(it.col||dc)===c?'var(--mark)':'var(--line)'};background:${c};cursor:pointer"></button>`).join('')+
@@ -2042,7 +2054,7 @@ function clearDims(k,cols,fs){let s='';const f=fs*0.5,st='stroke:var(--mark);str
   return s}
 function wallSvg(){
   const R=P.room,w=wallInfo(wv),L=w.len,H=R.h,t=R.t;fs=Math.max(L,H)/36;
-  const occ=occupancy(wv),items=R.items.filter(it=>it.wall===wv),bl=blockOcc(wv);
+  const occ=occupancy(wv),items=exItems(R.items).filter(it=>it.wall===wv),bl=blockOcc(wv);
   const hasUp=!INSTALL&&showDims&&occ.some(o=>o.k.upper),xU=hasUp?fs*1.6:0; // място отгоре за размерите на горните шкафове
   const vb=EXP?[-t-fs*5,-H-fs*7.5-xU,L+2*t+fs*10,H+fs*15+xU]:[-t-fs*5,-H-fs*5.5-xU,L+2*t+fs*10,H+fs*11+xU];
   let s=`<rect x="${-t}" y="${-H}" width="${t}" height="${H}" style="fill:var(--wall)"/><rect x="${L}" y="${-H}" width="${t}" height="${H}" style="fill:var(--wall)"/>`+
@@ -2054,7 +2066,7 @@ function wallSvg(){
   for(const it of items){const d=ITEM[it.type];
     if(it.type==='window')s+=`<rect x="${it.off}" y="${-(it.z+it.h)}" width="${it.w}" height="${it.h}" style="fill:${d.color};fill-opacity:.18;stroke:${d.color};stroke-width:2;vector-effect:non-scaling-stroke"/><line x1="${it.off+it.w/2}" y1="${-(it.z+it.h)}" x2="${it.off+it.w/2}" y2="${-it.z}" style="stroke:${d.color};stroke-width:1;vector-effect:non-scaling-stroke"/>`;
     else if(it.type==='door'){const hx=it.hinge==='L'?it.off:it.off+it.w,ox=it.hinge==='L'?it.off+it.w:it.off;
-      s+=`<rect x="${it.off}" y="${-it.h}" width="${it.w}" height="${it.h}" style="fill:${it.leaf===false?d.color:it.col||'#c9b28f'};fill-opacity:${it.leaf===false?.15:.85};stroke:${d.color};stroke-width:2;vector-effect:non-scaling-stroke"/><polyline points="${ox},0 ${hx},${-it.h/2} ${ox},${-it.h}" style="fill:none;stroke:${d.color};stroke-dasharray:6 5;stroke-width:1;vector-effect:non-scaling-stroke"/>`}
+      s+=`<rect x="${it.off}" y="${-it.h}" width="${it.w}" height="${it.h}" style="fill:${it.leaf===false||it.glz?ITEM.window.color:it.col||'#c9b28f'};fill-opacity:${it.leaf===false?.15:it.glz?.18:.85};stroke:${d.color};stroke-width:2;vector-effect:non-scaling-stroke"/><polyline points="${ox},0 ${hx},${-it.h/2} ${ox},${-it.h}" style="fill:none;stroke:${d.color};stroke-dasharray:6 5;stroke-width:1;vector-effect:non-scaling-stroke"/>`}
     else if(it.type==='column')s+=`<rect x="${it.off}" y="${-H}" width="${it.w}" height="${H}" style="fill:var(--wall);opacity:.7"/>`;
     else if(isBox(it.type))s+=boxIcon(it.type,it.off,-(it.z+it.h),it.w,it.h);
   }
@@ -2239,7 +2251,7 @@ function planSvg(){
     s+=`<g transform="translate(${w.A[0]} ${w.A[1]}) rotate(${deg})">`;
     if(on)s+=`<rect x="0" y="${-R.t}" width="${w.len}" height="${R.t}" style="fill:var(--mark);opacity:.55"/>`;
     s+=`<rect data-wall="${i}" x="0" y="${-R.t-20}" width="${w.len}" height="${R.t+40}" style="fill:transparent;cursor:pointer"/>`;
-    for(const it of R.items.filter(q=>q.wall===i)){
+    for(const it of exItems(R.items).filter(q=>q.wall===i)){
       const d=ITEM[it.type];
       if(it.type==='window')s+=`<rect x="${it.off}" y="${-R.t}" width="${it.w}" height="${R.t}" style="fill:var(--floor);stroke:var(--fg);stroke-width:2"/><line x1="${it.off}" y1="${-R.t/2}" x2="${it.off+it.w}" y2="${-R.t/2}" style="stroke:${d.color};stroke-width:${Math.max(8,R.t/6)}"/>`;
       else if(it.type==='door'){const hx=it.hinge==='L'?it.off:it.off+it.w,ex=it.hinge==='L'?it.off+it.w:it.off,sw=it.hinge==='L'?1:0;
@@ -2252,7 +2264,7 @@ function planSvg(){
       else{const cx=it.off+it.w/2,r=it.type==='duct'?Math.max(fs*0.55,it.w/2):fs*0.55;s+=`<circle cx="${cx}" cy="${r+12}" r="${r}" style="fill:${d.color}"/><text x="${cx}" y="${r+12}" dy="0.35em" text-anchor="middle" font-size="${fs*0.65}" font-weight="600" font-family="IBM Plex Sans,sans-serif" transform="rotate(${-deg} ${cx} ${r+12})" style="fill:#fff">${d.mark}</text>`}
     }
     const ocA=occupancy(i),ocU=ocA.filter(o=>o.k.upper),flip=deg>90||deg<=-90,ty=-R.t-fs*(showDims?(ocU.length?4.4:2.9):0.55);
-    if(showDims){const its=R.items.filter(q=>q.wall===i);
+    if(showDims){const its=exItems(R.items).filter(q=>q.wall===i);
       if(its.length)s+=chain([0,w.len,...its.flatMap(q=>isPt(q.type)?[q.off+q.w/2]:[q.off,q.off+q.w])],-R.t-fs*1.1,-1,flip,0,w.len);
       if(ocU.length)s+=chain([0,w.len,...ocU.flatMap(o=>[o.s0,o.s1])],-R.t-fs*(its.length?2.6:1.1),-1,flip,0,w.len); // горните — извън стаята
       const oc=ocA.filter(o=>!o.k.upper),bo=blockOcc(i);if(oc.length||bo.length){const md=Math.max(...oc.map(o=>o.front?o.k.D:0),...bo.map(b=>b.dep),300);s+=chain([0,w.len,...oc.flatMap(o=>[o.s0,o.s1]),...bo.flatMap(b=>[b.s0,b.s1])],md+fs*0.9,1,flip,0,w.len)}}
