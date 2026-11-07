@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 01:20 · поправка: шкаф не става сам ъглов</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 01:30 · Gola: изрезите се виждат в 3D</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1114,8 +1114,11 @@ function buildRaw(k){
   if(isGola(k)){const Lw=+S.golaLw||26,Lh=+S.golaLh||56,Cw=+S.golaCw||26,Ch=+S.golaCh||73,sides=parts.filter(p=>/^Страница/.test(p.name)),top=Math.max(...sides.map(p=>p.box[5]));
     const fr=parts.filter(p=>p.kind==='door'&&p.name==='Чело').sort((a,b)=>b.box[4]-a.box[4]),cs=[];for(let i=0;i+1<fr.length;i++)cs.push((fr[i].box[4]+fr[i+1].box[5])/2);
     const nt=[{n:'L',w:Lw,z0:top-Lh,z1:top}];for(const zc of cs)nt.push({n:'C',w:Cw,z0:zc-Ch/2,z1:zc+Ch/2});
-    for(const p of sides)p.notch=nt.map(q=>({...q})); // изрези в страницата отпред (на циркуляра)
-    for(const q of nt)add(q.n==='L'?'Gola L профил':'Gola C профил',0,0,'k2',[0,0,0,0],[T,W-T,Dk-q.w,Dk-1,q.z0+(q.n==='L'?0:4),q.z1-(q.n==='L'?18:4)],'hw');
+    for(const p of sides){p.notch=nt.map(q=>({...q})); // изрези в страницата отпред (на циркуляра)
+      const[,,y0,y1,z0,z1]=p.box,ns=nt.filter(q=>q.z1>z0&&q.z0<z1).sort((a,b)=>a.z0-b.z0),sp=[[y0,z0],[y1,z0]];let topCut=false; // контурът на страницата с изрезите — за 3D
+      for(const q of ns){const a=Math.max(z0,q.z0),b=Math.min(z1,q.z1);sp.push([y1,a],[y1-q.w,a],[y1-q.w,b]);if(b<z1-0.1)sp.push([y1,b]);else topCut=true}
+      if(!topCut)sp.push([y1,z1]);sp.push([y0,z1]);p.sp=sp}
+    for(const q of nt)add(q.n==='L'?'Gola L профил':'Gola C профил',0,0,'k2',[0,0,0,0],[0,W,Dk-q.w,Dk-1,q.z0+(q.n==='L'?0:4),q.z1-(q.n==='L'?0:4)],'hw'); // профилът минава през изрезите в страниците
     warn.push(`Gola (без дръжки): изрези отпред в страниците — L горе ${fmt(Lw)} × ${fmt(Lh)}`+(cs.length?`; C ${fmt(Cw)} × ${fmt(Ch)} на ${cs.map(z=>fmt(Math.round(top-z))).join(', ')} мм от горния ръб (до средата)`:'')+`. Профил L ${fmt(W)} мм`+(cs.length?`, C ${cs.length} × ${fmt(W)} мм`:'')+'.')}
   if(half){add('Гръб',H-c-2*T,iR-iL,k.mc,[1,0,0,0],[iL,iR,0,T,c+T,H-T],'back')}
   else if(opn){add('Гръб',H-c-2*T,iR-iL,k.mc,[0,0,0,0],[iL,iR,0,T,c+T,H-T],'back')} // етажерка: гръб ПДЧ от корпуса, между страниците, дъното и тавана // твърд гръб от корпуса, между дъното и тавана
@@ -1815,9 +1818,10 @@ function rebuild3D(){
       if((!showDoors||(k.hideD&&!noHideD))&&(p.kind==='door'||p.kind==='alu'||p.kind==='glass')&&!p.gsh)continue; // скрити врати — само за картинката
       const [x0,x1,y0,y1,z0,z1]=p.box;
       if(p.kind==='virt'||p.noDraw)continue; // виртуален делител — само помощна линия; цял гръб, показан изрязан
-      const gc=p.kind==='glass'?GLCOL[p.glc||String(p.m).replace('__glass_','')]:null,pm=gc&&p.glc&&p.glc!=='clear'?{...mat(p.m),color:gc[1]}:mat(p.m),op=p.kind==='glass'?(gc?gc[2]:.3):1,tx=p.kind!=='hw'&&!p.fr&&!p.pl&&pm.tex;
+      const gc=p.kind==='glass'?GLCOL[p.glc||String(p.m).replace('__glass_','')]:null,pm=gc&&p.glc&&p.glc!=='clear'?{...mat(p.m),color:gc[1]}:mat(p.m),op=p.kind==='glass'?(gc?gc[2]:.3):1,tx=p.kind!=='hw'&&!p.fr&&!p.pl&&!p.sp&&pm.tex;
       let mesh;
       if(p.pl){const sh=new THREE.Shape(p.pl.map(([u,v])=>new THREE.Vector2(u*M,v*M)));mesh=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:(z1-z0)*M,bevelEnabled:false}),meshMat(pm.texAvg||pm.color,op));mesh.rotation.x=Math.PI/2;mesh.position.set(0,z1*M,0);g.add(mesh)} // скосен детайл — многоъгълник в плана
+      else if(p.sp&&!p.hidden){const sh=new THREE.Shape(p.sp.map(([u,v])=>new THREE.Vector2(u*M,v*M)));mesh=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:(x1-x0)*M,bevelEnabled:false}),meshMat(pm.texAvg||pm.color,op));mesh.rotation.y=-Math.PI/2;mesh.position.set(x1*M,0,0);g.add(mesh)} // страница с изрези (Gola)
       else if(p.fp){const sh=new THREE.Shape(p.fp.map(([u,v])=>new THREE.Vector2(u*M,v*M)));mesh=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:(y1-y0)*M,bevelEnabled:false}),meshMat(pm.texAvg||pm.color,op));mesh.position.set(0,0,y0*M);g.add(mesh)} // гръб с изрез под прозореца — едно парче
       else if(p.fr){const sh=new THREE.Shape(miterPts(p.fr).map(([u,v])=>new THREE.Vector2(u*M,v*M)));mesh=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:(y1-y0)*M,bevelEnabled:false}),accMat(pm.color,.35,.12));mesh.position.set(0,0,y0*M);g.add(mesh)} // ал. профил — под 45°
       else mesh=boxAt(g,(x1-x0)*M,(z1-z0)*M,(y1-y0)*M,(x0+x1)/2*M,(z0+z1)/2*M,(y0+y1)/2*M,tx?texMat(pm,op):meshMat(p.kind==='hw'?'#a7aeb3':pm.color,op));
