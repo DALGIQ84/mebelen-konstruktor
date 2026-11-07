@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 22:50 · свободни детайли</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 21:10 · свободни детайли + размери</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2095,7 +2095,7 @@ function clearDims(k,cols,fs){let s='';const f=fs*0.5,st='stroke:var(--mark);str
 function wallSvg(){
   const R=P.room,w=wallInfo(wv),L=w.len,H=R.h,t=R.t;fs=Math.max(L,H)/36;
   const occ=occupancy(wv),items=exItems(R.items).filter(it=>it.wall===wv),bl=blockOcc(wv);
-  const hasUp=!INSTALL&&showDims&&occ.some(o=>o.k.upper),xU=hasUp?fs*1.6:0; // място отгоре за размерите на горните шкафове
+  const hasUp=!INSTALL&&showDims&&(occ.some(o=>o.k.upper)||P.cabinets.some(q=>['wpanel','wshelf','ubottom'].includes(q.type)&&q.wall===wv)),xU=hasUp?fs*1.6:0; // място отгоре за размерите на горните шкафове
   const vb=EXP?[-t-fs*5,-H-fs*7.5-xU,L+2*t+fs*10,H+fs*15+xU]:[-t-fs*5,-H-fs*5.5-xU,L+2*t+fs*10,H+fs*11+xU];
   let s=`<rect x="${-t}" y="${-H}" width="${t}" height="${H}" style="fill:var(--wall)"/><rect x="${L}" y="${-H}" width="${t}" height="${H}" style="fill:var(--wall)"/>`+
     `<rect x="0" y="${-H}" width="${L}" height="${H}" style="fill:var(--floor);stroke:var(--fg);stroke-width:1.5;vector-effect:non-scaling-stroke"/>`+
@@ -2112,7 +2112,9 @@ function wallSvg(){
   }
   for(const k of P.cabinets.filter(q=>['wpanel','wshelf','ubottom'].includes(q.type)&&q.wall===wv)){const on=isSel(k.id); // свободни детайли по стената
     s+=`<g data-id="${k.id}" style="cursor:pointer">`+build(k).parts.map(p=>`<rect x="${k.off+p.box[0]}" y="${-p.box[5]}" width="${p.box[1]-p.box[0]}" height="${Math.max(4,p.box[5]-p.box[4])}" style="fill:${mat(p.m).color};stroke:${on?'var(--mark)':'var(--fg)'};stroke-width:${on?3:1};vector-effect:non-scaling-stroke"/>`).join('')+
-      `<text x="${k.off+k.W/2}" y="${-(k.type==='wpanel'?k.c+(+k.fpH||700)/2:k.c)-fs*0.4}" text-anchor="middle" font-size="${fs*0.5}" font-family="IBM Plex Sans,sans-serif" style="fill:var(--fg)">${esc(k.name)}</text></g>`}
+      `<text x="${k.off+k.W/2}" y="${-(k.type==='wpanel'?k.c+(+k.fpH||700)/2:k.c)-fs*0.4}" text-anchor="middle" font-size="${fs*0.5}" font-family="IBM Plex Sans,sans-serif" style="fill:var(--fg)">${esc(k.name)}</text></g>`;
+    if(showDims){const ps=build(k).parts,zt=Math.max(...ps.map(p=>p.box[5])),zs=k.type==='wshelf'?ps.map(p=>p.box[4]):k.type==='wpanel'?[k.c,zt]:[k.c,zt]; // размери: позиция по стената, ширина, височини от пода
+      s+=`<g class="fdim">`+chainV([0,...zs],Math.min(L,k.off+k.W)+fs*0.7,1)+`</g>`}}
   for(const k of P.cabinets.filter(q=>q.type==='splash'&&q.wall===wv)){const x0=Math.max(0,k.off),x1=Math.min(L,k.off+k.W);
     const fp=build(k).parts.find(p=>p.fp)?.fp,shp=fp?`<polygon points="${fp.map(([u,v])=>(k.off+u)+','+(-v)).join(' ')}"`:`<rect x="${x0}" y="${-k.H}" width="${x1-x0}" height="${k.H-k.c}"`; // с изреза под прозореца
     s+=`<g data-id="${k.id}" style="cursor:pointer">${shp} style="fill:${mat(k.mf).color};fill-opacity:.55;stroke:${isSel(k.id)?'var(--mark)':'var(--fg)'};stroke-width:${isSel(k.id)?3:1};vector-effect:non-scaling-stroke"/>`+
@@ -2163,7 +2165,7 @@ function wallSvg(){
     if(top.length)s+=chain([0,L,...top],-H-fs*1.4,-1,false,0,L);
     const bot=[...(INSTALL?[]:occ.filter(o=>!o.k.upper).flatMap(o=>[o.s0,o.s1])),...bl.flatMap(b=>[b.s0,b.s1])];
     if(bot.length)s+=chain([0,L,...bot],fs*1.3,1,false,0,L);
-    const upO=INSTALL?[]:occ.filter(o=>o.k.upper); // горните шкафове — размерите им са отгоре
+    const upO=INSTALL?[]:[...occ.filter(o=>o.k.upper),...P.cabinets.filter(q=>['wpanel','wshelf','ubottom'].includes(q.type)&&q.wall===wv).map(k=>({k,s0:k.off,s1:k.off+k.W}))]; // горните шкафове и свободните детайли — размерите им са отгоре
     if(upO.length)s+=chain([0,L,...upO.flatMap(o=>[o.s0,o.s1])],-H-fs*(top.length?2.9:1.4),-1,false,0,L);
     s+=dimH(0,L,bot.length?fs*3.3:fs*1.3,DT(L),1,false);
     for(const b of bl)if(b.z>0||b.z+b.h<H-1)s+=chainV([0,b.z,b.z+b.h,H].filter((v,i,a)=>a.indexOf(v)===i),Math.min(L,b.s1)+fs*0.7,1);
