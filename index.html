@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 21:20 · меню Файл надясно</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 21:25 · гръб в Стени с изрез</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2079,7 +2079,8 @@ function wallSvg(){
     else if(isBox(it.type))s+=boxIcon(it.type,it.off,-(it.z+it.h),it.w,it.h);
   }
   for(const k of P.cabinets.filter(q=>q.type==='splash'&&q.wall===wv)){const x0=Math.max(0,k.off),x1=Math.min(L,k.off+k.W);
-    s+=`<g data-id="${k.id}" style="cursor:pointer"><rect x="${x0}" y="${-k.H}" width="${x1-x0}" height="${k.H-k.c}" style="fill:${mat(k.mf).color};fill-opacity:.55;stroke:${isSel(k.id)?'var(--mark)':'var(--fg)'};stroke-width:${isSel(k.id)?3:1};vector-effect:non-scaling-stroke"/>`+
+    const fp=build(k).parts.find(p=>p.fp)?.fp,shp=fp?`<polygon points="${fp.map(([u,v])=>(k.off+u)+','+(-v)).join(' ')}"`:`<rect x="${x0}" y="${-k.H}" width="${x1-x0}" height="${k.H-k.c}"`; // с изреза под прозореца
+    s+=`<g data-id="${k.id}" style="cursor:pointer">${shp} style="fill:${mat(k.mf).color};fill-opacity:.55;stroke:${isSel(k.id)?'var(--mark)':'var(--fg)'};stroke-width:${isSel(k.id)?3:1};vector-effect:non-scaling-stroke"/>`+
       `<text x="${(x0+x1)/2}" y="${-(k.H+k.c)/2}" dy=".35em" text-anchor="middle" font-size="${fs*0.55}" font-family="IBM Plex Sans,sans-serif" style="fill:var(--fg)">гръб ${Math.round(k.W)} × ${Math.round(k.H-k.c)}</text></g>`;
     if(showDims)s+=chainV([k.c,k.H],Math.min(L,k.off+k.W)+fs*0.7,1)}
   for(const k of P.cabinets.filter(q=>q.type==='top'&&q.wall===wv)){const tt=+mat(k.mf).t||38,x0=Math.max(0,k.off),x1=Math.min(L,k.off+k.W);
