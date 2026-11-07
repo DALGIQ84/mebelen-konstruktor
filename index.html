@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 19:50 · врата на стаята</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 19:55 · покажи вратата</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1636,6 +1636,7 @@ function rebuild3D(){
         const leaf=boxAt(g,(ww-20)*M,(o.h-10)*M,0.04,(o.s0+o.s1)/2*M,(o.h-10)/2*M,-0.02,lm);leaf.userData.rdoor=o.id;
         for(const[cx,wd,hh,cy]of[[o.s0-fw/2+5,fw,o.h+fw-5,(o.h+fw-5)/2],[o.s1+fw/2-5,fw,o.h+fw-5,(o.h+fw-5)/2],[(o.s0+o.s1)/2,ww+2*fw-10,fw,o.h+fw/2-5]]){const m=boxAt(g,wd*M,hh*M,0.012,cx*M,cy*M,0.006,fm);m.userData.rdoor=o.id}
         const hk=o.hinge==='L'?o.s1-90:o.s0+90,hm=boxAt(g,0.14,0.02,0.05,hk*M,1050*M,0.025,meshMat('#9aa3a8'));hm.userData.rdoor=o.id}
+      if(o.type==='door'&&o.leaf===false){const hm=boxAt(g,(o.s1-o.s0)*M,o.h*M,0.01,(o.s0+o.s1)/2*M,o.h/2*M,-t/2,new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hm.userData.rdoor=o.id} // невидима „мишена“ в отвора — десен бутон я показва пак
       s=Math.max(s,o.s1)}
     piece(s,w.len+e1,0,R.h);
     for(const it of R.items.filter(it=>it.wall===i&&it.type!=='window'&&it.type!=='door')){
