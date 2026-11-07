@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="bg"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>KORPUS</title><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f4e6e">
+<title>KORPUS</title><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#f2b11f">
 <link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
 <style>[hidden]{display:none!important}</style></head><body><title>KORPUS</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -8,7 +8,7 @@
 /* Layout: workshop tool — editor column left (cabinets / room tabs), 3D/plan stage right, cut list below the stage */
 :root{
   --bg:#e9edef; --panel:#ffffff; --line:#d0d7db; --fg:#1a2227; --muted:#5a6870;
-  --accent:#1f5a85; --accent-ink:#ffffff; --mark:#cf8f00; --warn:#b4472c; --stage:#dfe4e7; --field:#f5f7f8;
+  --accent:#f2b11f; --accent-ink:#1d1d1f; --mark:#e8590c; --dimc:#2b3338; --warn:#b4472c; --stage:#dfe4e7; --field:#f5f7f8;
   --wall:#6d7a82; --floor:#fbfbfa;
   --f-display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
   --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -16,18 +16,18 @@
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#131819; --panel:#1b2226; --line:#2d373d; --fg:#e2e8ea; --muted:#94a2a9;
-  --accent:#6ea6d4; --accent-ink:#0d1a24; --mark:#f0b429; --warn:#e07a5f; --stage:#192024; --field:#222a2f;
+  --accent:#ffc02e; --accent-ink:#1d1d1f; --mark:#ff7a33; --dimc:#c9d2d8; --warn:#e07a5f; --stage:#192024; --field:#222a2f;
   --wall:#56636b; --floor:#20282d; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#131819; --panel:#1b2226; --line:#2d373d; --fg:#e2e8ea; --muted:#94a2a9;
-  --accent:#6ea6d4; --accent-ink:#0d1a24; --mark:#f0b429; --warn:#e07a5f; --stage:#192024; --field:#222a2f;
+  --accent:#ffc02e; --accent-ink:#1d1d1f; --mark:#ff7a33; --dimc:#c9d2d8; --warn:#e07a5f; --stage:#192024; --field:#222a2f;
   --wall:#56636b; --floor:#20282d; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:14px;line-height:1.45}
 .top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding-block:6px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:var(--panel);border-bottom:1px solid var(--line)}
 .brand{font-family:var(--f-display);font-weight:600;font-size:19px;letter-spacing:.01em;margin-right:10px}
 #bSet{margin-left:0}
-@media (display-mode: standalone){.top .brand{display:none}} /* инсталираната програма: името и версията са в синята лента на прозореца */
+@media (display-mode: standalone){.top .brand small{display:none}} /* инсталираната програма: името и версията са в синята лента на прозореца */
 .brand small{font-family:var(--f-body);font-weight:400;font-size:12px;color:var(--muted);margin-left:8px}
 button,select,input{font:inherit;color:inherit}
 .btn{border:1px solid var(--line);background:var(--panel);padding:6px 12px;border-radius:6px;cursor:pointer}
@@ -118,9 +118,9 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 .mats input[type=color]{padding:0;height:28px}
 .mats .h{font-size:12px;color:var(--muted)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:6px;font-size:13px;z-index:30}
-.dm{stroke:var(--accent);stroke-width:1.2;vector-effect:non-scaling-stroke;fill:none}
-.dx{stroke:var(--accent);stroke-width:.8;vector-effect:non-scaling-stroke;opacity:.45}
-.dt{fill:var(--accent);font-family:var(--f-mono);font-weight:500}
+.dm{stroke:var(--dimc);stroke-width:1.2;vector-effect:non-scaling-stroke;fill:none}
+.dx{stroke:var(--dimc);stroke-width:.8;vector-effect:non-scaling-stroke;opacity:.45}
+.dt{fill:var(--dimc);font-family:var(--f-mono);font-weight:500}
 #wallNav{display:inline-flex;align-items:center;gap:4px}
 #wallNav select{background:var(--field);border:1px solid var(--line);border-radius:5px;padding:3px 6px;color:var(--fg)}
 .dd{position:relative}
@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KORPUS<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 00:00 · име KORPUS и ново лого</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KORPUS<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 00:15 · жълти цветове като логото</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1354,7 +1354,7 @@ function renderEditor(){
   $('#edTitle').textContent='Параметри · '+k.name;
   const onWall=k.wall!==null;
   const colDr=q=>false,drOK=q=>['drawers','oven'].includes(q.type),C3=['doors','drawers','oven','col','bed'];
-  const COND={bMW:['bed'],bML:['bed'],bGap:['bed'],bH:['bed'],bSpl:['bed'],bUp:['bed'],bFl:['bed'],bHB:['bed'],bHBh:q=>q.type==='bed'&&q.bHB!=='none',bHBw:q=>q.type==='bed'&&q.bHB!=='none',fcut:['wpanel'],fpH:['wpanel'],fsD:['wshelf'],fsN:['wshelf'],fsG:['wshelf'],wCorner:['wardrobe'],wLsh:q=>q.type==='wardrobe'&&!!q.wCorner,doorsB:q=>q.type==='wardrobe'&&!!q.wCorner,wsecsB:q=>q.type==='wardrobe'&&!!q.wCorner,wDoor:['wardrobe'],antr:['wardrobe'],antH:q=>q.type==='wardrobe'&&!!q.antr,antSh:q=>q.type==='wardrobe'&&!!q.antr,wRod:['wardrobe'],wDrH:['wardrobe'],wBoxH:['wardrobe'],wDrD:['wardrobe'],wSlide:['wardrobe'],wsecs:['wardrobe'],eR:q=>q.type==='endShelf'&&q.eShape==='r',eFloor:q=>q.type==='endShelf'&&!q.upper,eShape:['endShelf'],eSide:['endShelf'],diag:q=>q.type==='cornerL'&&!!q.upper,hoodStrip:q=>q.type==='doors'&&q.upper&&!!q.hood,hoodH:q=>q.type==='doors'&&q.upper&&!!q.hood,hoodD:q=>q.type==='doors'&&q.upper&&!!q.hood,liftMech:q=>q.type==='doors'&&q.upper&&+q.lift>0&&(!q.open||q.vitrine),liftInfo:q=>q.type==='doors'&&q.upper&&+q.lift>0&&(!q.open||q.vitrine),upper:['doors','cornerL'],lift:q=>q.type==='doors'&&q.upper&&(!q.open||q.vitrine),hood:q=>q.type==='doors'&&q.upper,hoodD:q=>q.type==='doors'&&q.upper&&q.hood,apShow:q=>['oven','col'].includes(q.type)||(q.upper&&!!q.hood),glCol:q=>q.type==='wardrobe'||q.type==='doors'&&!!q.open&&!!q.vitrine,glColS:['wardrobe'],mGv:q=>q.type==='wardrobe'||q.type==='doors'&&!!q.open&&!!q.vitrine,mGs:['wardrobe'],wExM:['wardrobe'],wEx:['wardrobe'],wExB:['wardrobe'],wExSep:['wardrobe'],alCol:q=>q.type==='doors'&&!!q.open&&!!q.vitrine,vitrine:q=>q.type==='doors'&&!!q.open,vdoors:q=>q.type==='doors'&&!!q.open&&!!q.vitrine&&!(q.upper&&+q.lift>0),split:q=>q.type==='doors'&&!!q.open,open:'doors',armB:'cornerL',deadOpen:q=>q.type==='doors'&&(q.deadSide||'none')!=='none',half:'doors',divRef:q=>q.type==='doors'&&+q.div>0,divp:q=>q.type==='doors'&&+q.div>0&&divMode(q)!=='auto',over:'endPanel',toFloor:'endPanel',pc:'endPanel',deadSide:'doors',deadW:'doors',div:'doors',sh:'doors',doors:'doors',dr:q=>q.type==='drawers'||colDr(q),dh:q=>q.type==='drawers'||colDr(q),slide:drOK,nl:drOK,bh:drOK,mx:drOK,mxb:drOK,
+  const COND={nsMount:['nstand'],nsLeg:['nstand'],nsPlB:['nstand'],nsTop:['nstand'],nsBot:['nstand'],nsSecs:['nstand'],nsHinge:['nstand'],bMW:['bed'],bML:['bed'],bGap:['bed'],bH:['bed'],bSpl:['bed'],bUp:['bed'],bFl:['bed'],bHB:['bed'],bHBh:q=>q.type==='bed'&&q.bHB!=='none',bHBw:q=>q.type==='bed'&&q.bHB!=='none',fcut:['wpanel'],fpH:['wpanel'],fsD:['wshelf'],fsN:['wshelf'],fsG:['wshelf'],wCorner:['wardrobe'],wLsh:q=>q.type==='wardrobe'&&!!q.wCorner,doorsB:q=>q.type==='wardrobe'&&!!q.wCorner,wsecsB:q=>q.type==='wardrobe'&&!!q.wCorner,wDoor:['wardrobe'],antr:['wardrobe'],antH:q=>q.type==='wardrobe'&&!!q.antr,antSh:q=>q.type==='wardrobe'&&!!q.antr,wRod:['wardrobe'],wDrH:['wardrobe'],wBoxH:['wardrobe'],wDrD:['wardrobe'],wSlide:['wardrobe'],wsecs:['wardrobe'],eR:q=>q.type==='endShelf'&&q.eShape==='r',eFloor:q=>q.type==='endShelf'&&!q.upper,eShape:['endShelf'],eSide:['endShelf'],diag:q=>q.type==='cornerL'&&!!q.upper,hoodStrip:q=>q.type==='doors'&&q.upper&&!!q.hood,hoodH:q=>q.type==='doors'&&q.upper&&!!q.hood,hoodD:q=>q.type==='doors'&&q.upper&&!!q.hood,liftMech:q=>q.type==='doors'&&q.upper&&+q.lift>0&&(!q.open||q.vitrine),liftInfo:q=>q.type==='doors'&&q.upper&&+q.lift>0&&(!q.open||q.vitrine),upper:['doors','cornerL'],lift:q=>q.type==='doors'&&q.upper&&(!q.open||q.vitrine),hood:q=>q.type==='doors'&&q.upper,hoodD:q=>q.type==='doors'&&q.upper&&q.hood,apShow:q=>['oven','col'].includes(q.type)||(q.upper&&!!q.hood),glCol:q=>q.type==='wardrobe'||q.type==='doors'&&!!q.open&&!!q.vitrine,glColS:['wardrobe'],mGv:q=>q.type==='wardrobe'||q.type==='doors'&&!!q.open&&!!q.vitrine,mGs:['wardrobe'],wExM:['wardrobe'],wEx:['wardrobe'],wExB:['wardrobe'],wExSep:['wardrobe'],alCol:q=>q.type==='doors'&&!!q.open&&!!q.vitrine,vitrine:q=>q.type==='doors'&&!!q.open,vdoors:q=>q.type==='doors'&&!!q.open&&!!q.vitrine&&!(q.upper&&+q.lift>0),split:q=>q.type==='doors'&&!!q.open,open:'doors',armB:'cornerL',deadOpen:q=>q.type==='doors'&&(q.deadSide||'none')!=='none',half:'doors',divRef:q=>q.type==='doors'&&+q.div>0,divp:q=>q.type==='doors'&&+q.div>0&&divMode(q)!=='auto',over:'endPanel',toFloor:'endPanel',pc:'endPanel',deadSide:'doors',deadW:'doors',div:'doors',sh:'doors',doors:'doors',dr:q=>q.type==='drawers'||colDr(q),dh:q=>q.type==='drawers'||colDr(q),slide:drOK,nl:drOK,bh:drOK,mx:drOK,mxb:drOK,
     ovenH:['oven','col'],mwOn:'col',mwH:q=>q.type==='col'&&q.mwOn!==false,fridgeH:()=>false,frDoors:()=>false,frLow:()=>false,divShort:['col','fridge'],grooveD:'col',grooveY:'col',colTopPos:['col','fridge'],topSh:'col',floor:['doors','drawers','oven'],plinth:['doors','drawers','oven','dw','fridge'],top:['doors','drawers'],mb:C3,backPos:['doors','drawers','oven'],bRails:C3};
   const FILL_OK=['_','name','W','H','D','c','mc','mf','wall','off','gap','px','py','rot'];
   if(isAcc(k)){const a=accOf(k),inb=accIn(k),v=x=>esc(x);
@@ -2182,7 +2182,7 @@ function clearDims(k,cols,fs){let s='';const f=fs*0.5,st='stroke:var(--mark);str
     const zt=bs.length>1?bs[1][0]:bs[0][1]+200,zy=bs[0][1]+Math.min(120,(zt-bs[0][1])/2);
     s+=`<line x1="${X0}" y1="${-zy}" x2="${X1}" y2="${-zy}" style="${st};stroke-dasharray:4 3"/>`+tx(X0+w*0.28,-zy-f*.7,Math.round(w));
     for(const z of c.rods)s+=`<line x1="${X0+8}" y1="${-z}" x2="${X1-8}" y2="${-z}" style="stroke:#8a959b;stroke-width:3;vector-effect:non-scaling-stroke"/>`;
-    for(const q of bs)if(q[2]==='рафт')s+=`<text x="${X0+f*.3}" y="${-q[0]-f*.15}" font-size="${f*.9}" font-family="IBM Plex Mono,monospace" font-weight="600" style="fill:#fff;paint-order:stroke;stroke:#1f5a85;stroke-width:${f/3.2}px;stroke-linejoin:round">↥${Math.round(q[0]-bs[0][1])}</text>`}
+    for(const q of bs)if(q[2]==='рафт')s+=`<text x="${X0+f*.3}" y="${-q[0]-f*.15}" font-size="${f*.9}" font-family="IBM Plex Mono,monospace" font-weight="600" style="fill:#fff;paint-order:stroke;stroke:#1d1d1f;stroke-width:${f/3.2}px;stroke-linejoin:round">↥${Math.round(q[0]-bs[0][1])}</text>`}
   return s}
 function wallSvg(){
   const R=P.room,w=wallInfo(wv),L=w.len,H=R.h,t=R.t;fs=Math.max(L,H)/36;
@@ -2448,10 +2448,10 @@ function planSvg(){
 }
 
 /* ---------- Запазване като картинка ---------- */
-const LIGHT='--panel:#ffffff;--line:#d0d7db;--fg:#1a2227;--muted:#5a6870;--accent:#1f5a85;--mark:#cf8f00;--wall:#6d7a82;--floor:#ffffff';
+const LIGHT='--panel:#ffffff;--line:#d0d7db;--fg:#1a2227;--muted:#5a6870;--accent:#f2b11f;--dimc:#2b3338;--mark:#e8590c;--wall:#6d7a82;--floor:#ffffff';
 async function svgCanvas(s,vb,px){
   const h=Math.round(px*vb[3]/vb[2]);
-  const doc=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb.join(' ')}" width="${px}" height="${h}"><style>svg{${LIGHT}} .dm{stroke:var(--accent);stroke-width:2.2;vector-effect:non-scaling-stroke;fill:none} .dt{fill:var(--accent);font-family:'IBM Plex Mono',Consolas,monospace;font-weight:500} text{font-family:'IBM Plex Sans',Arial,sans-serif}</style><rect x="${vb[0]}" y="${vb[1]}" width="${vb[2]}" height="${vb[3]}" fill="#ffffff"/>${s}</svg>`;
+  const doc=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb.join(' ')}" width="${px}" height="${h}"><style>svg{${LIGHT}} .dm{stroke:var(--dimc);stroke-width:2.2;vector-effect:non-scaling-stroke;fill:none} .dt{fill:var(--dimc);font-family:'IBM Plex Mono',Consolas,monospace;font-weight:500} text{font-family:'IBM Plex Sans',Arial,sans-serif}</style><rect x="${vb[0]}" y="${vb[1]}" width="${vb[2]}" height="${vb[3]}" fill="#ffffff"/>${s}</svg>`;
   const img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(doc);await img.decode();
   const c=document.createElement('canvas');c.width=px;c.height=h;c.getContext('2d').drawImage(img,0,0,px,h);return c;
 }
@@ -2631,7 +2631,7 @@ function shotCab(k,doors,w,h){
   renderer.render(scene,camera);const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,w,h);g.drawImage(renderer.domElement,0,0,w,h);
   scene.background=bg;camera.position.copy(pos);controls.target.copy(tg);controls.update();renderer.setPixelRatio(pr);
   isoCab=null;noHideD=false;({sel,showDoors,showWalls}=keep);rebuild3D();resize();return c}
-function drawEdge(g,x,y,e){const w=70,h=34;g.strokeStyle='#c7ced2';g.lineWidth=2;g.strokeRect(x,y,w,h);g.strokeStyle='#1f5a85';g.lineWidth=7;
+function drawEdge(g,x,y,e){const w=70,h=34;g.strokeStyle='#c7ced2';g.lineWidth=2;g.strokeRect(x,y,w,h);g.strokeStyle='#e3a21a';g.lineWidth=7;
   const L=(a,b,c2,d)=>{g.beginPath();g.moveTo(a,b);g.lineTo(c2,d);g.stroke()};if(e[0])L(x,y,x+w,y);if(e[1])L(x,y+h,x+w,y+h);if(e[2])L(x,y,x,y+h);if(e[3])L(x+w,y,x+w,y+h)}
 const QMAX=8; // до толкова реда детайли — шкафът влиза в четвърт лист
 function cabRows(k){const keep=scope;scope='cab';const r=rows([k],false,true);scope=keep;return r}

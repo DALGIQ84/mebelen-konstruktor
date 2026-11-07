@@ -1,2 +1,2 @@
-{"name":"KORPUS","short_name":"KORPUS","description":"Мебели по мярка · детайли · разкрой — М Плюс Мебели","start_url":"./","scope":"./","display":"standalone","background_color":"#f3f4f2","theme_color":"#1f4e6e","lang":"bg",
+{"name":"KORPUS","short_name":"KORPUS","description":"Мебели по мярка · детайли · разкрой — М Плюс Мебели","start_url":"./","scope":"./","display":"standalone","background_color":"#f3f4f2","theme_color":"#f2b11f","lang":"bg",
 "icons":[{"src":"icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},{"src":"icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}
