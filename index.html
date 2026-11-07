@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 20:55 · гръб цял, зарязва се</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 21:05 · плот само над избраните</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1892,8 +1892,9 @@ function addTops(grp){ // по един плот за всяка стена; в 
   for(const w in byW){const g=byW[w],wi=wallInfo(+w),iv=occupancy(+w).filter(o=>!o.front).map(o=>[o.s0,o.s1]);
     let a0=Math.min(...g.map(q=>q.off)),a1=Math.max(...g.map(q=>q.off+q.W));const top=Math.max(...g.map(q=>+q.H));
     const cornerL=iv.some(([a,b])=>a<1&&b>a0-5),cornerR=iv.some(([a,b])=>b>wi.len-1&&a<a1+5);
-    if(a0<60)a0=0;else if(cornerL&&a0<TD+150)a0=TD;
-    if(a1>wi.len-60)a1=wi.len;else if(cornerR&&a1>wi.len-TD-150)a1=wi.len-TD;
+    const fil=(x0,x1)=>P.cabinets.some(q=>q.type==='filler'&&q.wall===+w&&q.off<x1+1&&q.off+ +q.W>x0-1); // до стената — само ако там има пълнеж
+    if(a0<60){if(a0<1||fil(0,a0))a0=0}else if(cornerL&&a0<TD+150)a0=TD;
+    if(a1>wi.len-60){if(a1>wi.len-1||fil(a1,wi.len))a1=wi.len}else if(cornerR&&a1>wi.len-TD-150)a1=wi.len-TD;
     if(g.some(q=>q.cb==='end'))a1=Math.min(a1,wi.len-TD);if(g.some(q=>q.cb==='start'))a0=Math.max(a0,TD); // рамо Б опира в плота на рамо А
     const p=cabDef({type:'top',name:'Плот',W:Math.round(a1-a0),D:TD,c:top,H:top+38,mf:'pl38',wall:+w,off:a0,gap:0,plinth:false});place(p);P.cabinets.push(p);made.push(p)}
   sel=made[0].id;multiSel=new Set(made.map(p=>p.id));P.example=false;changed(true);
