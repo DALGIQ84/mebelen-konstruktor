@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 23:35 · нощно шкафче — кутии</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 23:40 · нощно шкафче — цокъл</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1222,7 +1222,7 @@ function buildNstand(k){const S=P.settings,parts=[],warn=[],add=(name,L,Wd,m,e,b
   if(botUnder)add('Дъно',W,Dk-yb,k.mc,mt==='wall'?[1,0,1,1]:[1,0,0,0],[0,W,yb,Dk,z0,z0+T]);else add('Дъно',W-2*T,Dk-yb,k.mc,[1,0,0,0],[T,W-T,yb,Dk,z0,z0+T]);
   if(!noB){if(hdf)add('Гръб',H-z0-bt,W-bt,k.mb,[0,0,0,0],[bt/2,W-bt/2,-B,0,z0+bt/2,H-bt/2],'back');else add('Гръб',H-z0-2*T,W-2*T,k.mb,[0,0,0,0],[T,W-T,0,B,z0+T,H-T],'back')}
   if(mt==='legs'){const lg=40;for(const[x,y]of[[30,yb+30],[W-30-lg,yb+30],[30,Dk-30-lg],[W-30-lg,Dk-30-lg]])parts_hw(add,'Краче',[x,x+lg,y,y+lg,0,z0]);warn.push(`На 4 крачета ${fmt(z0)} мм.`)}
-  if(mt==='plinth'&&z0>0){const pb=Math.max(0,+(k.nsPlB??30));add('Цокъл',W-2*T,z0,k.mf,[1,0,0,0],[T,W-T,Dk-pb-T,Dk-pb,0,z0])}
+  const plOn=mt==='plinth'||(mt!=='wall'&&!!k.plinth);if(plOn&&z0>0){const pb=Math.max(0,+(k.nsPlB??30)),tP=+mat(k.mf).t||18,x0=mt==='sides'?T:0,x1=mt==='sides'?W-T:W;add('Цокъл',x1-x0,z0,k.mf,[1,0,0,0],[x0,x1,Dk-pb-tP,Dk-pb,0,z0])}
   if(mt==='wall')warn.push(`Висящо — долният ръб на ${fmt(z0)} мм от пода.`);
   // лицата: секции отгоре надолу
   const sc=nsSecs(k),fz0=z0,fz1=H,tot=fz1-fz0,fix=sc.reduce((a,q)=>a+(+q.h>0?+q.h:0),0),nA=sc.filter(q=>!(+q.h>0)).length,auto=nA?(tot-fix)/nA:0;
@@ -1364,8 +1364,8 @@ function renderEditor(){
   ed.innerHTML=FIELDS.map(([f,l,t,x])=>{
     if(t==='note')return `<label class="full">${l}<textarea id="f_note" data-f="note" rows="2" placeholder="напр. Push панти, без дръжка…" style="font:inherit;resize:vertical;height:54px;min-height:34px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--fg)">${esc(k.note||'')}</textarea><span style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${NOTE_CHIPS.map(c=>`<button type="button" class="btn sm" data-nchip="${esc(c)}" style="padding:2px 8px;font-size:11px">+ ${esc(c)}</button>`).join('')}</span></label>`;
     if(k.type==='filler'&&!FILL_OK.includes(f))return '';
-    if(k.type==='nstand'){if(!['_','name','note','W','H','D','nsMount','nsLeg','nsPlB','nsTop','nsBot','nsSecs','nsHinge','slide','nl','mc','mf','mb','mx','mxb','wall','off','gap','px','py','rot'].includes(f))return '';const sc=nsSecs(k),mt=k.nsMount||'legs';
-      if(f==='nsPlB'&&mt!=='plinth')return '';if(f==='nsBot'&&mt==='sides')return '';if(f==='nsHinge'&&!sc.some(q=>q.t==='door'))return '';if(['slide','nl','mx','mxb'].includes(f)&&!sc.some(q=>q.t==='dr'))return '';
+    if(k.type==='nstand'){if(!['_','name','note','W','H','D','nsMount','nsLeg','plinth','nsPlB','nsTop','nsBot','nsSecs','nsHinge','slide','nl','mc','mf','mb','mx','mxb','wall','off','gap','px','py','rot'].includes(f))return '';const sc=nsSecs(k),mt=k.nsMount||'legs';
+      if(f==='plinth'&&(mt==='wall'||mt==='plinth'))return '';if(f==='nsPlB'&&!(mt==='plinth'||mt!=='wall'&&k.plinth))return '';if(f==='nsBot'&&mt==='sides')return '';if(f==='nsHinge'&&!sc.some(q=>q.t==='door'))return '';if(['slide','nl','mx','mxb'].includes(f)&&!sc.some(q=>q.t==='dr'))return '';
       if(f==='H')l='Височина от пода, мм';if(f==='D')l='Дълбочина с лицето, мм';if(f==='nsLeg')l=mt==='legs'?'Крачета, мм':mt==='plinth'?'Цокъл, мм':mt==='wall'?'Долният ръб — от пода, мм':'Дъното — от пода, мм';if(f==='mf')l='Лице';if(f==='mb')l='Гръб (HDF или плоскост)'}
     else if(k.type==='bed'){if(!['_','name','note','bMW','bML','bGap','bH','bSpl','bUp','bFl','bHB','bHBh','bHBw','c','mc','mf','mb','wall','off','gap','px','py','rot'].includes(f))return '';if(f==='c')l='Крачета под коша (от пода), мм';if(f==='mc')l='Кош';if(f==='mf')l='Облицовка и табла';if(f==='mb')l='Дъно на раклата'}
     else if(k.type==='wpanel'){if(!['_','name','note','W','fpH','c','mf','wall','off'].includes(f))return '';if(f==='c')l='От пода (долният ръб), мм';if(f==='mf')l='Материал'}
@@ -1477,7 +1477,7 @@ $('#ed').addEventListener('input',e=>{
   place(k);P.example=false;if(f==='dr')k.dr=Math.min(12,Math.max(1,k.dr|0));
   if(f==='slide')k.nl=0;
   if(f==='frDoors')k.frDoors=+v;
-  const full=['nsMount','nsTop','nsBot','bHB','wExSep','wExM','wLsh','wCorner','wDoor','antr','eShape','eFloor','diag','hoodStrip','hoodH','liftMech','upper','lift','hood','vitrine','vdoors','split','sh','open','half','deadOpen','div','divRef','mb','backPos','type','dr','slide','deadSide','lowType','frDoors','mwOn','toFloor'].includes(f);
+  const full=['plinth','nsMount','nsTop','nsBot','bHB','wExSep','wExM','wLsh','wCorner','wDoor','antr','eShape','eFloor','diag','hoodStrip','hoodH','liftMech','upper','lift','hood','vitrine','vdoors','split','sh','open','half','deadOpen','div','divRef','mb','backPos','type','dr','slide','deadSide','lowType','frDoors','mwOn','toFloor'].includes(f);
   const typing=e.target.tagName==='INPUT'&&e.target.type!=='checkbox'&&e.target.type!=='radio'; // докато пишеш в полето — не прерисувай редактора (губи се фокусът); прерисува се при излизане/Enter
   if(full&&typing){edPending=true;changed(false)}else changed(full);
 });
