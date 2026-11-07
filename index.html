@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 21:50 · скосяване в Детайли</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 21:55 · размери на скосяванията</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2907,6 +2907,14 @@ function pedSvg(k,ps,view){ // чертеж: front (x–z), side (y–z, отл�
     g+=`<line x1="${xl}" y1="${Y(y0)}" x2="${xl}" y2="${Y(y1)}" style="${dm}"/>`+tx(xl-fs*.4,(Y(y0)+Y(y1))/2,Math.round(y1-y0),1);
     const bl=view!=='top'&&b[5]-b[4]<=40?pedBelow(ps,sp,(b[0]+b[1])/2,b[4]):null,z0=bl?bl.box[5]:bb[2]; // за рафт — светлото до детайла под него
     g+=`<line x1="${x0}" y1="${Y(y0)}" x2="${x0}" y2="${Y(z0)}" style="${dm};stroke-dasharray:4 3"/>`+(Math.abs(y0-z0)>1?tx(x0+fs*1.4,(Y(y0)+Y(z0))/2,'↕'+Math.round(y0-z0)):'')}
+  if(view==='front'&&k.type==='wpanel')for(const p of vis.filter(q=>q.fp)){ // размерите на скосяванията — с по-малки цифри
+    const b=p.box,W=b[1]-b[0],h=b[5]-b[4],fc=fcutOf(k,W,h),f2=fs*0.6,o=fs*0.7,cs='stroke:#2f7fc1;stroke-width:1;vector-effect:non-scaling-stroke',
+      t2=(x,y,t,r,anc='middle')=>`<text x="${x}" y="${y}" ${r?`transform="rotate(-90 ${x} ${y})"`:''} text-anchor="${anc}" dy=".35em" font-size="${f2}" font-family="IBM Plex Mono,monospace" font-weight="600" style="fill:#2f7fc1;paint-order:stroke;stroke:#f5f7f8;stroke-width:${f2/4}px">${t}</text>`,
+      hd=(xa,xb,z,up)=>{const y=Y(z)+(up?-o:o);return `<line x1="${xa}" y1="${y}" x2="${xb}" y2="${y}" style="${cs}"/><line x1="${xa}" y1="${y-f2*.4}" x2="${xa}" y2="${y+f2*.4}" style="${cs}"/><line x1="${xb}" y1="${y-f2*.4}" x2="${xb}" y2="${y+f2*.4}" style="${cs}"/>`+t2((xa+xb)/2,y+(up?-f2*.75:f2*.75),fmt(Math.abs(xb-xa)))},
+      vd=(x,za,zb,lf)=>{const xx=x+(lf?-o:o);return `<line x1="${xx}" y1="${Y(za)}" x2="${xx}" y2="${Y(zb)}" style="${cs}"/><line x1="${xx-f2*.4}" y1="${Y(za)}" x2="${xx+f2*.4}" y2="${Y(za)}" style="${cs}"/><line x1="${xx-f2*.4}" y1="${Y(zb)}" x2="${xx+f2*.4}" y2="${Y(zb)}" style="${cs}"/>`+t2(xx+(lf?-f2*.75:f2*.75),(Y(za)+Y(zb))/2,fmt(Math.abs(zb-za)),1)};
+    for(const[key]of FCN){const q=fc[key];if(!(q.x>0&&q.y>0))continue;const top=key[0]==='T',lf=key[1]==='L',xe=lf?b[0]:b[1],ze=top?b[5]:b[4],xi=lf?xe+q.x:xe-q.x,zi=top?ze-q.y:ze+q.y;
+      g+=hd(xe,xi,ze,top)+vd(xe,ze,zi,lf);
+      const mx=(xi+xe)/2,mz=(ze+zi)/2;g+=t2(mx+(lf?f2*1.2:-f2*1.2),Y(mz)+(top?f2*1.1:-f2*1.1),fcAng(q)+'°',0,lf?'start':'end')}}
   const ttl={front:'Отпред',side:'Отляво',top:'Отгоре'}[view];
   return`<div style="display:flex;flex-direction:column;min-width:0;min-height:0"><div style="font:600 12px var(--f-display);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:2px 4px">${ttl}</div><svg data-view="${view}" data-base="${vb0.join(',')}" viewBox="${vb.join(' ')}" style="touch-action:none;width:100%;height:100%;min-height:0;flex:1;background:var(--field);border:1px solid var(--line);border-radius:6px">${g}</svg></div>`}
 function renderPed(){const sc=[$('#pedList')?.scrollTop||0,$('#pedCol')?.scrollTop||0];renderPed0();const a=$('#pedList'),b=$('#pedCol');if(a)a.scrollTop=sc[0];if(b)b.scrollTop=sc[1]} // пази мястото в списъка
