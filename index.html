@@ -147,7 +147,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 18:40 · под при чупени стени</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 19:15 · записване в папка</span></small></div>
   <div class="dd" id="ddKit"><button class="btn primary" id="bKit" aria-haspopup="true" aria-expanded="false">Кухни ▾</button><div class="ddm" id="kitMenu" hidden></div></div><div class="dd" id="ddWard"><button class="btn primary" id="bWard" aria-haspopup="true" aria-expanded="false">Гардероби ▾</button></div>
   <div class="dd"><button class="btn" id="bCut" aria-haspopup="true" aria-expanded="false">Разкрой ▾</button>
     <div class="ddm" id="cutMenu" hidden style="left:auto;right:0">
@@ -161,7 +161,8 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
       <label class="item" style="cursor:pointer"><span>Отвори проект…</span><small>.json файл от компютъра</small><input type="file" id="openFile" accept=".json,.txt,application/json" hidden></label>
-      <button class="item" id="bSave"><span>Запази проекта</span><small>като файл на компютъра</small></button>
+      <button class="item" id="bSave"><span>Запази проекта <kbd style="font-size:10px;opacity:.6">Ctrl+S</kbd></span><small id="bSaveSm">като файл на компютъра</small></button>
+      <button class="item" id="bSaveAs" hidden><span>Запази като…</span><small>нов файл / друга папка</small></button>
       <div style="border-top:1px solid var(--line);margin:4px 0"></div>
       <button class="item" id="fPdf"><span>Запази като PDF</span><small>3D, отгоре, стени, шкафове с детайлите</small></button>
       <button class="item" id="fInst"><span>Мерителен лист (ВиК и ел.)</span><small>PDF: стаята и точките, без шкафовете</small></button>
@@ -2696,7 +2697,7 @@ $('#cutMenu').addEventListener('click',async e=>{e.stopPropagation();const b=e.t
   const date=new Date().toISOString().slice(0,10);
   const ok=a==='csv'?await saveFile(`${projBase()} разкрой ${date}.csv`,exportCSV('all')):await saveFile(`${projBase()} разкрой ${date}.txt`,exportText('all'));
   if(!ok){copyText(exportText('all'),'Запазването на файл не е позволено тук — детайлите са копирани')}});
-$('#fNew').onclick=e=>sureItem(e.currentTarget,()=>{P={room:{h:P.room.h,t:P.room.t,pts:SHAPES.rect(3600,3000),shape:{kind:'rect',W:3600,L:3000,a:1200,b:1000},items:[]},settings:{...P.settings},materials:P.materials,cabinets:[]};afterLoad()});
+$('#fNew').onclick=e=>sureItem(e.currentTarget,()=>{projFH=null;$('#bSaveSm').textContent='като файл на компютъра';P={room:{h:P.room.h,t:P.room.t,pts:SHAPES.rect(3600,3000),shape:{kind:'rect',W:3600,L:3000,a:1200,b:1000},items:[]},settings:{...P.settings},materials:P.materials,cabinets:[]};afterLoad()});
 $('#fSample').onclick=e=>sureItem(e.currentTarget,()=>{P=sample();afterLoad()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#kitMenu').hidden)toggleKit(false)});
 function cornerMirror(k){if(k.wall===null||k.wall>=N())return !!k.mirror;const L=wallInfo(k.wall).len;if(+k.off<=40)return false;if(+k.off+ +k.W>=L-40)return true;return !!k.mirror}
@@ -2940,7 +2941,20 @@ $('#pjLoad').onclick=()=>loadProject($('#pjText').value);
 $('#openFile').onchange=e=>{toggleFile(false);const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>loadProject(r.result);r.readAsText(f);e.target.value=''};
 $('#fPdf').onclick=()=>{toggleFile(false);savePDF()};
 $('#fInst').onclick=()=>{toggleFile(false);saveInstallPDF()};
-$('#bSave').onclick=async()=>{toggleFile(false);
+let projFH=null; // отвореният файл (инсталираната програма) — Ctrl+S записва направо върху него
+const FSA=OFFLINE&&!!window.showSaveFilePicker;if(FSA)$('#bSaveAs').hidden=false;
+const pjTypes=[{description:'Мебелен проект',accept:{'application/json':['.json']}}];
+async function saveProj(as){const name=projBase()+'.json',data=JSON.stringify(P);
+  if(FSA){try{if(as||!projFH)projFH=await showSaveFilePicker({suggestedName:name,types:pjTypes,id:'mebeli-proj',startIn:projFH||'documents'});
+      const w=await projFH.createWritable();await w.write(data);await w.close();toast('Запазено: '+projFH.name);$('#bSaveSm').textContent=projFH.name;return true}
+    catch(e){if(e&&e.name==='AbortError')return false;toast('Не можах да запиша: '+(e&&e.message||e))}}
+  if(OFFLINE){plainDownload(name,data);toast('Запазено в „Изтеглени“: '+name);return true}
+  return false}
+$('#bSaveAs').onclick=()=>{toggleFile(false);saveProj(true)};
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.code==='KeyS'){e.preventDefault();if(OFFLINE)saveProj(e.shiftKey);else $('#bSave').click()}});
+$('#openFile').closest('label').addEventListener('click',async e=>{if(!(FSA&&window.showOpenFilePicker))return;e.preventDefault();toggleFile(false);
+  try{const[h]=await showOpenFilePicker({types:pjTypes,id:'mebeli-proj',startIn:'documents'});const t=await (await h.getFile()).text();loadProject(t);projFH=h;$('#bSaveSm').textContent=h.name}catch(err){if(err&&err.name!=='AbortError')toast('Не можах да отворя файла')}});
+$('#bSave').onclick=async()=>{toggleFile(false);if(OFFLINE){await saveProj(false);return}
   const name=((P.name||'проект').replace(/[\\/:*?"<>|]+/g,' ').trim()||'проект')+' '+new Date().toISOString().slice(0,10)+'.json';
   const data=JSON.stringify(P);let dl=null;try{dl=await window.claude?.use?.('downloads')}catch(e){}
   if(dl){try{await dl.save({filename:name,data});toast('Проектът е запазен: '+name);return}catch(e){if(e&&e.code==='declined')return}}
