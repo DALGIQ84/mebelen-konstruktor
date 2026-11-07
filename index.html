@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 22:05 · нови имена на PDF-ите</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 22:20 · скосени панели: PDF, надмярка, DXF</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -171,6 +171,8 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
       <div style="border-top:1px solid var(--line);margin:4px 0"></div>
       <button class="item" data-cut="csv"><span>Запази като CSV</span><small>отваря се в Excel и се импортира в OptiCut</small></button>
       <button class="item" data-cut="txt"><span>Запази като текст (.txt)</span><small>колони с табулация, като копирането</small></button>
+      <div style="border-top:1px solid var(--line);margin:4px 0"></div>
+      <button class="item" data-cut="dxf"><span>DXF за CNC рутера</span><small>контурите на панелите на стената (скосените) · отваря се в AutoCAD и CAM</small></button>
     </div></div>
   <div class="dd" id="ddKit"><button class="btn primary" id="bKit" aria-haspopup="true" aria-expanded="false">Кухни ▾</button><div class="ddm" id="kitMenu" hidden></div></div><div class="dd" id="ddWard"><button class="btn primary" id="bWard" aria-haspopup="true" aria-expanded="false">Гардероби ▾</button></div>
   <button class="btn" id="bUndoAll" title="Назад (Ctrl+Z)" aria-label="Назад">↶</button><button class="btn" id="bRedoAll" title="Напред (Ctrl+Y)" aria-label="Напред">↷</button>
@@ -952,7 +954,8 @@ function buildRaw(k){
     return{parts:all,warn:[...ra.warn,...rb.warn],Dk}}
   if(k.type==='wpanel'){ // панел на стената (облицовка, декоративен)
     const tt=+mat(k.mf).t||18,h=Math.max(20,+k.fpH||700),fc=fcutOf(k,W,h),cut=Object.values(fc).some(q=>q.x>0&&q.y>0);
-    add('Панел на стената',h,W,k.mf,[1,1,1,1],[0,W,0,tt,c,c+h],'');parts.at(-1).L=r1(h);parts.at(-1).Wd=r1(W);
+    const ov=Math.max(0,+k.fover||0);add('Панел на стената',h,W,k.mf,[1,1,1,1],[0,W,0,tt,c,c+h],'');parts.at(-1).L=r1(h+2*ov);parts.at(-1).Wd=r1(W+2*ov);parts.at(-1).ov=ov; // надмярка на страна — за CNC
+    if(ov>0)warn.push(`Панел ${Math.round(W)} × ${Math.round(h)}: в разкроя е с надмярка ${fmt(ov)} мм на страна (${fmt(W+2*ov)} × ${fmt(h+2*ov)}) — CNC го реже по контура.`);
     if(cut){const{TL,TR,BL,BR}=fc,fp=[[BL.x,c],[W-BR.x,c],[W,c+BR.y],[W,c+h-TR.y],[W-TR.x,c+h],[TL.x,c+h],[0,c+h-TL.y],[0,c+BL.y]];
       parts.at(-1).fp=fp.filter((q,i)=>{const n=fp[(i+1)%fp.length];return Math.abs(q[0]-n[0])>0.01||Math.abs(q[1]-n[1])>0.01});
       warn.push(`Панел ${Math.round(W)} × ${Math.round(h)} — скосявания: `+FCN.filter(([key])=>fc[key].x>0&&fc[key].y>0).map(([key,nm])=>`${nm} ${fmt(fc[key].x)} по хоризонтала × ${fmt(fc[key].y)} по вертикала (${fcAng(fc[key])}°)`).join('; ')+'.')}
@@ -2436,8 +2439,45 @@ async function exportSet(){
   if(AS.length){for(let i=0;i<AS.length;){const nq=AS.slice(i,i+4),quad=nq.length>2&&nq.every(k=>cabRows(k).length<=QMAX);const n=quad?nq.length:Math.min(2,AS.length-i);
     out.push({c:cabPageN(i,n,quad),name:fname('шкафове '+(i+1))});i+=n}}
   if(extraList().length)extraPages().forEach((c,j)=>out.push({c,name:fname('плотове и пълнежи'+(j?' '+(j+1):''))}));
+  cutPanelPages().forEach((c,j)=>out.push({c,name:fname('скосени панели'+(j?' '+(j+1):''))}));
   return out;
 }
+
+/* ---------- Скосени панели: страница в работния PDF и DXF за рутера ---------- */
+function cutPanels(){return P.cabinets.filter(k=>k.type==='wpanel').map(k=>{const p=build(k).parts[0],W=+k.W,h=Math.max(20,+k.fpH||700),c=+k.c||0;
+  const fp=(p&&p.fp?p.fp:[[0,c],[W,c],[W,c+h],[0,c+h]]).map(([u,v])=>[u,v-c]);return{k,p,W,h,fp,fc:fcutOf(k,W,h),ov:Math.max(0,+k.fover||0),cut:!!(p&&p.fp)}}).filter(o=>o.cut||o.ov>0)}
+function cutPanelPages(){const L=cutPanels(),out=[];
+  for(let i=0;i<L.length;i+=3){const grp=L.slice(i,i+3),{c,g}=pageBase('Скосени панели',`размерите на срезовете · ${L.length} бр.`+(L.some(o=>o.ov>0)?' · в разкроя са с надмярка за CNC':''));
+    const cw=(PGW-160)/3,top=230,bot=PGH-70;
+    grp.forEach((o,j)=>{const x0=80+j*cw,BLU='#1f6fb5',RED='#b4472c';
+      g.fillStyle='#1a2227';g.font=`600 40px ${FC}`;g.fillText(fitText(g,o.k.name+' — '+mat(o.k.mf).name,cw-40),x0+10,top+40);
+      g.fillStyle='#5a6870';g.font=`30px ${FF}`;g.fillText(`нето ${fmt(o.h)} × ${fmt(o.W)} мм`+(o.ov>0?` · разкрой ${fmt(o.h+2*o.ov)} × ${fmt(o.W+2*o.ov)} (+${fmt(o.ov)} на страна)`:''),x0+10,top+84,cw-30);
+      const ax0=x0+150,ax1=x0+cw-150,ay0=top+200,ay1=bot-230,sc=Math.min((ax1-ax0)/(o.W+2*o.ov),(ay1-ay0)/(o.h+2*o.ov)),ox=(ax0+ax1)/2-o.W*sc/2,oy=(ay0+ay1)/2+o.h*sc/2,X=u=>ox+u*sc,Y=v=>oy-v*sc;
+      if(o.ov>0){g.setLineDash([14,10]);g.strokeStyle='#8a959b';g.lineWidth=2;g.strokeRect(X(-o.ov),Y(o.h+o.ov),(o.W+2*o.ov)*sc,(o.h+2*o.ov)*sc);g.setLineDash([])}
+      g.beginPath();o.fp.forEach(([u,v],n)=>n?g.lineTo(X(u),Y(v)):g.moveTo(X(u),Y(v)));g.closePath();g.fillStyle=mat(o.k.mf).color||'#e9dcc4';g.globalAlpha=.35;g.fill();g.globalAlpha=1;g.strokeStyle='#1a2227';g.lineWidth=4;g.stroke();
+      const dim=(xa,ya,xb,yb,t,col,fsz,vert)=>{g.strokeStyle=col;g.fillStyle=col;g.lineWidth=2;g.beginPath();g.moveTo(xa,ya);g.lineTo(xb,yb);g.stroke();
+        const tk=10;g.beginPath();if(vert){g.moveTo(xa-tk,ya);g.lineTo(xa+tk,ya);g.moveTo(xb-tk,yb);g.lineTo(xb+tk,yb)}else{g.moveTo(xa,ya-tk);g.lineTo(xa,ya+tk);g.moveTo(xb,yb-tk);g.lineTo(xb,yb+tk)}g.stroke();
+        g.font=`600 ${fsz}px ${FM}`;g.textAlign='center';g.textBaseline='middle';if(vert){g.save();g.translate(xa-fsz*.8,(ya+yb)/2);g.rotate(-Math.PI/2);g.fillText(t,0,0);g.restore()}else g.fillText(t,(xa+xb)/2,ya-fsz*.75);g.textAlign='left';g.textBaseline='alphabetic'};
+      const oo=o.ov*sc;dim(X(0),Y(0)+oo+200,X(o.W),Y(0)+oo+200,fmt(o.W),RED,40,0);dim(X(0)-oo-120,Y(0),X(0)-oo-120,Y(o.h),fmt(o.h),RED,40,1);
+      for(const[key,nm]of FCN){const q=o.fc[key];if(!(q.x>0&&q.y>0))continue;const tp=key[0]==='T',lf=key[1]==='L',xe=lf?0:o.W,ze=tp?o.h:0,xi=lf?q.x:o.W-q.x,zi=tp?o.h-q.y:q.y,d=oo+45;
+        const yh=tp?Y(ze)-d:Y(ze)+d+50;dim(X(Math.min(xe,xi)),yh,X(Math.max(xe,xi)),yh,fmt(q.x),BLU,30,0);
+        const xv=lf?X(xe)-d:X(xe)+d+44;dim(xv,Y(Math.min(ze,zi)),xv,Y(Math.max(ze,zi)),fmt(q.y),BLU,30,1);
+        g.fillStyle=BLU;g.font=`600 32px ${FM}`;g.textAlign=lf?'left':'right';g.fillText(fcAng(q)+'°',X((xe+xi)/2)+(lf?24:-24),Y((ze+zi)/2)+(tp?40:-18));g.textAlign='left'}
+      if(j<grp.length-1){g.fillStyle='#e3e8eb';g.fillRect(x0+cw-2,top,3,bot-top)}});
+    out.push(c)}
+  return out}
+const TRL={а:'a',б:'b',в:'v',г:'g',д:'d',е:'e',ж:'zh',з:'z',и:'i',й:'y',к:'k',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'h',ц:'ts',ч:'ch',ш:'sh',щ:'sht',ъ:'a',ь:'y',ю:'yu',я:'ya'};
+const latin=t=>String(t).replace(/[а-яА-Я]/g,ch=>{const l=TRL[ch.toLowerCase()]||'';return ch===ch.toLowerCase()?l:l.charAt(0).toUpperCase()+l.slice(1)}).replace(/[^\x20-\x7e]/g,'');
+function panelsDXF(){const L=P.cabinets.filter(k=>k.type==='wpanel').map(k=>cutPanels().find(o=>o.k===k)||{k,W:+k.W,h:Math.max(20,+k.fpH||700),fp:[[0,0],[+k.W,0],[+k.W,Math.max(20,+k.fpH||700)],[0,Math.max(20,+k.fpH||700)]],ov:0});
+  if(!L.length)return '';const e=[],r=v=>Math.round(v*1000)/1000,pl=(lay,pts)=>{e.push('0','POLYLINE','8',lay,'66','1','70','1','10','0','20','0','30','0');for(const[x,y]of pts)e.push('0','VERTEX','8',lay,'10',r(x),'20',r(y),'30','0');e.push('0','SEQEND','8',lay)},
+    tx=(x,y,hh,t)=>e.push('0','TEXT','8','TEXT','10',r(x),'20',r(y),'30','0','40',r(hh),'1',latin(t));
+  let x=0;for(const o of L){const ox=x+o.ov,oy=o.ov;pl('KONTUR',o.fp.map(([u,v])=>[ox+u,oy+v]));if(o.ov>0)pl('NADMIARKA',[[x,0],[x+o.W+2*o.ov,0],[x+o.W+2*o.ov,o.h+2*o.ov],[x,o.h+2*o.ov]]);
+    tx(x,-60,30,`${o.k.name} ${Math.round(o.W)}x${Math.round(o.h)} ${+mat(o.k.mf).t||18}mm`+(o.ov>0?` (+${o.ov}/strana)`:''));x+=o.W+2*o.ov+150}
+  const lay=(n,col)=>['0','LAYER','2',n,'70','0','62',String(col),'6','CONTINUOUS'];
+  return ['0','SECTION','2','HEADER','9','$ACADVER','1','AC1009','9','$INSUNITS','70','4','0','ENDSEC',
+    '0','SECTION','2','TABLES','0','TABLE','2','LTYPE','70','1','0','LTYPE','2','CONTINUOUS','70','0','3','Solid line','72','65','73','0','40','0.0','0','ENDTAB',
+    '0','TABLE','2','LAYER','70','3',...lay('KONTUR',7),...lay('NADMIARKA',8),...lay('TEXT',3),'0','ENDTAB','0','ENDSEC',
+    '0','SECTION','2','ENTITIES',...e,'0','ENDSEC','0','EOF'].join('\r\n')}
 /* ---------- Страници за монтаж: списък и всеки шкаф с детайлите ---------- */
 const TYPE_BG={wardrobe:'Гардероб',endShelf:'Крайна етажерка',cornerL:'Ъглов Г',splash:'Гръб кухня',top:'Плот',endPanel:'Завършваща страница',plinthRun:'Цокъл',filler:'Пълнеж',doors:'Шкаф с врати',drawers:'Шкаф с чекмеджета',oven:'Шкаф за фурна',dw:'Съдомиялна за вграждане',col:'Колона фурна + микровълнова',fridge:'Шкаф за хладилник'};
 const PGW=2480,PGH=1754,FF='"IBM Plex Sans",Arial,sans-serif',FC='"IBM Plex Sans Condensed","IBM Plex Sans",Arial,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';
@@ -2800,6 +2840,7 @@ $('#cutMenu').addEventListener('click',async e=>{e.stopPropagation();const b=e.t
   if(a==='copy-all'||a==='copy-cab'){const t=exportText(a==='copy-all'?'all':'cab');if(!t){toast('Няма детайли');return}copyText(t,'Копирано — постави в разкроя');return}
   if(!P.cabinets.length){toast('Няма детайли');return}
   const date=new Date().toISOString().slice(0,10);
+  if(a==='dxf'){const d=panelsDXF();if(!d){toast('Няма панели на стената');return}await saveFile(`${projBase()} CNC ${date}.dxf`,new Blob([d],{type:'application/dxf'}));return}
   const ok=a==='csv'?await saveFile(`${projBase()} разкрой ${date}.csv`,exportCSV('all')):await saveFile(`${projBase()} разкрой ${date}.txt`,exportText('all'));
   if(!ok){copyText(exportText('all'),'Запазването на файл не е позволено тук — детайлите са копирани')}});
 function newProject(){projFH=null;$('#bSaveSm').textContent='като файл на компютъра';P={room:{h:P.room.h,t:P.room.t,pts:SHAPES.rect(3600,3000),shape:{kind:'rect',W:3600,L:3000,a:1200,b:1000},items:[]},settings:{...P.settings},materials:P.materials,cabinets:[]};afterLoad()}
@@ -2925,7 +2966,9 @@ function pedLinkKeys(k){ // старите умни рафтове/чекмед�
 function fcutHtml(k){const fc=k.fcut||{},inp=(key,c,ph)=>`<input class="f" type="number" min="0" step="1" data-fc="${key}" data-fk="${c}" placeholder="${ph}" value="${fc[key]&&+fc[key][c]>0?+fc[key][c]:''}" style="width:100%;font-family:var(--f-mono)">`;
   return `<div style="padding:10px 12px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px"><b style="font-size:13px" title="Колко навътре по хоризонталния ръб и колко по вертикалния — оттам до там се реже. Ъгълът се смята сам; ако го зададеш, хоризонталата остава, вертикалата се сменя.">Скосявания (от всеки ъгъл) <span style="color:var(--muted);font-weight:400;cursor:help">ⓘ</span></b>
     <div style="display:grid;grid-template-columns:auto 1fr 1fr 70px;gap:4px 6px;align-items:center;font-size:12px"><span></span><span style="color:var(--muted)">по хоризонтала</span><span style="color:var(--muted)">по вертикала</span><span style="color:var(--muted)">ъгъл °</span>
-    ${FCN.map(([key,nm])=>`<span>${nm}</span>${inp(key,'x','0')}${inp(key,'y','0')}<input class="f" type="number" min="0" max="90" step="0.5" data-fc="${key}" data-fk="a" placeholder="—" value="${fc[key]?fcAng({x:+fc[key].x||0,y:+fc[key].y||0}):''}" style="width:100%;font-family:var(--f-mono)">`).join('')}</div></div>`}
+    ${FCN.map(([key,nm])=>`<span>${nm}</span>${inp(key,'x','0')}${inp(key,'y','0')}<input class="f" type="number" min="0" max="90" step="0.5" data-fc="${key}" data-fk="a" placeholder="—" value="${fc[key]?fcAng({x:+fc[key].x||0,y:+fc[key].y||0}):''}" style="width:100%;font-family:var(--f-mono)">`).join('')}</div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-top:4px">Надмярка за CNC, мм на страна<input class="f" type="number" min="0" step="1" data-fov="1" value="${+k.fover>0?+k.fover:''}" placeholder="0" style="width:80px;font-family:var(--f-mono)"></label>
+    <div style="font-size:11.5px;color:var(--muted)">${(()=>{const W=+k.W,h=Math.max(20,+k.fpH||700),ov=Math.max(0,+k.fover||0);return ov>0?`В разкроя: <b style="color:var(--fg)">${fmt(h+2*ov)} × ${fmt(W+2*ov)}</b> (нето ${fmt(h)} × ${fmt(W)}) — CNC реже по контура.`:`В разкроя: ${fmt(h)} × ${fmt(W)} (без надмярка).`})()}</div></div>`}
 function renderPed0(){const k=cab(pedK),el=$('#ped');if(!k){closePed();return}pedLinkKeys(k);const ps=pedParts(k),p=ps.find(q=>q.key===pedSel),o=(k.pOv||{})[pedSel]||{};
   const f=(lbl,id,v,ex='')=>`<label style="display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--muted)">${lbl}<input class="f" type="number" data-pe="${id}" value="${v}" ${ex} style="font-family:var(--f-mono)"></label>`;
   let form='';
@@ -3028,6 +3071,7 @@ function pedEdit(k,f,v){ // една промяна върху маркиран�
     for(const q in o)if(o[q]===undefined||o[q]===0)delete o[q];if(Object.keys(o).length)k.pOv[pedSel]=o;else delete k.pOv[pedSel];}
 }
 $('#ped').addEventListener('change',e=>{const k=cab(pedK),t=e.target;if(t.id==='pedDr')return;
+  if(k&&t.dataset.fov){pushUndo();k.fover=t.value===''?0:Math.max(0,+t.value);P.example=false;changed(false);renderPed();return}
   if(k&&t.dataset.fc){const key=t.dataset.fc,c=t.dataset.fk,v=t.value;pushUndo();k.fcut=JSON.parse(JSON.stringify(k.fcut||{}));const q=k.fcut[key]=k.fcut[key]||{}; // скосяване на панела
     if(c==='a'){const a=+v;if(v!==''&&a>0&&a<90){if(!(+q.x>0))q.x=100;q.y=Math.round(+q.x*Math.tan(a*Math.PI/180)*10)/10}else if(v===''||a<=0){q.x=0;q.y=0}}else q[c]=v===''?0:Math.max(0,+v);
     P.example=false;changed(false);renderPed();rebuild3D();return}if(!k||!t.dataset.pe||!pedSel)return;const f=t.dataset.pe,v=t.type==='checkbox'?t.checked:t.value;pushUndo();
