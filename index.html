@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 22:00 · прозорец „Скосявания“</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 22:05 · нови имена на PDF-ите</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -157,8 +157,8 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
       <button class="item" id="bSave"><span>Запази<kbd style="font-size:10px;opacity:.6;margin-left:6px">Ctrl+S</kbd></span><small id="bSaveSm">като файл на компютъра</small></button>
       <button class="item" id="bSaveAs" hidden><span>Запази като…<kbd style="font-size:10px;opacity:.6;margin-left:6px">Ctrl+Shift+S</kbd></span><small>нов файл / друга папка</small></button>
       <div style="border-top:1px solid var(--line);margin:4px 0"></div>
-      <button class="item" id="fPdf"><span>PDF за клиента</span><small>3D, отгоре, стени, шкафове с детайлите</small></button>
-      <button class="item" id="fInst"><span>Мерителен лист</span><small>PDF за ВиК и ел.: стаята и точките, без шкафовете</small></button>
+      <button class="item" id="fPdf"><span>Работен PDF</span><small>3D, отгоре, стени, шкафове с детайлите</small></button>
+      <button class="item" id="fInst"><span>План на точките</span><small>PDF за ВиК и ел.: стаята и точките, без шкафовете</small></button>
       <div style="border-top:1px solid var(--line);margin:4px 0"></div>
       <button class="item" id="fName"><span>Име на проекта / клиента</span><small id="fNameSm">излиза на картинките и в PDF-а</small></button>
       <button class="item" id="bProj"><span>Пренос като текст</span><small>за имейл или за друг компютър</small></button>
@@ -2192,7 +2192,7 @@ function wallSvg(){
     const fr=INSTALL?[]:occ.filter(o=>o.front);
     if(fr.length)s+=chainV([0,...fr.map(o=>o.k.c),...fr.map(o=>o.k.H),H],L+t+fs*1.4,1);
   }
-  s+=`<text x="${L/2}" y="${-H-fs*3.6-xU}" text-anchor="middle" font-size="${fs*0.85}" font-family="IBM Plex Sans Condensed,sans-serif" font-weight="600" style="fill:var(--fg)">${INSTALL?'Мерителен лист · ':''}Стена ${wv+1} — гледана отвътре${showClear&&occupancy(wv).some(o=>o.front&&o.k.type==='wardrobe')?' · светли отвори':''}</text>`;
+  s+=`<text x="${L/2}" y="${-H-fs*3.6-xU}" text-anchor="middle" font-size="${fs*0.85}" font-family="IBM Plex Sans Condensed,sans-serif" font-weight="600" style="fill:var(--fg)">${INSTALL?'План на точките · ':''}Стена ${wv+1} — гледана отвътре${showClear&&occupancy(wv).some(o=>o.front&&o.k.type==='wardrobe')?' · светли отвори':''}</text>`;
   if(EXP){
     s+=`<text x="${-t-fs*4.5}" y="${-H-fs*6.3}" font-size="${fs*0.7}" font-family="IBM Plex Sans,sans-serif" style="fill:var(--muted)">${esc(P.name||'')}${P.name?' · ':''}${new Date().toLocaleDateString('bg-BG')} · размерите са в мм</text>`;
     const types=[...new Set(items.map(q=>q.type))].filter(k=>['water','power','gas','window','door','radiator','panel','duct'].includes(k));
@@ -2363,7 +2363,7 @@ function planSvg(){
       <text x="${k.W/2}" y="${k.D/2+fs}" text-anchor="middle" font-size="${fs*.7}" font-family="IBM Plex Mono,monospace" transform="rotate(${-k.rot} ${k.W/2} ${k.D/2})" style="fill:var(--muted)">${k.W}</text>`}</g>`;
   }
   if(tab==='room')R.pts.forEach((p,j)=>{s+=`<circle data-v="${j}" cx="${p[0]}" cy="${p[1]}" r="${fs*0.5}" style="fill:var(--panel);stroke:var(--accent);stroke-width:${fs*0.18};cursor:grab"/>`});
-  if(EXP)s+=`<text x="${vb[0]+fs}" y="${vb[1]+fs*1.4}" font-size="${fs*0.7}" font-family="IBM Plex Sans,sans-serif" style="fill:var(--muted)">${esc(P.name||'')}${P.name?' · ':''}${INSTALL?'Мерителен лист · ':''}План · ${new Date().toLocaleDateString('bg-BG')} · мм</text>`;
+  if(EXP)s+=`<text x="${vb[0]+fs}" y="${vb[1]+fs*1.4}" font-size="${fs*0.7}" font-family="IBM Plex Sans,sans-serif" style="fill:var(--muted)">${esc(P.name||'')}${P.name?' · ':''}${INSTALL?'План на точките · ':''}План · ${new Date().toLocaleDateString('bg-BG')} · мм</text>`;
   return{s,vb};
 }
 
@@ -2403,7 +2403,7 @@ async function deliverMany(files){ // всяка стена като отдел�
     fig.querySelector('figcaption').textContent=f.name;fig.querySelector('img').src=URL.createObjectURL(blobs[i]);fig.querySelector('img').alt=f.name;box.appendChild(fig)});
   $('#imgPrev').hidden=true;$('#imgName').textContent='Картинки';$('#ovImg').hidden=false;
 }
-/* ---------- Комплект за клиента: 3D + отгоре + стени ---------- */
+/* ---------- Работен PDF: 3D + отгоре + стени ---------- */
 function shot3D(w=2400,h=1500,cam=null,label='3D изглед'){
   const keep={sel,onlySel,showDoors},pos=camera.position.clone(),tg=controls.target.clone(),bg=scene.background,pr=renderer.getPixelRatio();
   sel=null;onlySel=false;showDoors=true;noHideD=true;rebuild3D();fit();
@@ -2559,7 +2559,7 @@ function cabPage(k,i){const{c,g}=pageBase(`${i+1}. ${k.name}`,`${TYPE_BG[k.type|
   return c}
 let INSTALL=false,PTN={};
 function ptList(){const l=P.room.items.filter(it=>isPt(it.type)||isBox(it.type)).sort((a,b)=>a.wall-b.wall||(a.off+a.w/2)-(b.off+b.w/2));PTN={};l.forEach((it,i)=>PTN[it.id]=i+1);return l}
-function installTable(l){const{c,g}=pageBase('Мерителен лист — точки',`${l.length} бр. · размерите са в мм, от вътрешната страна на стената и от готовия под`);
+function installTable(l){const{c,g}=pageBase('План на точките — списък',`${l.length} бр. · размерите са в мм, от вътрешната страна на стената и от готовия под`);
   const cols=[[80,'№'],[190,'Елемент'],[620,'Стена'],[860,'Хоризонтално'],[1380,'Вертикално'],[1880,'Размер']];
   const rh=Math.min(64,(PGH-330)/(l.length+1));let y=260;g.font=`500 28px ${FF}`;g.fillStyle='#5a6870';cols.forEach(([x,t])=>g.fillText(t,x,y));y+=18;
   l.forEach((it,i)=>{y+=rh;if(i%2===0){g.fillStyle='#f3f5f6';g.fillRect(70,y-rh+14,PGW-140,rh)}const d=ITEM[it.type],pt=isPt(it.type);
@@ -2573,15 +2573,15 @@ function installTable(l){const{c,g}=pageBase('Мерителен лист — т
 async function saveInstallPDF(){
   if(!window.jspdf){toast('PDF не може да се направи — няма връзка с библиотеката');return}
   toast('Подготвям мерителния лист…');const set=[];INSTALL=true;
-  try{const l=ptList();const r=withExport(planSvg);set.push({c:await svgCanvas(r.s,r.vb,2400),name:fname('мерителен лист план')});
+  try{const l=ptList();const r=withExport(planSvg);set.push({c:await svgCanvas(r.s,r.vb,2400),name:fname('план на точките план')});
     const ws=[...Array(N()).keys()].filter(i=>P.room.items.some(it=>it.wall===i));
-    for(const i of(ws.length?ws:[...Array(N()).keys()])){const q=withExport(()=>{wv=i;return wallSvg()});set.push({c:await svgCanvas(q.s,q.vb,2400),name:fname('мерителен лист стена '+(i+1))})}
-    if(l.length)set.push({c:installTable(l),name:fname('мерителен лист точки')})}
+    for(const i of(ws.length?ws:[...Array(N()).keys()])){const q=withExport(()=>{wv=i;return wallSvg()});set.push({c:await svgCanvas(q.s,q.vb,2400),name:fname('план на точките стена '+(i+1))})}
+    if(l.length)set.push({c:installTable(l),name:fname('план на точките точки')})}
   catch(e){toast('Мерителният лист не можа да се направи');return}finally{INSTALL=false}
   const doc=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'}),PW=297,PH=210,M=8;
   set.forEach((f,i)=>{if(i)doc.addPage('a4','landscape');const k=Math.min((PW-2*M)/f.c.width,(PH-2*M)/f.c.height),w=f.c.width*k,h=f.c.height*k;
     doc.addImage(f.c.toDataURL('image/jpeg',0.9),'JPEG',(PW-w)/2,(PH-h)/2,w,h)});
-  const ok=await saveFile(`${projBase()} мерителен лист ${new Date().toISOString().slice(0,10)}.pdf`,doc.output('blob'));
+  const ok=await saveFile(`${projBase()} план на точките ${new Date().toISOString().slice(0,10)}.pdf`,doc.output('blob'));
   if(!ok)deliverMany(set);
 }
 async function savePDF(){
