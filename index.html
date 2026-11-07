@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 01:10 · Gola (без дръжки)</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 01:15 · поправка: ъгловите при подравняване</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1518,6 +1518,7 @@ $('#ed').addEventListener('click',e=>{
 });
 $('#list').addEventListener('click',e=>{const li=e.target.closest('.li[data-id]');if(!li)return;if(e.ctrlKey||e.metaKey)toggleMulti(li.dataset.id);else select(li.dataset.id)});
 function frontOf(k){ // докъде стига шкафът отпред — по детайлите (и след „Детайли“: скъсена страница, преместен детайл…)
+  if(k.type==='cornerL'||k.wCorner||k.corner2||k.half)return +k.D; // ъглов: рамо Б отива назад по другата стена — лицето е по рамо А
   const ps=build(k).parts.filter(p=>p.box&&!p.hidden&&!['hw','vis','virt','appl'].includes(p.kind));return ps.length?Math.max(...ps.map(p=>p.box[3])):+k.D}
 function frontRefs(k){const row=q=>!!q.upper===!!k.upper,ok=q=>q!==k&&q.wall===k.wall&&!isAcc(q)&&!['top','plinthRun','splash','wpanel','wshelf','ubottom'].includes(q.type)&&row(q);
   const all=P.cabinets.filter(ok),near=all.filter(q=>q.off<=k.off+k.W+5&&q.off+q.W>=k.off-5); // първо — съседите до него
