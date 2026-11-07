@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 20:20 · вратопрозорец</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 20:30 · размер на вратата отляво</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2125,7 +2125,8 @@ function wallSvg(){
     s+=dimV(-t-fs*1.4,0,-H,DT(H),-1);
     for(const it of items){
       if(it.type==='window')s+=chainV([0,it.z,it.z+it.h,H],it.off+it.w+fs*0.7,1);
-      else if(it.type==='door')s+=chainV([0,it.h,H],it.off+it.w+fs*0.7,1);
+      else if(it.type==='door'){const lf=it.off-Math.max(0,...items.filter(q=>q!==it&&q.off+q.w<=it.off+1&&!isPt(q.type)).map(q=>q.off+q.w)); // свободно отляво (до стената или до друг отвор)
+        s+=lf>=fs*2.2?chainV([0,it.h,H],it.off-fs*0.7,-1):chainV([0,it.h,H],it.off+it.w+fs*0.7,1)}
       else if(isBox(it.type))s+=chainV([0,it.z,it.z+it.h],it.off+it.w+fs*0.7,1);
       else if(isPt(it.type))s+=chainV([0,it.z],it.off+it.w/2+fs*0.7,1);
     }
