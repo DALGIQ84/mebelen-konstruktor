@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 19:35 · име в синята лента</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 19:50 · врата на стаята</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1535,7 +1535,7 @@ function renderItems(){
       (pt?`<label>От пода до центъра, мм<input id="i_z_${it.id}" data-k="z" type="number" value="${it.z}"></label>`:
        `<label>Ширина, мм<input id="i_ww_${it.id}" data-k="w" type="number" value="${it.w}"></label>`)+
       (it.type==='window'?`<label>Височина, мм<input id="i_h_${it.id}" data-k="h" type="number" value="${it.h}"></label><label>Парапет, мм<input id="i_z_${it.id}" data-k="z" type="number" value="${it.z}"></label>`:'')+
-      (it.type==='door'?`<label>Височина, мм<input id="i_h_${it.id}" data-k="h" type="number" value="${it.h}"></label><label>Панти<select id="i_hi_${it.id}" data-k="hinge"><option value="L" ${it.hinge==='L'?'selected':''}>от началото</option><option value="R" ${it.hinge==='R'?'selected':''}>от края</option></select></label>`:'')+
+      (it.type==='door'?`<label>Височина, мм<input id="i_h_${it.id}" data-k="h" type="number" value="${it.h}"></label><label>Панти<select id="i_hi_${it.id}" data-k="hinge"><option value="L" ${it.hinge==='L'?'selected':''}>от началото</option><option value="R" ${it.hinge==='R'?'selected':''}>от края</option></select></label><label style="flex-direction:row;align-items:center;gap:6px;display:flex"><input type="checkbox" data-k="leaf" ${it.leaf===false?'':'checked'}> Крило и каса</label><label>Цвят<input type="color" data-k="col" value="${it.col||'#c9b28f'}" style="height:32px;padding:2px"></label>`:'')+
       (it.type==='duct'?`<label>Диаметър Ф, мм<input id="i_dd_${it.id}" data-k="dia" type="number" value="${it.w}"></label>`:'')+
       (isBox(it.type)?`<label>Височина, мм<input id="i_h_${it.id}" data-k="h" type="number" value="${it.h}"></label><label>От пода, мм<input id="i_z_${it.id}" data-k="z" type="number" value="${it.z}"></label><label>Дълбочина, мм<input id="i_d_${it.id}" data-k="d" type="number" value="${it.d}"></label>`:'')+
       (it.type==='column'?`<label>Издадена, мм<input id="i_d_${it.id}" data-k="d" type="number" value="${it.d}"></label>`:'')+`</div>`}
@@ -1567,7 +1567,7 @@ $('#itemsForm').addEventListener('click',e=>{const b=e.target.closest('button');
 $('#itemsForm').addEventListener('input',e=>{const bb=e.target.closest('[data-blk]');if(bb){const o=(P.room.blocks||[]).find(q=>q.id===bb.dataset.blk),k=e.target.dataset.bk;
     if(!o||!k)return;const v=e.target.value===''&&(k==='h'||k==='z')?0:+e.target.value;if(!isFinite(v))return;if((k==='w'||k==='d')&&v<20)return;o[k]=v;P.example=false;save();rebuild3D();renderPlan();return}
   const box=e.target.closest('.it');if(!box)return;const it=P.room.items.find(i=>i.id===box.dataset.id),k=e.target.dataset.k;
-  if(k==='hinge'){it.hinge=e.target.value}else{const v=+e.target.value;if(!isFinite(v))return;
+  if(k==='hinge'){it.hinge=e.target.value}else if(k==='leaf'){it.leaf=e.target.checked?undefined:false}else if(k==='col'){it.col=e.target.value}else{const v=+e.target.value;if(!isFinite(v))return;
     if(k==='dia'){const c=it.off+it.w/2;it.w=it.h=Math.max(20,v);it.off=c-it.w/2}
     else if(k==='off'&&isPt(it.type))it.off=v-it.w/2;else it[k]=v}
   P.example=false;roomChanged(false)});
@@ -1632,6 +1632,10 @@ function rebuild3D(){
     const piece=(a,b,z0,z1)=>{if(b-a>1&&z1-z0>1){const ms=boxAt(g,(b-a)*M,(z1-z0)*M,t,(a+b)/2*M,(z0+z1)/2*M,-t/2,wmi);if(wo&&wo.tex)wallUV(ms.geometry,0,0,0,wo,(a+b)/2,(z0+z1)/2)}};
     for(const o of ops){piece(s,o.s0,0,R.h);piece(o.s0,o.s1,0,o.z);piece(o.s0,o.s1,o.z+o.h,R.h);
       if(o.type==='window')boxAt(g,(o.s1-o.s0)*M,o.h*M,0.006,(o.s0+o.s1)/2*M,(o.z+o.h/2)*M,-t/2,glass);
+      if(o.type==='door'&&o.leaf!==false){const dc=o.col||'#c9b28f',fw=60,ww=o.s1-o.s0,lm=meshMat(dc),fm=meshMat(o.fcol||dc); // крило + каса (обков) от вътрешната страна
+        const leaf=boxAt(g,(ww-20)*M,(o.h-10)*M,0.04,(o.s0+o.s1)/2*M,(o.h-10)/2*M,-0.02,lm);leaf.userData.rdoor=o.id;
+        for(const[cx,wd,hh,cy]of[[o.s0-fw/2+5,fw,o.h+fw-5,(o.h+fw-5)/2],[o.s1+fw/2-5,fw,o.h+fw-5,(o.h+fw-5)/2],[(o.s0+o.s1)/2,ww+2*fw-10,fw,o.h+fw/2-5]]){const m=boxAt(g,wd*M,hh*M,0.012,cx*M,cy*M,0.006,fm);m.userData.rdoor=o.id}
+        const hk=o.hinge==='L'?o.s1-90:o.s0+90,hm=boxAt(g,0.14,0.02,0.05,hk*M,1050*M,0.025,meshMat('#9aa3a8'));hm.userData.rdoor=o.id}
       s=Math.max(s,o.s1)}
     piece(s,w.len+e1,0,R.h);
     for(const it of R.items.filter(it=>it.wall===i&&it.type!=='window'&&it.type!=='door')){
@@ -1820,7 +1824,7 @@ canvas.addEventListener('pointerup',e=>{
     const h=ray.intersectObjects(world.children,true).find(h=>h.object.visible&&h.object.userData.cab===pedK&&h.object.userData.pk);if(h){pedSel=h.object.userData.pk;renderPed();rebuild3D();return}}
   if(e.button===2){const r=canvas.getBoundingClientRect(),ray=new THREE.Raycaster();
     ray.setFromCamera({x:(e.clientX-r.left)/r.width*2-1,y:-(e.clientY-r.top)/r.height*2+1},camera);
-    const hit=ray.intersectObjects(world.children,true).find(h=>h.object.userData.cab&&h.object.visible);if(hit)openCtx(hit.object.userData.cab,e.clientX,e.clientY);return}
+    const hit=ray.intersectObjects(world.children,true).find(h=>(h.object.userData.cab||h.object.userData.rdoor)&&h.object.visible);if(hit){if(hit.object.userData.rdoor)openDoorCtx(hit.object.userData.rdoor,e.clientX,e.clientY);else openCtx(hit.object.userData.cab,e.clientX,e.clientY)}return}
   const r=canvas.getBoundingClientRect(),ray=new THREE.Raycaster();
   ray.setFromCamera({x:(e.clientX-r.left)/r.width*2-1,y:-(e.clientY-r.top)/r.height*2+1},camera);
   const hit=ray.intersectObjects(world.children,true).find(h=>h.object.userData.cab&&h.object.visible);
@@ -1895,7 +1899,20 @@ function groupGaps(g){ // общ пълнеж за няколко шкафа н�
   const a0=Math.min(...g.map(k=>k.off)),a1=Math.max(...g.map(k=>k.off+k.W));let L=0,R=w.len,lW=true,rW=true;
   for(const[a,b]of iv){if(b<=a0+1&&b>L){L=b;lW=false}if(a>=a1-1&&a<R){R=a;rW=false}}
   return{l:a0-L,lAt:L,lWall:lW,r:R-a1,rAt:a1,rWall:rW}}
-function openCtx(id,x,y){if(!(multiSel.size>1&&multiSel.has(id))&&id!==sel)select(id);const k=cab(id);if(!k)return;const on=k.wall!==null,grp=groupOf(id);
+const DOORCOL=[['#c9b28f','дъб светъл'],['#8a6440','орех'],['#5b3d2a','венге'],['#f4f2ec','бяла'],['#9aa0a3','сива'],['#2f3437','антрацит']];
+function openDoorCtx(itId,x,y){const it=P.room.items.find(q=>q.id===itId);if(!it)return;
+  ctx.innerHTML=`<div class="gh" style="padding:6px 8px;font-weight:600">Врата на стаята</div>`+
+    `<button class="item" data-dctx="tog"><span>${it.leaf===false?'Покажи вратата':'Скрий вратата'}</span><small>${it.leaf===false?'крилото и касата':'остава само отворът'}</small></button>`+
+    `<div style="padding:6px 8px 4px;font-size:12px;color:var(--muted)">Цвят</div><div style="display:flex;gap:6px;flex-wrap:wrap;padding:0 8px 8px">`+
+    DOORCOL.map(([c,n])=>`<button data-dcol="${c}" title="${n}" style="width:26px;height:26px;border-radius:6px;border:2px solid ${(it.col||'#c9b28f')===c?'var(--mark)':'var(--line)'};background:${c};cursor:pointer"></button>`).join('')+
+    `<label title="друг цвят" style="width:26px;height:26px;border-radius:6px;border:2px solid var(--line);overflow:hidden;cursor:pointer;display:inline-block"><input type="color" data-dcolp value="${it.col||'#c9b28f'}" style="width:40px;height:40px;margin:-6px;border:0;padding:0;cursor:pointer"></label></div>`;
+  ctx.hidden=false;const w=ctx.offsetWidth,h=ctx.offsetHeight;ctx.style.left=Math.min(x,innerWidth-w-8)+'px';ctx.style.top=Math.min(y,innerHeight-h-8)+'px';ctx.dataset.id='';ctx.dataset.door=itId}
+const setDoor=(f)=>{const it=P.room.items.find(q=>q.id===ctx.dataset.door);if(!it)return;pushUndo();f(it);P.example=false;save();rebuild3D();renderPlan();if(typeof renderItems==='function')try{renderItems()}catch(e){}};
+ctx.addEventListener('click',e=>{const b=e.target.closest('[data-dctx],[data-dcol]');if(!b||!ctx.dataset.door)return;e.stopPropagation();
+  if(b.dataset.dctx==='tog'){setDoor(it=>{it.leaf=it.leaf===false?undefined:false});ctx.hidden=true}else if(b.dataset.dcol){setDoor(it=>{it.col=b.dataset.dcol});ctx.hidden=true}},true);
+ctx.addEventListener('input',e=>{if(e.target.matches('[data-dcolp]')&&ctx.dataset.door)setDoor(it=>{it.col=e.target.value})});
+ctx.addEventListener('click',e=>{if(e.target.closest('[data-dcolp],label'))e.stopPropagation()});
+function openCtx(id,x,y){ctx.dataset.door='';if(!(multiSel.size>1&&multiSel.has(id))&&id!==sel)select(id);const k=cab(id);if(!k)return;const on=k.wall!==null,grp=groupOf(id);
   const it=(a,t,sm)=>`<button class="item" data-ctx="${a}"><span>${t}</span>${sm?`<small>${sm}</small>`:''}</button>`;
   ctx.innerHTML=`<div class="gh" style="padding:6px 8px;font-weight:600">${esc(k.name)}</div>`+
     (on?it('align','Подравни отпред','лицето на линия със съседите')+(+k.gap?it('wall0','Долепи до стената','отстъп 0'):''):'')+
@@ -2030,7 +2047,7 @@ function wallSvg(){
   for(const it of items){const d=ITEM[it.type];
     if(it.type==='window')s+=`<rect x="${it.off}" y="${-(it.z+it.h)}" width="${it.w}" height="${it.h}" style="fill:${d.color};fill-opacity:.18;stroke:${d.color};stroke-width:2;vector-effect:non-scaling-stroke"/><line x1="${it.off+it.w/2}" y1="${-(it.z+it.h)}" x2="${it.off+it.w/2}" y2="${-it.z}" style="stroke:${d.color};stroke-width:1;vector-effect:non-scaling-stroke"/>`;
     else if(it.type==='door'){const hx=it.hinge==='L'?it.off:it.off+it.w,ox=it.hinge==='L'?it.off+it.w:it.off;
-      s+=`<rect x="${it.off}" y="${-it.h}" width="${it.w}" height="${it.h}" style="fill:${d.color};fill-opacity:.15;stroke:${d.color};stroke-width:2;vector-effect:non-scaling-stroke"/><polyline points="${ox},0 ${hx},${-it.h/2} ${ox},${-it.h}" style="fill:none;stroke:${d.color};stroke-dasharray:6 5;stroke-width:1;vector-effect:non-scaling-stroke"/>`}
+      s+=`<rect x="${it.off}" y="${-it.h}" width="${it.w}" height="${it.h}" style="fill:${it.leaf===false?d.color:it.col||'#c9b28f'};fill-opacity:${it.leaf===false?.15:.85};stroke:${d.color};stroke-width:2;vector-effect:non-scaling-stroke"/><polyline points="${ox},0 ${hx},${-it.h/2} ${ox},${-it.h}" style="fill:none;stroke:${d.color};stroke-dasharray:6 5;stroke-width:1;vector-effect:non-scaling-stroke"/>`}
     else if(it.type==='column')s+=`<rect x="${it.off}" y="${-H}" width="${it.w}" height="${H}" style="fill:var(--wall);opacity:.7"/>`;
     else if(isBox(it.type))s+=boxIcon(it.type,it.off,-(it.z+it.h),it.w,it.h);
   }
