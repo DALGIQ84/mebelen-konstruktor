@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 22:25 · няколко детайла</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 22:50 · свободни детайли</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -950,6 +950,16 @@ function buildRaw(k){
     const all=[...ra.parts,...rb.parts,...ex];
     if(cornerMirror(k))for(const p of all){const[x0,x1,...r]=p.box;p.box=[W-x1,W-x0,...r];if(p.sd)p.sd=p.sd==='L'?'R':'L'} // огледален — рамо Б отдясно
     return{parts:all,warn:[...ra.warn,...rb.warn],Dk}}
+  if(k.type==='wpanel'){ // панел на стената (облицовка, декоративен)
+    const tt=+mat(k.mf).t||18,h=Math.max(20,+k.fpH||700);add('Панел на стената',h,W,k.mf,[1,1,1,1],[0,W,0,tt,c,c+h],'');parts.at(-1).L=r1(h);parts.at(-1).Wd=r1(W);
+    finishParts(k,parts);return{parts,warn,Dk:tt}}
+  if(k.type==='wshelf'){ // рафт(ове) на стената — на скрити конзоли
+    const tt=+mat(k.mf).t||18,d=Math.max(60,+k.fsD||250),n=Math.max(1,k.fsN|0||1),g=Math.max(50,+k.fsG||300);
+    for(let i=0;i<n;i++){const z=c+i*g;add('Рафт на стената',W,d,k.mf,[1,0,0,0],[0,W,0,d,z,z+tt],'')}
+    warn.push(`Рафт на стената: ${n} бр. ${Math.round(W)} × ${Math.round(d)}${n>1?`, през ${g} мм`:''} — на скрити конзоли.`);finishParts(k,parts);return{parts,warn,Dk:d}}
+  if(k.type==='ubottom'){ // цяло дъно под горния ред (дъната на шкафовете остават)
+    const tt=+mat(k.mf).t||18,d=Math.max(100,+k.D||350);add('Цяло дъно горен ред',W,d,k.mf,[1,0,1,1],[0,W,0,d,c,c+tt],'');
+    warn.push(`Цяло дъно под горните шкафове: ${Math.round(W)} × ${Math.round(d)} — дъната на шкафовете остават.`);finishParts(k,parts);return{parts,warn,Dk:d}}
   if(k.type==='splash'){ // гръб на кухнята — панел на стената над плота
     const tt=+mat(k.mf).t||10,off=+k.off||0,wins=k.wall!=null?exItems(P.room.items).filter(it=>it.wall===k.wall&&it.type==='window'&&it.z<H-1&&it.off<off+W&&it.off+it.w>off).map(it=>[clamp(it.off-off,0,W),clamp(it.off+it.w-off,0,W),Math.max(c,it.z)]):[]; // под прозореца гърбът е по-нисък
     if(!wins.length)add('Гръб кухня',W,H-c,k.mf,[1,0,0,0],[0,W,0,tt,c,H],'top');
@@ -1246,10 +1256,10 @@ function renderList(){
   const lq=($('#lsQ')?.value||'').trim().toLowerCase(),CL=P.cabinets.filter(c=>!isAcc(c)&&(!lq||(c.name+' '+(TYPE_BG[c.type]||'')).toLowerCase().includes(lq)))
     .sort((a,b)=>(a.wall??999)-(b.wall??999)||(+a.off||0)-(+b.off||0));let lastW;
   $('#list').innerHTML=CL.map(c=>{const hd=c.wall!==lastW?`<div class="lh">${c.wall!==null?'Стена '+(c.wall+1):'Свободни'}</div>`:'';lastW=c.wall;return hd+`<div class="li${isSel(c.id)?' on':''}" data-id="${c.id}"><b>${esc(c.name)}${String(c.note||'').trim()?` <span title="${esc(c.note)}" style="color:var(--mark)">✎</span>`:''}</b><span>${c.W}×${(c.type==='endShelf'&&!c.upper)||c.type==='wardrobe'?c.H:c.H-c.c}×${c.D}</span>
-    <span style="grid-column:1/-1">${c.wall!==null?'стена '+(c.wall+1):'свободен'} · ${c.type==='splash'?'гръб '+Math.round(c.W)+' × '+Math.round(c.H-c.c):c.type==='top'?'плот '+Math.round(c.W)+' × '+c.D:c.type==='endPanel'?'завършваща страница':c.type==='wardrobe'?'гардероб · '+wSecs(c).length+' секции':c.type==='endShelf'?'крайна етажерка · '+c.sh+' рафт':c.type==='plinthRun'?'цокъл '+Math.round(c.W)+' мм':c.type==='filler'?'пълнеж':c.type==='cornerL'?'ъглов Г · рамо Б '+(c.armB||900):c.type==='fridge'?'хладилник':c.type==='col'?'колона фурна'+(+c.mwH>0?' + микров.':'')+' · на '+c.c:c.type==='dw'?'съдомиялна':c.type==='oven'?'фурна + чекм.':c.type==='drawers'?(c.dr+' чекм.'):c.open?('етажерка · '+c.sh+' рафт/секц.'):(c.doors+' вр. · '+c.div+' дел. · '+c.sh+' рафт/секц.')}</span></div>`}).join('')||`<div class="li" style="cursor:default;color:var(--muted)">${lq?'Няма шкаф с това име.':'Още няма шкафове.'}</div>`;
+    <span style="grid-column:1/-1">${c.wall!==null?'стена '+(c.wall+1):'свободен'} · ${c.type==='wpanel'?'панел '+Math.round(c.W)+' × '+Math.round(+c.fpH||700):c.type==='wshelf'?'рафт на стената '+Math.round(c.W):c.type==='ubottom'?'цяло дъно '+Math.round(c.W):c.type==='splash'?'гръб '+Math.round(c.W)+' × '+Math.round(c.H-c.c):c.type==='top'?'плот '+Math.round(c.W)+' × '+c.D:c.type==='endPanel'?'завършваща страница':c.type==='wardrobe'?'гардероб · '+wSecs(c).length+' секции':c.type==='endShelf'?'крайна етажерка · '+c.sh+' рафт':c.type==='plinthRun'?'цокъл '+Math.round(c.W)+' мм':c.type==='filler'?'пълнеж':c.type==='cornerL'?'ъглов Г · рамо Б '+(c.armB||900):c.type==='fridge'?'хладилник':c.type==='col'?'колона фурна'+(+c.mwH>0?' + микров.':'')+' · на '+c.c:c.type==='dw'?'съдомиялна':c.type==='oven'?'фурна + чекм.':c.type==='drawers'?(c.dr+' чекм.'):c.open?('етажерка · '+c.sh+' рафт/секц.'):(c.doors+' вр. · '+c.div+' дел. · '+c.sh+' рафт/секц.')}</span></div>`}).join('')||`<div class="li" style="cursor:default;color:var(--muted)">${lq?'Няма шкаф с това име.':'Още няма шкафове.'}</div>`;
 }
 const FIELDS=[
-  ['name','Име','text','full'],['note','Забележка (излиза и в PDF-а)','note','full'],['W','Ширина, мм','num'],['armB','Рамо Б (по съседната стена), мм','num'],['H','Височина без цокъла, мм','num'],['D','Дълбочина с вратата, мм','num'],['c','Цокъл, мм','num'],
+  ['name','Име','text','full'],['note','Забележка (излиза и в PDF-а)','note','full'],['W','Ширина, мм','num'],['fpH','Височина на панела, мм','num'],['fsD','Дълбочина на рафта, мм','num'],['fsN','Брой рафтове','num'],['fsG','Разстояние между рафтовете, мм','num'],['armB','Рамо Б (по съседната стена), мм','num'],['H','Височина без цокъла, мм','num'],['D','Дълбочина с вратата, мм','num'],['c','Цокъл, мм','num'],
   ['floor','Страница до пода','sel',[['none','Няма'],['L','Лява'],['R','Дясна'],['both','Двете']]],
   ['upper','Горен шкаф (виси на стената)','chk','full'],['plinth','Цокъл панел отпред','chk','full'],
   ['_','Вътрешност','sub'],['type','Тип','sel',[['doors','С врати'],['cornerL','Ъглов Г'],['endShelf','Крайна етажерка'],['wardrobe','Гардероб'],['drawers','С чекмеджета'],['oven','Фурна + чекмедже'],['dw','Съдомиялна за вграждане'],['col','Колона фурна + микровълнова'],['fridge','Шкаф за хладилник']]],
@@ -1285,7 +1295,10 @@ function renderEditor(){
   ed.innerHTML=FIELDS.map(([f,l,t,x])=>{
     if(t==='note')return `<label class="full">${l}<textarea id="f_note" data-f="note" rows="2" placeholder="напр. Push панти, без дръжка…" style="font:inherit;resize:vertical;height:54px;min-height:34px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--fg)">${esc(k.note||'')}</textarea><span style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${NOTE_CHIPS.map(c=>`<button type="button" class="btn sm" data-nchip="${esc(c)}" style="padding:2px 8px;font-size:11px">+ ${esc(c)}</button>`).join('')}</span></label>`;
     if(k.type==='filler'&&!FILL_OK.includes(f))return '';
-    if(k.type==='splash'){if(!['_','name','W','H','mf','wall','off'].includes(f))return '';if(f==='W')l='Дължина, мм';if(f==='H')l='Височина на гърба, мм';if(f==='mf')l='Материал'}
+    if(k.type==='wpanel'){if(!['_','name','note','W','fpH','c','mf','wall','off'].includes(f))return '';if(f==='c')l='От пода (долният ръб), мм';if(f==='mf')l='Материал'}
+    else if(k.type==='wshelf'){if(!['_','name','note','W','fsD','c','fsN','fsG','mf','wall','off'].includes(f))return '';if(f==='W')l='Дължина, мм';if(f==='c')l='Височина от пода (първият рафт), мм';if(f==='mf')l='Материал'}
+    else if(k.type==='ubottom'){if(!['_','name','note','W','D','c','mf','wall','off'].includes(f))return '';if(f==='W')l='Дължина, мм';if(f==='D')l='Дълбочина, мм';if(f==='c')l='От пода (долу), мм';if(f==='mf')l='Материал'}
+    else if(k.type==='splash'){if(!['_','name','W','H','mf','wall','off'].includes(f))return '';if(f==='W')l='Дължина, мм';if(f==='H')l='Височина на гърба, мм';if(f==='mf')l='Материал'}
     if(k.type==='top'){if(!['_','name','W','D','mf','wall','off'].includes(f))return '';if(f==='W')l='Дължина, мм';if(f==='D')l='Дълбочина, мм';if(f==='mf')l='Плот (дебелина)'}
     if(k.type==='endPanel'){if(!['_','name','H','toFloor','pc','over','D','mf','wall','off','gap','px','py','rot'].includes(f))return '';if(f==='pc'&&k.toFloor!==false)return '';if(f==='over'&&k.toFloor===false)return '';if(f==='H')l='Височина от пода, мм';if(f==='D')l='Дълбочина, мм';if(f==='mf')l='Материал'}
     if(k.type==='plinthRun'){if(!['_','name','W','c','mf','wall','off','gap','px','py','rot'].includes(f))return '';if(f==='W')l='Дължина, мм';if(f==='c')l='Височина на цокъла, мм';if(f==='mf')l='Материал'}
@@ -1898,6 +1911,11 @@ function addSplash(grp){ // гръб над всеки избран плот; в
     const z0=+t.c+tt,p=cabDef({type:'splash',name:'Гръб кухня',W:Math.round(a1-a0),c:z0,H:z0+600,D:bt,mf:'plbs',wall:t.wall,off:a0,gap:0,plinth:false});
     place(p);P.cabinets.push(p);made.push(p)}
   sel=made[0].id;multiSel=new Set(made.map(p=>p.id));P.example=false;changed(true);toast(made.length>1?`${made.length} гърба`:`Гръб ${made[0].W} × 600 мм`)}
+function addUBottom(grp){ // цяло дъно под избраните горни шкафове — по стена, до лицето на вратите
+  const ok=grp.filter(q=>q.wall!==null&&q.upper&&!['ubottom','wpanel','wshelf'].includes(q.type));if(!ok.length){toast('Избери горни шкафове');return}pushUndo();const byW={},made=[];for(const q of ok)(byW[q.wall]=byW[q.wall]||[]).push(q);
+  for(const w in byW){const g=byW[w],a0=Math.min(...g.map(q=>q.off)),a1=Math.max(...g.map(q=>q.off+q.W)),mf=g[0].mf,t=+mat(mf).t||18,c=Math.min(...g.map(q=>+q.c))-t,D=Math.max(...g.map(q=>+q.D));
+    const p=cabDef({type:'ubottom',name:'Цяло дъно',W:Math.round(a1-a0),D,c,H:c+t,mf,wall:+w,off:a0,gap:0,plinth:false,upper:true});place(p);P.cabinets.push(p);made.push(p)}
+  sel=made[0].id;multiSel=new Set(made.map(p=>p.id));P.example=false;changed(true);toast('Цяло дъно под горните шкафове — дъната им остават')}
 function addTops(grp){ // по един плот за всяка стена; в ъгъла плотът на ъгловия шкаф стига до стената, другият опира в него
   const ok=grp.filter(q=>q.wall!==null&&BASE.includes(q.type)&&!q.upper),byW={};for(const q of ok)(byW[q.wall]=byW[q.wall]||[]).push(q);
   for(const q of ok.filter(q=>q.type==='cornerL')){const a=cornerAdj(q);if(!a)continue;const L=wallInfo(a.w).len,aB=+q.armB||900; // рамо Б — плот по съседната стена
@@ -1959,6 +1977,7 @@ function openCtx(id,x,y){ctx.dataset.door='';if(!(multiSel.size>1&&multiSel.has(
     (grp.length>1?`<div class="gh" style="padding:2px 8px 6px;color:var(--muted)">избрани ${grp.length} шкафа</div>`:'')+
     ((on||grp.every(q=>q.wall===null))&&!['plinthRun','filler','endPanel','acc'].includes(k.type)?it('endL','Завършваща страница отляво',grp.length>1?'обща за избраните':'цяло платно до пода')+it('endR','Завършваща страница отдясно',grp.length>1?'обща за избраните':'цяло платно до пода'):'')+
     (grp.some(q=>q.type==='top')?it('splash','Гръб над плота',grp.length>1?'за избраните плотове':'по дължината на плота'):'')+
+    (grp.some(q=>q.wall!==null&&q.upper&&!['ubottom','wpanel','wshelf'].includes(q.type))?it('ubot','Цяло дъно отдолу',grp.length>1?'общо под избраните горни':'под този горен шкаф'):'')+
     (grp.some(q=>q.wall!==null&&BASE.includes(q.type)&&!q.upper)?it('top','Плот',grp.length>1?'общ за избраните':'за този шкаф'):'')+
     (grp.some(q=>q.wall!==null&&!q.upper&&!['col','plinthRun','filler','endPanel','acc'].includes(q.type))?it('plinth','Цокъл отпред',grp.length>1?'общ за избраните':'за този шкаф'):'')+
     (on&&k.type!=='filler'&&!accIn(k)?(()=>{const g=grp.length>1?groupGaps(grp):sideGaps(k);if(!g)return '';return (g.l>=3&&g.l<=400?it('fillL','Пълнеж отляво',`${Math.round(g.l)} мм до ${g.lWall?'стената':'съседа'}`):'')+(g.r>=3&&g.r<=400?it('fillR','Пълнеж отдясно',`${Math.round(g.r)} мм до ${g.rWall?'стената':'съседа'}`):'')})():'')+
@@ -1987,6 +2006,7 @@ ctx.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[
     if(a!=='cdOff'){const[ow,ot]=a==='cdLo'?[sp.lo,sp.hi]:[sp.hi,sp.lo];ow.cdW=ot.id;ot.cdOf=ow.id;toast(`Обща врата — броиш я в „${ow.name}“`)}else toast('Общата врата е махната')}
   if(a==='plinth'){addPlinths(groupOf(k.id));return}
   if(a==='top'){addTops(groupOf(k.id));return}
+  if(a==='ubot'){addUBottom(groupOf(k.id));return}
   if(a==='splash'){addSplash(groupOf(k.id));return}
   if(a==='endL'||a==='endR'){addEndPanel(groupOf(k.id),a==='endL'?'L':'R');return}
   if(a==='fillL'||a==='fillR'){addFiller(k,a==='fillL'?'L':'R');return}
@@ -2038,7 +2058,7 @@ function blockOcc(i){ // свободни колони, долепени до с
 function occupancy(i){ // шкафове на стената (лице) и шкафове от съседни стени (профил)
   const w=wallInfo(i),out=[];
   for(const k of P.cabinets){
-    if(k.type==='plinthRun'||k.type==='top'||k.type==='splash'||accIn(k))continue; // цокълът, плотът, мивката и котлонът не заемат място по стената
+    if(k.type==='plinthRun'||k.type==='top'||k.type==='splash'||k.type==='wpanel'||k.type==='wshelf'||k.type==='ubottom'||accIn(k))continue; // цокълът, плотът, мивката и котлонът не заемат място по стената
     if(k.wall===i){out.push({k,s0:k.off,s1:k.off+k.W,front:true});continue}
     const c=corners(k),ss=c.map(p=>(p[0]-w.A[0])*w.u[0]+(p[1]-w.A[1])*w.u[1]),dd=c.map(p=>(p[0]-w.A[0])*w.n[0]+(p[1]-w.A[1])*w.n[1]);
     if(Math.min(...dd)<60&&Math.max(...dd)>0&&Math.max(...ss)>1&&Math.min(...ss)<w.len-1)out.push({k,s0:Math.min(...ss),s1:Math.max(...ss),front:false});
@@ -2090,6 +2110,9 @@ function wallSvg(){
     else if(it.type==='column')s+=`<rect x="${it.off}" y="${-H}" width="${it.w}" height="${H}" style="fill:var(--wall);opacity:.7"/>`;
     else if(isBox(it.type))s+=boxIcon(it.type,it.off,-(it.z+it.h),it.w,it.h);
   }
+  for(const k of P.cabinets.filter(q=>['wpanel','wshelf','ubottom'].includes(q.type)&&q.wall===wv)){const on=isSel(k.id); // свободни детайли по стената
+    s+=`<g data-id="${k.id}" style="cursor:pointer">`+build(k).parts.map(p=>`<rect x="${k.off+p.box[0]}" y="${-p.box[5]}" width="${p.box[1]-p.box[0]}" height="${Math.max(4,p.box[5]-p.box[4])}" style="fill:${mat(p.m).color};stroke:${on?'var(--mark)':'var(--fg)'};stroke-width:${on?3:1};vector-effect:non-scaling-stroke"/>`).join('')+
+      `<text x="${k.off+k.W/2}" y="${-(k.type==='wpanel'?k.c+(+k.fpH||700)/2:k.c)-fs*0.4}" text-anchor="middle" font-size="${fs*0.5}" font-family="IBM Plex Sans,sans-serif" style="fill:var(--fg)">${esc(k.name)}</text></g>`}
   for(const k of P.cabinets.filter(q=>q.type==='splash'&&q.wall===wv)){const x0=Math.max(0,k.off),x1=Math.min(L,k.off+k.W);
     const fp=build(k).parts.find(p=>p.fp)?.fp,shp=fp?`<polygon points="${fp.map(([u,v])=>(k.off+u)+','+(-v)).join(' ')}"`:`<rect x="${x0}" y="${-k.H}" width="${x1-x0}" height="${k.H-k.c}"`; // с изреза под прозореца
     s+=`<g data-id="${k.id}" style="cursor:pointer">${shp} style="fill:${mat(k.mf).color};fill-opacity:.55;stroke:${isSel(k.id)?'var(--mark)':'var(--fg)'};stroke-width:${isSel(k.id)?3:1};vector-effect:non-scaling-stroke"/>`+
@@ -2412,6 +2435,9 @@ function cabInfo(k){const sl=slideOf(k),a=[];
   if(k.type==='cornerL'&&k.upper)return `горен Г-ъгъл, цял: рамо А ${k.W} · рамо Б ${k.armB||600} мм · дъно, таван и рафтове Г-образни · ${k.sh} рафт · 2 врати — всяка поотделно`;
   if(k.type==='cornerL')return `${k.upper?'горен ':''}Г-ъгъл: рамо А ${k.W} · рамо Б ${k.armB||900} мм · част Б с една страница и твърд гръб ПДЧ · ${k.sh} рафт на част · 2 врати — всяка се отваря поотделно (пантите са към външните краища)`;
   if(k.type==='top')return `плот ${Math.round(k.W)} × ${k.D} мм, дебелина ${mat(k.mf).t} мм · ${mat(k.mf).name}`;
+  if(k.type==='wpanel')return `панел на стената ${Math.round(k.W)} × ${Math.round(+k.fpH||700)} мм, от ${Math.round(k.c)} мм от пода · ${mat(k.mf).name}`;
+  if(k.type==='wshelf')return `рафт на стената ${Math.round(k.W)} × ${Math.round(+k.fsD||250)} мм${(k.fsN|0)>1?` · ${k.fsN} бр. през ${k.fsG||300}`:''} · на ${Math.round(k.c)} мм от пода · ${mat(k.mf).name}`;
+  if(k.type==='ubottom')return `цяло дъно под горните шкафове ${Math.round(k.W)} × ${Math.round(k.D)} мм · ${mat(k.mf).name}`;
   if(k.type==='splash')return `гръб ${Math.round(k.W)} × ${Math.round(k.H-k.c)} мм над плота, от ${Math.round(k.c)} до ${Math.round(k.H)} мм от пода · ${mat(k.mf).name}`;
   if(k.type==='plinthRun')return `цокъл ${Math.round(k.W)} × ${k.c} мм · ${mat(k.mf).name}`;
   if(k.type==='filler')return `пълнеж ${Math.round(k.W)} мм празнина · режеш с ${+(P.settings.fillAllow??50)} мм надмярка`;
@@ -2609,7 +2635,7 @@ svg.addEventListener('pointermove',e=>{
       for(const t of tg)if(Math.abs(off-t)<40){off=t;break}
       k.off=clamp(off,-k.W+10,w.len-10);
       const gc=[0,...frontRefs(k).map(r=>r-k.D)].filter(x=>x>=0);let best=null;for(const c of gc)if(Math.abs(g-c)<30&&(best===null||Math.abs(g-c)<Math.abs(g-best)))best=c;
-      k.gap=best!==null?best:Math.max(0,Math.round(g/5)*5);if(k.type==='top'||k.type==='splash')k.gap=0;place(k)}
+      k.gap=best!==null?best:Math.max(0,Math.round(g/5)*5);if(['top','splash','wpanel','wshelf','ubottom'].includes(k.type))k.gap=0;place(k)}
   }
   if(k.wall===null){
     k.x=Math.round((p.x-drag.dx)/10)*10;k.y=Math.round((p.y-drag.dy)/10)*10;
@@ -2719,6 +2745,9 @@ const KITCHEN=[
     {name:'Шкаф за хладилник',p:{type:'fridge',W:600,c:100,H:1920,frDoors:1}},
     {name:'Отворен шкаф (етажерка)',p:{W:600,H:2100,open:true,doors:0,sh:5,top:'full',split:3}},
     {name:'Крайна етажерка — висока, от 2 части',p:{type:'endShelf',W:300,c:100,H:2170,D:580,sh:6,split:3,eShape:'45',eSide:'L'}}]},
+  {cat:'Свободни детайли',items:[
+    {name:'Панел на стената',p:{type:'wpanel',name:'Панел',W:600,fpH:700,c:1450,D:18,H:2150,plinth:false}},
+    {name:'Рафт на стената',p:{type:'wshelf',name:'Рафт на стената',W:800,fsD:250,fsN:1,fsG:300,c:1500,D:250,H:1518,plinth:false}}]},
   {cat:'Гардероби',items:[
     {name:'Гардероб с 2 врати',p:{type:'wardrobe',wPl:true,W:1000,H:2400,D:600,c:100,wDoor:'hinge',doors:2,wRod:1800,wDrH:180,secs:[{fill:'empty',sh:0}]}},
     {name:'Гардероб с 3 врати',p:{type:'wardrobe',wPl:true,W:1500,H:2400,D:600,c:100,wDoor:'hinge',doors:3,wRod:1800,wDrH:180,secs:[{fill:'empty',sh:0}]}},
@@ -2777,7 +2806,9 @@ function addCorner2(armA=900,armB=900,upper=false){ // един шкаф „Ъг
 function addCab(o){
   const k=cabDef({name:'Д'+(P.cabinets.length+1),...o});
   let w=0,best=-1;for(let i=0;i<N();i++){const L=wallInfo(i).len;if(L>best){best=L;w=i}}
-  let off=0;for(const o of P.cabinets)if(o.wall===w&&!!o.upper===!!k.upper&&!isAcc(o)&&!['top','splash','plinthRun'].includes(o.type))off=Math.max(off,o.off+o.W);
+  const FREE=['wpanel','wshelf','ubottom'],zr=o=>o.type==='wpanel'?[+o.c,+o.c+(+o.fpH||700)]:o.type==='wshelf'?[+o.c,+o.c+((+o.fsN||1)-1)*(+o.fsG||300)+18]:o.type==='ubottom'?[+o.c,+o.c+18]:o.upper?[+o.c,+o.H]:[0,+o.H];
+  let off=0;if(FREE.includes(k.type)){const a=zr(k);for(const o of P.cabinets)if(o.wall===w&&!isAcc(o)&&!['top','splash','plinthRun'].includes(o.type)){const b=zr(o);if(b[0]<a[1]&&a[0]<b[1])off=Math.max(off,o.off+o.W)}}
+  else for(const o of P.cabinets)if(o.wall===w&&!!o.upper===!!k.upper&&!isAcc(o)&&!['top','splash','plinthRun',...FREE].includes(o.type))off=Math.max(off,o.off+o.W);
   if(off+k.W<=wallInfo(w).len){k.wall=w;k.off=off;place(k)}else{const b=roomBox();k.x=(b[0]+b[1])/2-k.W/2;k.y=(b[2]+b[3])/2-k.D/2}
   P.cabinets.push(k);P.example=false;sel=k.id;if(tab!=='cab')setTab('cab');changed(true)};
 $('#bDup').onclick=()=>{const s=cab(sel);if(!s)return;const k={...s,id:uid(),name:s.name+' копие',secs:s.secs?JSON.parse(JSON.stringify(s.secs)):s.secs,dh:[...(s.dh||[])],bh:[...(s.bh||[])],edgeOv:JSON.parse(JSON.stringify(s.edgeOv||{})),matOv:{...(s.matOv||{})},grainOv:{...(s.grainOv||{})}};
