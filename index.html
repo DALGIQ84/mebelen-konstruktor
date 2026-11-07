@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 21:25 · гръб в Стени с изрез</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 21:40 · начален прозорец</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -254,6 +254,17 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </main>
 
 <div id="pedOv" hidden style="display:none"></div><div id="ped" hidden style="position:fixed;left:2vw;top:3vh;width:96vw;height:94vh;min-width:420px;min-height:320px;resize:both;z-index:25;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.25);display:flex;flex-direction:column;overflow:hidden"></div>
+<div id="ovStart" class="ov" hidden>
+  <div class="dlg" style="max-width:520px">
+    <h3>Мебелен конструктор <button class="btn sm" data-close>Затвори</button></h3>
+    <div class="body" style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn" id="stLast" style="text-align:left;padding:10px 12px"><b>Продължи последния проект</b><br><small id="stLastSm" style="color:var(--muted)"></small></button>
+      <button class="btn" id="stNew" style="text-align:left;padding:10px 12px"><b>Нов проект</b><br><small style="color:var(--muted)">празна стая 3600 × 3000</small></button>
+      <button class="btn" id="stOpen" style="text-align:left;padding:10px 12px"><b>Отвори от папка…</b><br><small style="color:var(--muted)">проект, записан на компютъра</small></button>
+      <div id="stRecent"></div>
+    </div>
+  </div>
+</div>
 <div id="ovProj" class="ov" hidden>
   <div class="dlg">
     <h3>Проект <button class="btn sm" data-close>Затвори</button></h3>
@@ -2747,7 +2758,8 @@ $('#cutMenu').addEventListener('click',async e=>{e.stopPropagation();const b=e.t
   const date=new Date().toISOString().slice(0,10);
   const ok=a==='csv'?await saveFile(`${projBase()} разкрой ${date}.csv`,exportCSV('all')):await saveFile(`${projBase()} разкрой ${date}.txt`,exportText('all'));
   if(!ok){copyText(exportText('all'),'Запазването на файл не е позволено тук — детайлите са копирани')}});
-$('#fNew').onclick=e=>sureItem(e.currentTarget,()=>{projFH=null;$('#bSaveSm').textContent='като файл на компютъра';P={room:{h:P.room.h,t:P.room.t,pts:SHAPES.rect(3600,3000),shape:{kind:'rect',W:3600,L:3000,a:1200,b:1000},items:[]},settings:{...P.settings},materials:P.materials,cabinets:[]};afterLoad()});
+function newProject(){projFH=null;$('#bSaveSm').textContent='като файл на компютъра';P={room:{h:P.room.h,t:P.room.t,pts:SHAPES.rect(3600,3000),shape:{kind:'rect',W:3600,L:3000,a:1200,b:1000},items:[]},settings:{...P.settings},materials:P.materials,cabinets:[]};afterLoad()}
+$('#fNew').onclick=e=>sureItem(e.currentTarget,newProject);
 $('#fSample').onclick=e=>sureItem(e.currentTarget,()=>{P=sample();afterLoad()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#kitMenu').hidden)toggleKit(false)});
 function cornerMirror(k){if(k.wall===null||k.wall>=N())return !!k.mirror;const L=wallInfo(k.wall).len;if(+k.off<=40)return false;if(+k.off+ +k.W>=L-40)return true;return !!k.mirror}
@@ -2996,16 +3008,20 @@ const FSA=OFFLINE&&!!window.showSaveFilePicker;if(FSA)$('#bSaveAs').hidden=false
 const pjTypes=[{description:'Мебелен проект',accept:{'application/json':['.json']}}];
 async function saveProj(as){const name=projBase()+'.json',data=JSON.stringify(P);
   if(FSA){try{if(as||!projFH)projFH=await showSaveFilePicker({suggestedName:name,types:pjTypes,id:'mebeli-proj',startIn:projFH||'documents'});
-      const w=await projFH.createWritable();await w.write(data);await w.close();toast('Запазено: '+projFH.name);$('#bSaveSm').textContent=projFH.name;return true}
+      const w=await projFH.createWritable();await w.write(data);await w.close();recentAdd(projFH);toast('Запазено: '+projFH.name);$('#bSaveSm').textContent=projFH.name;return true}
     catch(e){if(e&&e.name==='AbortError')return false;toast('Не можах да запиша: '+(e&&e.message||e))}}
   if(OFFLINE){plainDownload(name,data);toast('Запазено в „Изтеглени“: '+name);return true}
   return false}
 $('#bSaveAs').onclick=()=>{toggleFile(false);saveProj(true)};
+const RDB=()=>new Promise((ok,no)=>{const r=indexedDB.open('mebeli-recent',1);r.onupgradeneeded=()=>r.result.createObjectStore('f');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)}); // последните файлове (инсталираната програма)
+async function recentGet(){try{const db=await RDB();return await new Promise(ok=>{const q=db.transaction('f').objectStore('f').get('list');q.onsuccess=()=>ok(q.result||[]);q.onerror=()=>ok([])})}catch(e){return[]}}
+async function recentAdd(h){if(!h)return;try{let l=await recentGet();const out=[{name:h.name,h,t:Date.now()}];for(const o of l){if(out.length>=8)break;try{if(await o.h.isSameEntry(h))continue}catch(e){}out.push(o)}
+  const db=await RDB();db.transaction('f','readwrite').objectStore('f').put(out,'list')}catch(e){}}
 $('#fName').onclick=()=>{$('#bProj').click();setTimeout(()=>{const n=$('#pjName');if(n){n.focus();n.select()}},50)};
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.code==='KeyO'&&!e.target.matches('input,select,textarea')){e.preventDefault();$('#lOpen').click()}});
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.code==='KeyS'){e.preventDefault();if(OFFLINE)saveProj(e.shiftKey);else $('#bSave').click()}});
 $('#openFile').closest('label').addEventListener('click',async e=>{if(!(FSA&&window.showOpenFilePicker))return;e.preventDefault();toggleFile(false);
-  try{const[h]=await showOpenFilePicker({types:pjTypes,id:'mebeli-proj',startIn:'documents'});const t=await (await h.getFile()).text();loadProject(t);projFH=h;$('#bSaveSm').textContent=h.name}catch(err){if(err&&err.name!=='AbortError')toast('Не можах да отворя файла')}});
+  try{const[h]=await showOpenFilePicker({types:pjTypes,id:'mebeli-proj',startIn:'documents'});const t=await (await h.getFile()).text();loadProject(t);projFH=h;recentAdd(h);$('#bSaveSm').textContent=h.name}catch(err){if(err&&err.name!=='AbortError')toast('Не можах да отворя файла')}});
 $('#bSave').onclick=async()=>{toggleFile(false);if(OFFLINE){await saveProj(false);return}
   const name=((P.name||'проект').replace(/[\\/:*?"<>|]+/g,' ').trim()||'проект')+' '+new Date().toISOString().slice(0,10)+'.json';
   const data=JSON.stringify(P);let dl=null;try{dl=await window.claude?.use?.('downloads')}catch(e){}
@@ -3144,5 +3160,16 @@ $('#bMy').onclick=()=>{const k=cab(sel);if(!k||isAcc(k)){toast('Избери ш�
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',themeScene);
 new MutationObserver(themeScene).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 migrate();snapSplash();snapAcc();save();renderList();renderEditor();renderTable();themeScene();resize();fit();setView('3d');applyVw();
+(async()=>{ // начален прозорец: продължи / нов / от папка / последните файлове
+  const n=P.cabinets.length;$('#stLastSm').textContent=P.example?'примерната кухня':`${P.name||'без име'} · ${n} ${n===1?'шкаф':'шкафа'}`;
+  $('#stLast').onclick=()=>{$('#ovStart').hidden=true};
+  $('#stNew').onclick=()=>{$('#ovStart').hidden=true;newProject()};
+  $('#stOpen').onclick=()=>{$('#ovStart').hidden=true;$('#lOpen').click()};
+  const l=FSA?await recentGet():[];
+  if(l.length){$('#stRecent').innerHTML='<div style="font-size:12px;color:var(--muted);margin:4px 0">Последни файлове</div>'+l.map((o,i)=>`<button class="btn sm" data-rec="${i}" style="display:block;width:100%;text-align:left;margin-bottom:4px">${esc(o.name)} <small style="color:var(--muted)">${new Date(o.t).toLocaleDateString('bg-BG')}</small></button>`).join('');
+    $('#stRecent').onclick=async e=>{const b=e.target.closest('[data-rec]');if(!b)return;const o=l[+b.dataset.rec];
+      try{if((await o.h.queryPermission({mode:'readwrite'}))!=='granted'&&(await o.h.requestPermission({mode:'readwrite'}))!=='granted')return;
+        const t=await (await o.h.getFile()).text();loadProject(t);projFH=o.h;recentAdd(o.h);$('#bSaveSm').textContent=o.h.name;$('#ovStart').hidden=true}catch(err){toast('Файлът не е намерен — може да е преместен')}}}
+  $('#ovStart').hidden=false})();
 </script>
 <script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(()=>{}));</script></body></html>
