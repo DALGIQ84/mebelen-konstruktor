@@ -3093,4 +3093,4 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',themeScene)
 new MutationObserver(themeScene).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 migrate();snapSplash();snapAcc();save();renderList();renderEditor();renderTable();themeScene();resize();fit();setView('3d');applyVw();
 </script>
-<script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));</script></body></html>
+<script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(()=>{}));</script></body></html>
