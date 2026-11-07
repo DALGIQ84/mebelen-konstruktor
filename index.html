@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 21:30 · скосен панел</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 21:40 · една стена</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1288,7 +1288,7 @@ function renderEditor(){
   $('#edTitle').textContent='Параметри · '+k.name;
   const onWall=k.wall!==null;
   const colDr=q=>false,drOK=q=>['drawers','oven'].includes(q.type),C3=['doors','drawers','oven','col'];
-  const COND={fcut:['wpanel'],wCorner:['wardrobe'],wLsh:q=>q.type==='wardrobe'&&!!q.wCorner,doorsB:q=>q.type==='wardrobe'&&!!q.wCorner,wsecsB:q=>q.type==='wardrobe'&&!!q.wCorner,wDoor:['wardrobe'],antr:['wardrobe'],antH:q=>q.type==='wardrobe'&&!!q.antr,antSh:q=>q.type==='wardrobe'&&!!q.antr,wRod:['wardrobe'],wDrH:['wardrobe'],wBoxH:['wardrobe'],wDrD:['wardrobe'],wSlide:['wardrobe'],wsecs:['wardrobe'],eR:q=>q.type==='endShelf'&&q.eShape==='r',eFloor:q=>q.type==='endShelf'&&!q.upper,eShape:['endShelf'],eSide:['endShelf'],diag:q=>q.type==='cornerL'&&!!q.upper,hoodStrip:q=>q.type==='doors'&&q.upper&&!!q.hood,hoodH:q=>q.type==='doors'&&q.upper&&!!q.hood,hoodD:q=>q.type==='doors'&&q.upper&&!!q.hood,liftMech:q=>q.type==='doors'&&q.upper&&+q.lift>0&&(!q.open||q.vitrine),liftInfo:q=>q.type==='doors'&&q.upper&&+q.lift>0&&(!q.open||q.vitrine),upper:['doors','cornerL'],lift:q=>q.type==='doors'&&q.upper&&(!q.open||q.vitrine),hood:q=>q.type==='doors'&&q.upper,hoodD:q=>q.type==='doors'&&q.upper&&q.hood,apShow:q=>['oven','col'].includes(q.type)||(q.upper&&!!q.hood),glCol:q=>q.type==='wardrobe'||q.type==='doors'&&!!q.open&&!!q.vitrine,glColS:['wardrobe'],mGv:q=>q.type==='wardrobe'||q.type==='doors'&&!!q.open&&!!q.vitrine,mGs:['wardrobe'],wExM:['wardrobe'],wEx:['wardrobe'],wExB:['wardrobe'],wExSep:['wardrobe'],alCol:q=>q.type==='doors'&&!!q.open&&!!q.vitrine,vitrine:q=>q.type==='doors'&&!!q.open,vdoors:q=>q.type==='doors'&&!!q.open&&!!q.vitrine&&!(q.upper&&+q.lift>0),split:q=>q.type==='doors'&&!!q.open,open:'doors',armB:'cornerL',deadOpen:q=>q.type==='doors'&&(q.deadSide||'none')!=='none',half:'doors',divRef:q=>q.type==='doors'&&+q.div>0,divp:q=>q.type==='doors'&&+q.div>0&&divMode(q)!=='auto',over:'endPanel',toFloor:'endPanel',pc:'endPanel',deadSide:'doors',deadW:'doors',div:'doors',sh:'doors',doors:'doors',dr:q=>q.type==='drawers'||colDr(q),dh:q=>q.type==='drawers'||colDr(q),slide:drOK,nl:drOK,bh:drOK,mx:drOK,mxb:drOK,
+  const COND={fcut:['wpanel'],fpH:['wpanel'],fsD:['wshelf'],fsN:['wshelf'],fsG:['wshelf'],wCorner:['wardrobe'],wLsh:q=>q.type==='wardrobe'&&!!q.wCorner,doorsB:q=>q.type==='wardrobe'&&!!q.wCorner,wsecsB:q=>q.type==='wardrobe'&&!!q.wCorner,wDoor:['wardrobe'],antr:['wardrobe'],antH:q=>q.type==='wardrobe'&&!!q.antr,antSh:q=>q.type==='wardrobe'&&!!q.antr,wRod:['wardrobe'],wDrH:['wardrobe'],wBoxH:['wardrobe'],wDrD:['wardrobe'],wSlide:['wardrobe'],wsecs:['wardrobe'],eR:q=>q.type==='endShelf'&&q.eShape==='r',eFloor:q=>q.type==='endShelf'&&!q.upper,eShape:['endShelf'],eSide:['endShelf'],diag:q=>q.type==='cornerL'&&!!q.upper,hoodStrip:q=>q.type==='doors'&&q.upper&&!!q.hood,hoodH:q=>q.type==='doors'&&q.upper&&!!q.hood,hoodD:q=>q.type==='doors'&&q.upper&&!!q.hood,liftMech:q=>q.type==='doors'&&q.upper&&+q.lift>0&&(!q.open||q.vitrine),liftInfo:q=>q.type==='doors'&&q.upper&&+q.lift>0&&(!q.open||q.vitrine),upper:['doors','cornerL'],lift:q=>q.type==='doors'&&q.upper&&(!q.open||q.vitrine),hood:q=>q.type==='doors'&&q.upper,hoodD:q=>q.type==='doors'&&q.upper&&q.hood,apShow:q=>['oven','col'].includes(q.type)||(q.upper&&!!q.hood),glCol:q=>q.type==='wardrobe'||q.type==='doors'&&!!q.open&&!!q.vitrine,glColS:['wardrobe'],mGv:q=>q.type==='wardrobe'||q.type==='doors'&&!!q.open&&!!q.vitrine,mGs:['wardrobe'],wExM:['wardrobe'],wEx:['wardrobe'],wExB:['wardrobe'],wExSep:['wardrobe'],alCol:q=>q.type==='doors'&&!!q.open&&!!q.vitrine,vitrine:q=>q.type==='doors'&&!!q.open,vdoors:q=>q.type==='doors'&&!!q.open&&!!q.vitrine&&!(q.upper&&+q.lift>0),split:q=>q.type==='doors'&&!!q.open,open:'doors',armB:'cornerL',deadOpen:q=>q.type==='doors'&&(q.deadSide||'none')!=='none',half:'doors',divRef:q=>q.type==='doors'&&+q.div>0,divp:q=>q.type==='doors'&&+q.div>0&&divMode(q)!=='auto',over:'endPanel',toFloor:'endPanel',pc:'endPanel',deadSide:'doors',deadW:'doors',div:'doors',sh:'doors',doors:'doors',dr:q=>q.type==='drawers'||colDr(q),dh:q=>q.type==='drawers'||colDr(q),slide:drOK,nl:drOK,bh:drOK,mx:drOK,mxb:drOK,
     ovenH:['oven','col'],mwOn:'col',mwH:q=>q.type==='col'&&q.mwOn!==false,fridgeH:()=>false,frDoors:()=>false,frLow:()=>false,divShort:['col','fridge'],grooveD:'col',grooveY:'col',colTopPos:['col','fridge'],topSh:'col',floor:['doors','drawers','oven'],plinth:['doors','drawers','oven','dw','fridge'],top:['doors','drawers'],mb:C3,backPos:['doors','drawers','oven'],bRails:C3};
   const FILL_OK=['_','name','W','H','D','c','mc','mf','wall','off','gap','px','py','rot'];
   if(isAcc(k)){const a=accOf(k),inb=accIn(k),v=x=>esc(x);
@@ -1462,7 +1462,7 @@ function roomRestore(str){const o=JSON.parse(str);Object.assign(P.room,{blocks:o
 function updUndo(){const b=$('#bUndo');if(b)b.disabled=!undoStack.length}
 function pushUndo(str){str=str||roomSnap();if(undoStack.at(-1)!==str)undoStack.push(str);if(undoStack.length>60)undoStack.shift();updUndo()}
 function segX(a,b,c,d){const o=(p,q,r)=>Math.sign((q[0]-p[0])*(r[1]-p[1])-(q[1]-p[1])*(r[0]-p[0]));return o(a,b,c)*o(a,b,d)<0&&o(c,d,a)*o(c,d,b)<0}
-function validRoom(p,open=P.room.open){const n=p.length;if(n<3)return false;const ns=open?n-1:n;
+function validRoom(p,open=P.room.open){const n=p.length;if(open&&n===2)return Math.hypot(p[1][0]-p[0][0],p[1][1]-p[0][1])>=20; /* само една стена */if(n<3)return false;const ns=open?n-1:n;
   for(let i=0;i<ns;i++){const a=p[i],b=p[(i+1)%n];if(Math.hypot(b[0]-a[0],b[1]-a[1])<20)return false;
     for(let j=i+2;j<ns;j++){if(i===0&&j===n-1)continue;if(segX(a,b,p[j],p[(j+1)%n]))return false}}
   return Math.abs(area(p))>1e4}
@@ -2251,7 +2251,7 @@ function drawHint(){if(!drawRoom)return;const n=drawRoom.pts.length;const wb=$('
   if(_twN!==n){_twN=n;const tf=$('#texForm');if(tf&&!tf.contains(document.activeElement))renderWallTex()}
   const a=drawRoom.armed;
   if(drawRoom.cont==='pick'){$('#hint').textContent='Кликни в един от жълтите краища — оттам започва новата стена · Esc = отказ';return}
-  $('#hint').textContent=(n===0?'Кликни за началото на първата стена.':!a?'Стената е готова. Кликни, за да продължиш от бялата точка, или върху оранжевата — от другия край'+(n>=3?' · Enter = край (без да се затваря) · клик върху първата точка = затворена стая.':'.'):
+  $('#hint').textContent=(n===0?'Кликни за началото на първата стена.':!a?'Стената е готова. Кликни, за да продължиш от бялата точка, или върху оранжевата — от другия край · Enter или двоен клик = край (без да се затваря)'+(n>=3?' · клик върху първата точка = затворена стая.':'.'):
     'Кликни за края на стената или напиши дължина и Enter'+(n>=3?' · клик върху първата точка затваря стаята.':'.'))+
     (drawRoom.buf?` · дължина: ${drawRoom.buf} мм`:a&&drawRoom.cur&&n?` · ${Math.round(Math.hypot(drawRoom.cur[0]-drawRoom.pts[n-1][0],drawRoom.cur[1]-drawRoom.pts[n-1][1]))} мм`:'')+' · Shift = без прав ъгъл · Backspace = назад · Esc = отказ'}
 function drawSnap(p,free){const d=drawRoom,last=d.pts[d.pts.length-1];let x=Math.round(p.x/10)*10,y=Math.round(p.y/10)*10;
@@ -2278,7 +2278,7 @@ function drawAdd(pt){const d=drawRoom;
     d.armed=true;d.cur=pt;drawHint();renderPlan();return} // нова стена започва от края на предишната
   if(d.pts.length>=3){const f=d.pts[0];if(Math.hypot(pt[0]-f[0],pt[1]-f[1])<fs*0.8)return drawFinish(false)}
   const last=d.pts[d.pts.length-1];if(last&&Math.hypot(pt[0]-last[0],pt[1]-last[1])<20)return;d.pts.push(pt);d.buf='';d.armed=d.pts.length===1;drawHint();renderPlan()}
-function drawFinish(open){const d=drawRoom;if(d.pts.length<3){toast(open?'Трябват поне 2 стени':'Трябват поне 3 ъгъла');return false}
+function drawFinish(open){const d=drawRoom;if(d.pts.length<(open?2:3)){toast(open?'Начертай поне една стена':'Трябват поне 3 ъгъла');return false}
   if(!validRoom(d.pts,open)){toast('Стените се пресичат — поправи последните ъгли');return}
   pushUndo();const keep=P.cabinets.map(k=>[k,k.x,k.y,k.rot]),cont=d.cont;
   P.room.pts=d.pts.map(p=>[p[0],p[1]]);P.room.shape=null;P.room.open=!!open;drawRoom=null;
@@ -2293,7 +2293,7 @@ document.addEventListener('keydown',e=>{if(!drawRoom||e.target.matches('input,se
   if(e.key==='Enter'){e.preventDefault();const last=d.pts[d.pts.length-1];
     if(d.buf&&last){const L=+d.buf,c=d.cur||[last[0]+1,last[1]];let dx=c[0]-last[0],dy=c[1]-last[1];const m=Math.hypot(dx,dy)||1;dx/=m;dy/=m;
       if(L>=50)drawAdd([Math.round(last[0]+dx*L),Math.round(last[1]+dy*L)]);d.buf='';drawHint();return}
-    if(d.pts.length>=3)drawFinish(true)}});
+    if(d.pts.length>=2)drawFinish(true)}});
 svg.addEventListener('pointermove',()=>{},{passive:true});
 function floorFill(){const o=P.room.ftex;if(!o)return '';if(o.tex){const tw=+o.w||1000,th=tw*(+o.ar||1);
     return `<defs><pattern id="ftp" patternUnits="userSpaceOnUse" width="${tw}" height="${th}"><image href="${o.tex}" width="${tw}" height="${th}" preserveAspectRatio="none"/></pattern></defs>`}return ''}
@@ -2684,13 +2684,13 @@ const HINTS={'3d':'Ляв бутон = въртене · натиснато ко
   plan:'Колелце = мащаб · влачи празното = местене · двоен клик върху стена отваря изгледа ѝ · влачи шкафовете · близо до стена се залепват и се плъзгат по нея · цветната линия е лицето',
   room:'Влачи кръгчетата, за да местиш ъглите · клик върху стена я избира (новите елементи отиват на нея)'};
 function setView(v){
-  if(drawRoom&&v!=='plan'){if(drawRoom.pts.length>=3)drawFinish(true);if(drawRoom)drawCancel()} // смяна на изгледа завършва чертането
+  if(drawRoom&&v!=='plan'){if(drawRoom.pts.length>=2)drawFinish(true);if(drawRoom)drawCancel()} // смяна на изгледа завършва чертането
   view=v;$('#v3').classList.toggle('on',v==='3d');$('#vp').classList.toggle('on',v==='plan');$('#vw').classList.toggle('on',v==='wall');
   canvas.hidden=v!=='3d';svg.toggleAttribute('hidden',v==='3d');$('#wallNav').hidden=v!=='wall';$('#bImgAll').hidden=v!=='wall';
   ['tDoors','tWalls','tOnly'].forEach(id=>$('#'+id).parentElement.hidden=v!=='3d');$('#tDims').parentElement.hidden=v==='3d';
   $('#hint').textContent=v==='3d'?HINTS['3d']:v==='wall'?HINTS.wall:tab==='room'?HINTS.room:HINTS.plan;
   if(v==='3d')resize();else renderPlan()}
-function setTab(t){if(t!=='room'&&drawRoom){if(drawRoom.pts.length>=3)drawFinish(true);drawRoom=null}const was=tab;tab=t;$('#tCab').classList.toggle('on',t==='cab');$('#tRoom').classList.toggle('on',t==='room');$('#tAcc').classList.toggle('on',t==='acc');
+function setTab(t){if(t!=='room'&&drawRoom){if(drawRoom.pts.length>=2)drawFinish(true);drawRoom=null}const was=tab;tab=t;$('#tCab').classList.toggle('on',t==='cab');$('#tRoom').classList.toggle('on',t==='room');$('#tAcc').classList.toggle('on',t==='acc');
   $('#paneCab').hidden=t!=='cab'&&t!=='acc';$('#paneRoom').hidden=t!=='room';$('#accAdd').hidden=t!=='acc';$('#lsBar').hidden=t==='acc';
   if((t==='acc'||t==='cab')&&was!==t){const k=cab(sel);if(!k||isAcc(k)!==(t==='acc')){const f=P.cabinets.find(q=>isAcc(q)===(t==='acc'));sel=f?f.id:null;multiSel=new Set(sel?[sel]:[])}renderList();renderEditor();renderTable();rebuild3D()}
   if(t==='room'){renderRoom();setView(view==='wall'?'wall':'plan')}else{selWall=null;setView(view)}renderPlan()}
@@ -2735,7 +2735,7 @@ document.addEventListener('keydown',e=>{
   if(o.dims===false){$('#tDims').checked=false;showDims=false}if(o.doors===false){$('#tDoors').checked=false;showDoors=false}if(o.walls===false){$('#tWalls').checked=false;showWalls=false}}}catch(e){}})();
 $('#wallSel').onchange=e=>{wv=+e.target.value;renderPlan()};
 $('#wPrev').onclick=()=>{wv=(wv-1+N())%N();renderPlan()};$('#wNext').onclick=()=>{wv=(wv+1)%N();renderPlan()};
-svg.addEventListener('dblclick',e=>{if(drawRoom){if(drawRoom.pts.length>=3)drawFinish(true);return}if(view!=='plan')return;const w=e.target.closest('[data-wall]');if(w){wv=+w.dataset.wall;setView('wall')}});
+svg.addEventListener('dblclick',e=>{if(drawRoom){if(drawRoom.pts.length>=2)drawFinish(true);return}if(view!=='plan')return;const w=e.target.closest('[data-wall]');if(w){wv=+w.dataset.wall;setView('wall')}});
 $('#tDoors').onchange=e=>{showDoors=e.target.checked;rebuild3D();saveVw()};
 $('#tWalls').onchange=e=>{showWalls=e.target.checked;saveVw()};
 $('#tOnly').onchange=e=>{onlySel=e.target.checked;rebuild3D();fit()};
