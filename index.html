@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 00:45 · Детайли: един детайл — маркиран веднага</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 00:55 · Подравни отпред — по детайлите</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1510,9 +1510,13 @@ $('#ed').addEventListener('click',e=>{
   else{e.target.classList.add('sure');e.target.textContent='Натисни пак за изтриване'}
 });
 $('#list').addEventListener('click',e=>{const li=e.target.closest('.li[data-id]');if(!li)return;if(e.ctrlKey||e.metaKey)toggleMulti(li.dataset.id);else select(li.dataset.id)});
-function frontRefs(k){return P.cabinets.filter(q=>q!==k&&q.wall===k.wall&&!['col','top','plinthRun','splash'].includes(q.type)).map(q=>(+q.gap||0)+ +q.D)}
-function alignFront(k){if(!k||k.wall===null)return;const r=frontRefs(k),ref=r.length?Math.max(...r):580;k.gap=Math.max(0,ref-k.D);place(k);P.example=false;changed(true);
-  toast(k.gap?`Отстъп ${fmt(k.gap)} мм от стената — лицето е на линия`:'Шкафът вече е на линия отпред')}
+function frontOf(k){ // докъде стига шкафът отпред — по детайлите (и след „Детайли“: скъсена страница, преместен детайл…)
+  const ps=build(k).parts.filter(p=>p.box&&!p.hidden&&!['hw','vis','virt','appl'].includes(p.kind));return ps.length?Math.max(...ps.map(p=>p.box[3])):+k.D}
+function frontRefs(k){const row=q=>!!q.upper===!!k.upper,ok=q=>q!==k&&q.wall===k.wall&&!isAcc(q)&&!['top','plinthRun','splash','wpanel','wshelf','ubottom'].includes(q.type)&&row(q);
+  const all=P.cabinets.filter(ok),near=all.filter(q=>q.off<=k.off+k.W+5&&q.off+q.W>=k.off-5); // първо — съседите до него
+  return(near.length?near:all).map(q=>(+q.gap||0)+frontOf(q))}
+function alignFront(k){if(!k||k.wall===null)return;const r=frontRefs(k),ref=r.length?Math.max(...r):(k.upper?320:580),f=frontOf(k),g0=+k.gap||0;k.gap=Math.max(0,Math.round((ref-f)*10)/10);place(k);P.example=false;changed(true);
+  toast(Math.abs(k.gap-g0)<0.5?(k.gap?`Вече е на линия — отстъп ${fmt(k.gap)} мм от стената`:'Шкафът вече е на линия отпред'):`Отстъп ${fmt(k.gap)} мм от стената — лицето е на линия със съседите`)}
 let multiSel=new Set();const isSel=id=>id===sel||multiSel.has(id);
 function toggleMulti(id){if(sel)multiSel.add(sel);if(multiSel.has(id)&&multiSel.size>1){multiSel.delete(id);if(sel===id)sel=[...multiSel][0]}else{multiSel.add(id);sel=id}
   renderList();renderEditor();renderTable();rebuild3D();renderPlan();if(multiSel.size>1)toast(`Избрани ${multiSel.size} шкафа — десен бутон за общ пълнеж`)}
