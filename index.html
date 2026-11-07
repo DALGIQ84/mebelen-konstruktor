@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 23:20 · нощно шкафче</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 23:25 · нощно шкафче — гръб</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1212,7 +1212,7 @@ function nsGeom(k){ // нощно шкафче: къде е корпусът
   k.c=z0;return{T,H,mt,z0}}
 function buildNstand(k){const S=P.settings,parts=[],warn=[],add=(name,L,Wd,m,e,box,kind='')=>parts.push({name,L:r1(L),Wd:r1(Wd),t:+mat(m).t,m,e,box,kind});
   const{T,H,mt,z0}=nsGeom(k),W=+k.W,D=+k.D,tF=+mat(k.mf).t||18,noB=k.mb==='none',B=noB?0:+mat(k.mb).t||3,hdf=!noB&&B<8,fu=S.fuga;
-  const Dk=D-S.doorGap-tF,yb=hdf?B:0,bIn=noB?0:B,topOver=(k.nsTop||'over')==='over',botUnder=mt!=='sides'&&(k.nsBot||'between')==='under';
+  const Dk=D-S.doorGap-tF,yb=0,bIn=noB||hdf?0:B,bt=+(S.backTot??5),topOver=(k.nsTop||'over')==='over',botUnder=mt!=='sides'&&(k.nsBot||'between')==='under';
   if(H-z0<2*T+60){warn.push('Шкафчето е твърде ниско.');return{parts,warn,Dk}}
   // корпус
   const sz0=mt==='sides'?0:botUnder?z0+T:z0,sz1=topOver?H-T:H;
@@ -1220,7 +1220,7 @@ function buildNstand(k){const S=P.settings,parts=[],warn=[],add=(name,L,Wd,m,e,b
   add(mt==='sides'?'Страница до пода':'Страница',sz1-sz0,Dk-yb,k.mc,mt==='sides'?[1,0,1,0]:[1,0,0,0],[W-T,W,yb,Dk,sz0,sz1]);
   if(topOver)add('Таван',W,Dk-yb,k.mc,[1,0,1,1],[0,W,yb,Dk,H-T,H]);else add('Таван',W-2*T,Dk-yb,k.mc,[1,0,0,0],[T,W-T,yb,Dk,H-T,H]);
   if(botUnder)add('Дъно',W,Dk-yb,k.mc,mt==='wall'?[1,0,1,1]:[1,0,0,0],[0,W,yb,Dk,z0,z0+T]);else add('Дъно',W-2*T,Dk-yb,k.mc,[1,0,0,0],[T,W-T,yb,Dk,z0,z0+T]);
-  if(!noB){if(hdf)add('Гръб',H-z0-4,W-4,k.mb,[0,0,0,0],[2,W-2,0,B,z0+2,H-2]);else add('Гръб',H-z0-2*T,W-2*T,k.mb,[0,0,0,0],[T,W-T,0,B,z0+T,H-T])}
+  if(!noB){if(hdf)add('Гръб',H-z0-bt,W-bt,k.mb,[0,0,0,0],[bt/2,W-bt/2,-B,0,z0+bt/2,H-bt/2],'back');else add('Гръб',H-z0-2*T,W-2*T,k.mb,[0,0,0,0],[T,W-T,0,B,z0+T,H-T],'back')}
   if(mt==='legs'){const lg=40;for(const[x,y]of[[30,yb+30],[W-30-lg,yb+30],[30,Dk-30-lg],[W-30-lg,Dk-30-lg]])parts_hw(add,'Краче',[x,x+lg,y,y+lg,0,z0]);warn.push(`На 4 крачета ${fmt(z0)} мм.`)}
   if(mt==='plinth'&&z0>0){const pb=Math.max(0,+(k.nsPlB??30));add('Цокъл',W-2*T,z0,k.mf,[1,0,0,0],[T,W-T,Dk-pb-T,Dk-pb,0,z0])}
   if(mt==='wall')warn.push(`Висящо — долният ръб на ${fmt(z0)} мм от пода.`);
