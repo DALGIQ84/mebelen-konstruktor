@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 22:50 · меню Легла</span></small></div>
+  <div class="brand">Мебелен конструктор<small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.07 · 22:55 · меню Легла (празно)</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2831,15 +2831,7 @@ const KITCHEN=[
     {name:'Ъглов гардероб с мъртва част',p:{type:'wardrobe',wPl:true,W:1600,H:2400,D:600,c:100,wDoor:'hinge',doors:2,deadSide:'L',deadW:650,wRod:1800,wDrH:180,secs:[{fill:'empty',sh:0}]}},
     {name:'Ъглов гардероб Г — от 2 части',p:{type:'wardrobe',wPl:true,wCorner:true,armB:1600,W:1600,H:2400,D:600,c:100,wDoor:'hinge',doors:2,doorsB:2,wRod:1800,wDrH:180,secs:[{fill:'empty',sh:0}],secsB:[{fill:'empty',sh:0}]}},
     {name:'Гардероб с плъзгащи врати',p:{type:'wardrobe',wPl:true,W:1800,H:2400,D:650,c:100,wDoor:'slide',doors:2,wRod:1800,wDrH:180,secs:[{fill:'empty',sh:0}]}}]}];
-KITCHEN.push({cat:'Легла',items:[
-    {name:'Легло с ракла 160 × 200 + 2 нощни шкафчета',p:{bedSet:true,type:'bed',name:'Легло',bMW:1600,bML:2000}},
-    {name:'Легло с ракла 90 × 200',p:{type:'bed',name:'Легло',bMW:900,bML:2000}},
-    {name:'Легло с ракла 140 × 200',p:{type:'bed',name:'Легло',bMW:1400,bML:2000}},
-    {name:'Легло с ракла 160 × 200',p:{type:'bed',name:'Легло',bMW:1600,bML:2000}},
-    {name:'Легло с ракла 180 × 200',p:{type:'bed',name:'Легло',bMW:1800,bML:2000}},
-    {name:'Нощно шкафче — 2 чекмеджета, на крачета',p:{type:'drawers',name:'Нощно шкафче',W:450,H:550,D:400,c:100,dr:2,plinth:false,top:'full'}},
-    {name:'Нощно шкафче — 1 чекмедже, висящо',p:{type:'drawers',name:'Нощно шкафче',W:450,H:600,D:380,c:400,dr:1,plinth:false,top:'full'}},
-    {name:'Нощно шкафче — с врата, на крачета',p:{name:'Нощно шкафче',W:450,H:550,D:400,c:100,doors:1,sh:1,plinth:false,top:'full'}}]});
+KITCHEN.push({cat:'Легла',items:[]}); // празно — леглата ги правим наново, както ги прави Евгени
 const BED0={bMW:1600,bML:2000,bGap:10,bH:300,bSpl:0,bUp:0,bFl:10,bHB:'board',bHBh:1100,bHBw:0,c:20,plinth:false,mb:'hdf'};
 function addBedSet(p){const ns={type:'drawers',name:'Нощно шкафче',W:450,H:550,D:400,c:100,dr:2,plinth:false,top:'full'};
   addCab({...BED0,...p,bedSet:undefined});const b=P.cabinets.at(-1);if(b.wall===null)return;const L=wallInfo(b.wall).len;
@@ -2851,7 +2843,7 @@ let kitOpen=0;
 function kitDesc(p){const q={...cabDef({}),...p};if(q.type==='bed')return `матрак ${q.bMW}×${q.bML} · ракла с повдигащ механизъм · табла`+(p.bedSet?' · + нощни шкафчета от двете страни':'');if(q.type==='wardrobe')return `${q.W}×${q.H}×${q.D} · ${q.wDoor==='slide'?'плъзгащи':'врати на панти'} · ${wSecs(q).length} секции${q.antr?' · надстройка':''}`;return `${q.W}×${q.H-q.c}×${q.D} · `+(q.type==='endShelf'?`отворен · ${q.sh} рафт · скосен / заоблен / прав`:q.type==='fridge'?'само за хладилника · 1 врата, без гръб':q.type==='col'?`на ${q.c} от пода · фурна ${q.ovenH} · микров. ${q.mwH}`:q.type==='dw'?'врата + 4 бленди':q.type==='oven'?`фурна ${q.ovenH} + чекмедже`:q.type==='drawers'?`${q.dr} чекм.`:`${q.doors} вр. · ${q.sh} рафт`+(q.deadSide&&q.deadSide!=='none'?` · мъртво ${q.deadW}`:''))}
 let kitMode='k';const isWardCat=c=>c.cat==='Гардероби',catMode=c=>c.cat==='Гардероби'?'w':c.cat==='Легла'?'b':'k';
 function renderKit(){const KM=KITCHEN.length;$('#kitMenu').innerHTML=KITCHEN.map((c,i)=>catMode(c)!==kitMode?'':(kitMode!=='k'?'':`<button class="cat" data-cat="${i}" aria-expanded="${kitOpen===i}"><span>${c.cat}</span><span class="ar">▸</span></button>`)+
-  ((kitOpen===i||kitMode!=='k')?`<div class="sub2">${c.items.map((x,j)=>`<button class="item" data-kit="${i}.${j}"><span>${esc(x.name)}</span><small>${kitDesc(x.p)}</small></button>`).join('')}</div>`:'')).join('')+
+  ((kitOpen===i||kitMode!=='k')?`<div class="sub2">${c.items.length?'':'<div class="item" style="cursor:default"><small>Още няма легла — ще ги добавим.</small></div>'}${c.items.map((x,j)=>`<button class="item" data-kit="${i}.${j}"><span>${esc(x.name)}</span><small>${kitDesc(x.p)}</small></button>`).join('')}</div>`:'')).join('')+
   `<button class="cat" data-cat="${KM}" aria-expanded="${kitOpen===KM}"><span>★ Мои шкафове${MY.length?' ('+MY.length+')':''}</span><span class="ar">▸</span></button>`+
   (kitOpen===KM?`<div class="sub2">${MY.length?MY.map((x,j)=>`<div style="display:flex;align-items:center"><button class="item" data-my="${j}" style="flex:1"><span>${esc(x.name)}</span><small>${esc(x.type)}</small></button><button class="btn sm" data-mydel="${j}" title="Махни от моите шкафове" aria-label="Махни ${esc(x.name)}" style="margin-right:6px">×</button></div>`).join(''):'<div class="item" style="cursor:default"><small>Избери шкаф и натисни „★ Мой“ над списъка — запазва се с всичките му настройки.</small></div>'}</div>`:'')}
 function toggleKit(open,mode){const m=$('#kitMenu');if(mode&&mode!==kitMode){kitMode=mode;$(mode==='w'?'#ddWard':mode==='b'?'#ddBed':'#ddKit').appendChild(m);if(open==null)open=true}open=open??m.hidden;if(open)renderKit();m.hidden=!open;$('#bKit').setAttribute('aria-expanded',String(open&&kitMode==='k'));$('#bWard').setAttribute('aria-expanded',String(open&&kitMode==='w'));$('#bBed').setAttribute('aria-expanded',String(open&&kitMode==='b'))}
