@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 15:35 · цяло дъно: витрината и вратите остават точно същите</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 15:45 · цяло дъно: кант само на първия размер</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -996,7 +996,7 @@ function buildRaw(k){
     for(let i=0;i<n;i++){const z=c+i*g;add('Рафт на стената',W,d,k.mf,[1,0,0,0],[0,W,0,d,z,z+tt],'')}
     warn.push(`Рафт на стената: ${n} бр. ${Math.round(W)} × ${Math.round(d)}${n>1?`, през ${g} мм`:''} — на скрити конзоли.`);finishParts(k,parts);return{parts,warn,Dk:d}}
   if(k.type==='ubottom'){ // цяло дъно под горния ред (дъната на шкафовете остават)
-    const tt=+mat(k.mf).t||18,d=Math.max(100,+k.D||350),ed=k.ubEdge||'none';add('Цяло дъно горен ред',W,d,k.mf,ed==='bev'?[0,0,1,1]:[1,0,1,1],[0,W,0,d,c,c+tt],'');
+    const tt=+mat(k.mf).t||18,d=Math.max(100,+k.D||350),ed=k.ubEdge||'none';add('Цяло дъно горен ред',W,d,k.mf,ed==='bev'?[0,0,0,0]:[1,0,0,0],[0,W,0,d,c,c+tt],'');
     warn.push(`Цяло дъно под горните шкафове: ${Math.round(W)} × ${Math.round(d)} — дъната на шкафовете остават.`);
     if(ed==='bev'){const a=clamp(+k.ubAng||45,5,85),bx=Math.round(tt/Math.tan(a*Math.PI/180)*10)/10,p=parts.at(-1);p.sp=[[0,c],[d-bx,c],[d,c+tt],[0,c+tt]];warn.push(`Цяло дъно: предният ръб е скосен на ${fmt(a)}° — отдолу ${fmt(bx)} мм навътре (хват отдолу), без кант отпред.`)}
     else if(ed==='L'||ed==='led'){const S=P.settings,pw=+S.ubPw||20,ph=+S.ubPh||30,col=(GOLA_COL[k.ubCol]||GOLA_COL.alu)[1];
