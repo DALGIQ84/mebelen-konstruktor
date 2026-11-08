@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 13:20 · вертикален Gola и в плана</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 13:25 · вертикален Gola: вратите остават с фугата</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1192,13 +1192,13 @@ function golaSec(n,b,f,z0,z1){ /* реално сечение по чертеж�
   const C=[[5.4,9],[5.4,28.35],[0,28.35],[0,32.95],[1.2,32.95],[1.2,29.55],[5.4,29.55],[5.4,43.35],[1.2,43.35],[1.2,39.95],[0,39.95],[0,44.55],[5.4,44.55],[5.4,63.9],[6.5,67.5],[10,69],[26,69],[26,72.9],[22.6,72.9],[22.6,71.7],[24.8,71.7],[24.8,67.8],[10,67.8],[7.6,66.5],[6.6,63.9],[6.6,9],[7.6,6.4],[10,5.1],[24.8,5.1],[24.8,1.2],[22.6,1.2],[22.6,0],[26,0],[26,3.9],[10,3.9],[6.5,5.4]];
   const pts=n==='L'?L:C,hh=n==='L'?55.9:72.9,sx=(f-b)/26,sz=(z1-z0)/hh;return pts.map(([x,z])=>[b+x*sx,z0+z*sz])}
 function golaRun(add,gn,W,Dk,H,S,parts){if(!gn||!golaL(gn))return;const Lw=+S.golaLw||26,Lh=+S.golaLh||56;add('Gola L профил',0,0,'k2',[0,0,0,0],[0,W,Dk-Lw,Dk,H-Lh,H],'hw');parts.at(-1).gp=golaSec('L',Dk-Lw,Dk,H-Lh,H);parts.at(-1).col=(GOLA_COL[gn.golaCol]||GOLA_COL.alu)[1]} /* L профилът продължава зад пълнежа / над съдомиялната */
-function golaVert(k,parts){ /* вертикален Gola C между колони: страниците към профила — по-плитки с C; между колоните C − 2 страници; летва на профила; вратите до ръба на страницата */
+function golaVert(k,parts){ /* вертикален Gola C между колони: страниците към профила — по-плитки с C; между колоните C − 2 страници; летва на профила; вратите остават както без дръжки */
   const S=P.settings,W=+k.W,Cw=+S.golaCw||26,Ch=+S.golaCh||73,sides=parts.filter(p=>/^Страница/.test(p.name)&&p.box&&p.kind!=='drawer');if(!sides.length)return;
   const T=+mat(k.mc).t||18,gap=Ch-2*T,Dk=Math.max(...sides.map(p=>p.box[3])),z0=Math.min(...sides.map(p=>p.box[4])),z1=Math.max(...sides.map(p=>p.box[5]));
   const sd=k.gV==='B'?['L','R']:[k.gV],col=(GOLA_COL[k.golaCol]||GOLA_COL.alu)[1],onW=k.wall!==null&&k.wall!==undefined;
   for(const d of sd){
     for(const p of sides){const isL=p.box[0]<1,isR=p.box[1]>W-1;if((d==='L'&&isL)||(d==='R'&&isR)){if(p.box[3]>Dk-Cw){p.box[3]=Dk-Cw;p.Wd=Math.round(p.Wd-Cw);if(p.notch){p.notch=p.notch.filter(q=>q.w>Cw+0.1);if(!p.notch.length)delete p.notch}delete p.sp} /* по-плитката страница вече е зад хоризонталните профили — без изрези */}}
-    for(const p of parts){if(p.kind!=='door'||!p.box)continue;if(d==='L'&&p.box[0]<S.fuga+1&&p.box[0]>0){const dd=p.box[0];p.box[0]=0;p.Wd=+(p.Wd+dd).toFixed(1)}if(d==='R'&&p.box[1]>W-S.fuga-1&&p.box[1]<W){const dd=W-p.box[1];p.box[1]=W;p.Wd=+(p.Wd+dd).toFixed(1)}}
+    /* вратите и челата си остават както без дръжки (с фугата) */
     const nb=onW?P.cabinets.find(q=>q!==k&&q.wall===k.wall&&(d==='R'?Math.abs(+q.off-(+k.off+W))<150&&+q.off>=+k.off+W-1:Math.abs(+k.off-(+q.off+(+q.W)))<150&&+k.off>=+q.off+(+q.W)-1)):null;
     const real=nb?Math.round(d==='R'?+nb.off-(+k.off+W):+k.off-(+nb.off+(+nb.W))):null;
     const owner=d==='R'||!(nb&&(nb.gV==='R'||nb.gV==='B'));
