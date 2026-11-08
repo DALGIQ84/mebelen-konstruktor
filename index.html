@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 15:20 · цяло дъно: корпусът − 20, вратите същите; ръб — L профил / LED / скосен</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 15:35 · цяло дъно: витрината и вратите остават точно същите</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -833,9 +833,9 @@ function buildCD(k){const r=buildRaw(k);if(k.type!=='doors')return r;const o=cdP
   r.warn.push(`Обща врата с „${o.name}“ — височина ${Math.round(h)} мм, броиш я тук.`+(h>2750?' Вратата е по-висока от плоскостта (2800) — провери.':''));return r}
 function buildRaw(k){
   if(k.upper&&!k._ub&&k.type!=='ubottom'&&k.wall!==null&&k.wall!==undefined){const ub=P.cabinets.find(q=>q.type==='ubottom'&&q.wall===k.wall&&Math.abs(+q.c-+k.c)<3&&+q.off<+k.off+(+k.W)-5&&+q.off+(+q.W)>+k.off+5);
-    if(ub){const rz=+(P.settings.ubRaise??20)||0,r=buildRaw({...k,c:+k.c+rz,_ub:1}),z0=+k.c+rz;
-      for(const p of r.parts){if(!p.box)continue;const b=p.box;if((p.kind==='door'||p.kind==='glass')&&b[4]<z0+(+P.settings.fuga||5)+1){b[4]-=rz;p.L=r1(p.L+rz)}
-        else if(p.kind==='alu'&&p.fr){if(p.fr.sd==='B'){b[4]-=rz;b[5]-=rz;p.fr={...p.fr,z0:p.fr.z0-rz,z1:p.fr.z1-rz}}else if(p.fr.z0<z0+(+P.settings.fuga||5)+1){b[4]-=rz;p.L=r1(p.L+rz);p.fr={...p.fr,z0:p.fr.z0-rz}}}}
+    if(ub){const rz=+(P.settings.ubRaise??20)||0,r=buildRaw({...k,c:+k.c+rz,_ub:1});
+      const r0=buildRaw({...k,_ub:1}),FR=['door','alu','glass']; /* вратите (и рамките на витрината) — точно като без цялото дъно */
+      r.parts=[...r.parts.filter(p=>!FR.includes(p.kind)),...r0.parts.filter(p=>FR.includes(p.kind))];
       r.warn.push(`Цяло дъно отдолу: корпусът е ${fmt(rz)} мм по-нисък (дъното стъпва върху цялото дъно), вратите остават същите.`);return r}}
   if((k.type||'doors')==='doors'&&!k.upper&&!k.open&&k.antr&&+k.antH>=150&&!k._cs)return buildColSplit(k);
   if(k.type==='doors'&&k.upper&&k.hood&&k._hs==null){const hs=Math.max(0,+(k.hoodStrip??40));return build({...k,c:+k.c+hs,_hs:hs})} // абсорбатор: височината 720 е с лентата — корпусът е 40 мм по-нисък
