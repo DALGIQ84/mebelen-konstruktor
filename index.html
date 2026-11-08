@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 12:00 · Gola ъгъл: мъртвото в цвета на корпуса, кант на първия размер</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 12:10 · Gola ъгъл: изрез в рафтовете за планката</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1109,6 +1109,10 @@ function buildRaw(k){
     const xa=L?T:W-dW,xb=L?dW-T:W-dW;
     add('Мъртво (Gola)',ph,pw,k.mc,[1,0,0,0],[xa,xa+pw,Dk-T,Dk,c+T,c+T+ph]);
     add('Планка панти (Gola ъгъл)',ph,pb,k.mc,[1,0,0,0],[xb,xb+T,Dk-T-pb,Dk-T,c+T,c+T+ph]);
+    {const nx0=xb-1,nx1=xb+T+1,ny0=Dk-T-pb-1;let nn=0; /* рафтовете — с изрез за планката отпред */
+     for(const q of parts){if(q.name!=='Рафт'||!q.box)continue;const[sx0,sx1,sy0,sy1]=q.box;if(sx1<=nx0||sx0>=nx1||sy1<=ny0)continue;
+       const a0=Math.max(sx0,nx0),a1=Math.min(sx1,nx1);q.pl=[[sx0,sy0],[sx1,sy0],[sx1,sy1],[a1,sy1],[a1,ny0],[a0,ny0],[a0,sy1],[sx0,sy1]];q.cut=`изрез ${fmt(a1-a0)} × ${fmt(sy1-ny0)} отпред на ${fmt(a0-sx0)} мм от левия край`;nn++}
+     if(nn)warn.push(`Gola ъгъл: рафтовете (${nn} бр.) — изрез ${fmt(nx1-nx0)} × ${fmt(Math.round(Dk-20-ny0))} мм отпред за планката на пантите, на ${fmt(nx0-T-(+S.shelfClear||0))} мм от левия край на рафта.`)}
     warn.push(`Gola ъгъл: мъртвото е вътрешно парче ${fmt(pw)} × ${fmt(ph)} (мъртво − ${fmt(T)}, стъпва на дъното, горе − профила ${fmt(Lh)}) + планка ${fmt(pb)} мм на Г за пантите; L профилът се събира под 45° в ъгъла.`)}
   else if(dW&&!k.deadOpen){const gL=isGola(k),dh=gL?H-c-golaTopGap(k):H-c-S.fuga,dz=gL?c:c+S.fuga/2,x=dS==='L'?0:W-dW; // мъртвото — без фуга в широчина (само във височина); Gola — колкото вратите
     add('Мъртво лице',dh,dW,k.mf,[1,0,1,1],[x,x+dW,Dk+S.doorGap,Dk+S.doorGap+tF,dz,dz+dh],'door')}
