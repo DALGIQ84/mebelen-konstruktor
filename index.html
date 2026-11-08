@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 18:40 · аксесоари: стенен аспиратор с комин</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 18:45 · аспиратор: височина вместо „горе до“</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1489,7 +1489,7 @@ function renderEditor(){
     let h=`<label class="full">Име<input id="f_name" data-f="name" value="${v(k.name)}"></label>`+
       `<label>Вид<select id="f_acc" data-f="acc">${Object.entries(ACC).map(([id,o])=>`<option value="${id}" ${id===k.acc?'selected':''}>${o.name}</option>`).join('')}</select></label>`+
       `<label>Цвят<select id="f_acol" data-f="acol">${Object.entries(ACOL).map(([id,o])=>`<option value="${id}" ${id===k.acol?'selected':''}>${o[0]}</option>`).join('')}</select></label>`+
-      num('W','Ширина, мм',k.W)+num('D','Дълбочина, мм',k.D)+(a.up?num('c','Долен ръб от пода, мм',Math.round(k.c))+num('H','Горе (комин) до, мм от пода',Math.round(k.H)):inb?'':num('H','Височина, мм',Math.round(k.H-k.c)));
+      num('W','Ширина, мм',k.W)+num('D','Дълбочина, мм',k.D)+(a.up?num('c','Долен ръб от пода, мм',Math.round(k.c))+num('H','Височина на аспиратора (с комина), мм',Math.round(k.H-k.c)):inb?'':num('H','Височина, мм',Math.round(k.H-k.c)));
     if(k.acc==='sink')h+=`<label>Корита<select id="f_bowls" data-f="bowls"><option value="1" ${+k.bowls!==2&&+k.bowls!==3?'selected':''}>1 коритo</option><option value="3" ${+k.bowls===3?'selected':''}>1 корито + отцедник</option><option value="2" ${+k.bowls===2?'selected':''}>2 корита</option></select></label>`;
     if(k.acc==='hob')h+=`<label>Зони<select id="f_zones" data-f="zones"><option value="4" ${+k.zones!==5&&+k.zones!==2?'selected':''}>4</option><option value="5" ${+k.zones===5?'selected':''}>5</option><option value="2" ${+k.zones===2?'selected':''}>2 (домино)</option><option value="22" ${+k.zones===22?'selected':''}>двоен — 2 домино един до друг</option></select></label>`;
     if(inb)h+=k.onTop?`<p class="note full">Стои върху плота — височината се взима сама (${Math.round(k.c)} мм от пода).</p>`:num('c','Височина на плота, мм',k.c)+`<p class="note full">Няма плот под него — сложи плот на шкафовете или задай височината.</p>`;
@@ -1612,6 +1612,7 @@ $('#ed').addEventListener('input',e=>{
   if(f==='vitrine'&&v&&!(+k.vdoors>0))k.vdoors=+k.W>650?2:1;
   if(f==='type'&&v==='cornerL'&&k.type!=='cornerL'){k.armB=k.armB||900;k.W=Math.max(+k.W,900)}
   if(f==='px')k.x=v;else if(f==='py')k.y=v;
+  else if(f==='c'&&isAcc(k)&&accOf(k).up){const h=k.H-k.c;k.c=v;k.H=v+h}
   else if(f==='H')k.H=(k.type==='endShelf'&&!k.upper)||k.type==='wardrobe'||k.type==='nstand'?v:v+ +k.c; // показва се без цокъла, пази се общата височина (висок завършващ рафт — от пода)
   else if(f==='c'){if((k.type==='endShelf'&&!k.upper)||k.type==='wardrobe')k.c=v;else{const body=k.H-k.c;k.c=v;k.H=body+v}}
   else if(f==='mf'&&k.type==='top'){ // друга дебелина на плота — гърбът над него слиза/качва се и пак опира в плота
