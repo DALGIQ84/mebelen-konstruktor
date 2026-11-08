@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 17:20 · колона с вътрешни чекмеджета</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 17:30 · махнато „отделно за всяко чекмедже“ (кутии)</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1303,7 +1303,7 @@ function buildDrawers(k,{S,T,tF,W,H,c,Dk,bIn,Wi,add,warn},ov){ // ov: чекме
   const room=Dk-bIn-2;let NL=+k.nl>0?+k.nl:[...lens].reverse().find(x=>x<=room);k._nl=NL||0;
   if(+k.nl>0&&NL>room)warn.push(`Водач ${NL} мм не се побира — в корпуса има ${Math.floor(room)} мм.`);
   if(!NL){warn.push('Нито една дължина на водачите не се побира в дълбочината.');}
-  const bhSet=i=>k.bh&&k.bh[i]!=null&&k.bh[i]!==''&&+k.bh[i]>0; // своя височина за чекмеджето
+  const bhSet=i=>k.type==='nstand'&&k.bh&&k.bh[i]!=null&&k.bh[i]!==''&&+k.bh[i]>0; // своя височина за чекмеджето
   const bhDef=h=>+k.bhAll>0?+k.bhAll:Math.max(50,h-sl.hOff); // обща за всички или авто
   const bt=+mat(k.mx).t,bB=+mat(k.mxb).t;
   const gl=!ov&&isGola(k);let z1=ov?ov.z1:gl&&gg?c+hs.reduce((a,b)=>a+b,0)+gg.reduce((a,b)=>a+b,0):H-S.fuga/2;const zTop=ov?ov.zMax:H-T;
@@ -1524,7 +1524,7 @@ function renderEditor(){
       return `<label>Височина на кутията, мм<input id="f_bhAll" data-bh="all" type="number" step="1" placeholder="чело − ${sl.hOff}" value="${+k.bhAll>0?k.bhAll:''}"></label>`}
     if(t==='bh'){if(slideOf(k).kind==='metal')return '';const sl=slideOf(k),fh=frontHeights(k),bs=i=>k.bh&&k.bh[i]!=null&&k.bh[i]!==''&&+k.bh[i]>0;
       return `<label>Височина на кутиите (за всички), мм<input id="f_bhAll" data-bh="all" type="number" step="1" placeholder="чело − ${sl.hOff}" value="${+k.bhAll>0?k.bhAll:''}"></label>
-        <div class="full" style="grid-column:1/-1;display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)">Отделно за всяко чекмедже (отгоре надолу), мм<div style="display:grid;grid-template-columns:repeat(${Math.min(4,Math.max(1,k.dr|0))},1fr);gap:6px">${fh.hs.map((h,i)=>`<input id="f_bh${i}" data-bh="${i}" type="number" step="1" placeholder="${fmt(+k.bhAll>0?+k.bhAll:Math.max(50,h-sl.hOff))}" value="${bs(i)?k.bh[i]:''}" aria-label="Кутия ${i+1}">`).join('')}</div><span>Празно поле взима общата височина, а ако и тя е празна — челото − ${sl.hOff} мм.</span></div>`}
+        `}
     if(t==='idrs'){const L=idrList(k);return `<div class="full" style="grid-column:1/-1;display:flex;flex-direction:column;gap:5px"><div class="sub" style="margin:4px 0 0">${l}</div>
       <div style="display:grid;grid-template-columns:16px repeat(3,minmax(0,1fr)) 26px;gap:6px;font-size:11px;color:var(--muted)"><span></span><span>от дъното</span><span>чело</span><span>кутия</span><span></span></div>
       ${L.map((q,i)=>`<div style="display:grid;grid-template-columns:16px repeat(3,minmax(0,1fr)) 26px;gap:6px;align-items:center"><span style="color:var(--muted);font-size:12px">${i+1}.</span><input type="number" min="0" data-idr="${i}" data-idk="z" value="${+q.z||0}" title="От горната страна на дъното до долния ръб на челото, мм"><input type="number" min="40" data-idr="${i}" data-idk="h" value="${+q.h||150}" title="Височина на челото, мм"><input type="number" min="0" data-idr="${i}" data-idk="bh" value="${+q.bh>0?+q.bh:''}" placeholder="авто" title="Височина на кутията, мм — празно = авто"><button class="btn sm" data-idrdel="${i}" title="Махни">×</button></div>`).join('')}
