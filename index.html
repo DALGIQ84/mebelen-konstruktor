@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 14:25 · отворена стая: стените са независими</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 14:35 · П-образна отворена стая: подът правоъгълен</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2465,7 +2465,11 @@ function openFloor(p){ // отворена стая: подът — по сте�
   if(p.length===2){const a=p[0],b=p[1],L=Math.hypot(b[0]-a[0],b[1]-a[1])||1,nx=-(b[1]-a[1])/L*Math.min(3000,L),ny=(b[0]-a[0])/L*Math.min(3000,L);return[a,b,[b[0]+nx,b[1]+ny],[a[0]+nx,a[1]+ny]]}
   { // от двата свободни края — перпендикулярно навътре; където се срещнат, там е 4-тият ъгъл на пода
     const n=p.length,nr=(a,b)=>{const L=Math.hypot(b[0]-a[0],b[1]-a[1])||1;return[-(b[1]-a[1])/L,(b[0]-a[0])/L]},A=p[0],d1=nr(p[0],p[1]),B=p[n-1],d2=nr(p[n-2],p[n-1]);
-    const den=d1[0]*d2[1]-d1[1]*d2[0];if(Math.abs(den)>1e-6){const t=((B[0]-A[0])*d2[1]-(B[1]-A[1])*d2[0])/den,u=((B[0]-A[0])*d1[1]-(B[1]-A[1])*d1[0])/den;
+    const den=d1[0]*d2[1]-d1[1]*d2[0];
+    if(Math.abs(den)<=1e-6&&n>=3){ /* успоредни крайни стени (П-образна стая): по-късата се допълва до дължината на по-дългата — подът е правоъгълен */
+      const P1=p[1],Pn=p[n-2],l1=Math.hypot(A[0]-P1[0],A[1]-P1[1])||1,l2=Math.hypot(B[0]-Pn[0],B[1]-Pn[1])||1,f=Math.max(l1,l2);
+      return[[P1[0]+(A[0]-P1[0])/l1*f,P1[1]+(A[1]-P1[1])/l1*f],...p.slice(1,n-1),[Pn[0]+(B[0]-Pn[0])/l2*f,Pn[1]+(B[1]-Pn[1])/l2*f]]}
+    if(Math.abs(den)>1e-6){const t=((B[0]-A[0])*d2[1]-(B[1]-A[1])*d2[0])/den,u=((B[0]-A[0])*d1[1]-(B[1]-A[1])*d1[0])/den;
       if(t>1&&u>1){const Q=[A[0]+d1[0]*t,A[1]+d1[1]*t],P2=[...p,Q];if(validRoom(P2,false))return P2}}}
   return p}
 function planSvg(){
