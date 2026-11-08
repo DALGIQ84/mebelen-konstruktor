@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 10:15 · Gola: челото остава както е написано, фугите от остатъка</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 10:25 · челата в цели мм (без десети)</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1183,17 +1183,18 @@ function gcAuto(){const k=cab(sel);if(!k)return;delete k.gc;delete k.gL;P.exampl
 function golaGaps(k){const n=Math.max(1,k.dr|0),a=golaAuto(n,golaL(k)),gc=k.gc||[];return a.map((v,i)=>gc[i]===true||gc[i]===false?gc[i]:v)}
 function golaGapH(k){const S=P.settings,g=golaGaps(k);return g.map(c=>c?(+S.golaMid||35):+S.fuga)}
 function frontAvail(k){if(isGola(k)){return k.H-k.c-golaTopGap(k)} /* Gola: от общата височина − 35 горе, долу наравно */return k.type==='col'?+k.lowH||760:k.H-k.c}
-function dhLeftTxt(fh){return fh.autos?`Остават ${fmt(fh.left)} мм за ${fh.autos} ${fh.autos===1?'чело':'чела'}`+(fh.autos>1?` (по ${fmt(fh.a)})`:''):(Math.abs(fh.diff)>0.5?`Сборът не стига/надвишава с ${fmt(fh.diff)} мм — последното е коригирано`:'Сборът е точен')}
+function dhLeftTxt(fh){return fh.autos?`Остават ${fmt(fh.left)} мм за ${fh.autos} ${fh.autos===1?'чело':'чела'}`+(fh.autos>1?` (по ~${fmt(Math.floor(fh.a))})`:''):(Math.abs(fh.diff)>0.5?`Сборът не стига/надвишава с ${fmt(fh.diff)} мм — последното е коригирано`:'Сборът е точен')}
+function splitInt(t,n){const b=Math.floor(Math.floor(t+1e-6)/n),r=Math.floor(t+1e-6)-b*n;return [...Array(n)].map((_,j)=>b+(j>=n-r?1:0))} /* цели мм; остатъкът — към долните */
 function frontHeights(k){ // въвеждат се реални размери (модул); челото = размер − фуга; празно = авто
   const S=P.settings,n=Math.max(1,k.dr|0),avail=frontAvail(k),cu=k.dh||[];
   const isSet=i=>cu[i]!==null&&cu[i]!==undefined&&cu[i]!==''&&+cu[i]>0;
   let fixed=0,autos=0;for(let i=0;i<n;i++){if(isSet(i))fixed+=+cu[i];else autos++}
   const gg=isGola(k)?golaGapH(k):null;
   if(gg){ /* Gola: пишеш самото чело — то остава; всички фуги (C 35 / обикновена) се вадят от остатъка */
-    const gs=gg.reduce((a,b)=>a+b,0),left=avail-fixed-gs,a=autos?left/autos:0,hs=[...Array(n)].map((_,i)=>isSet(i)?+cu[i]:a);
+    const gs=gg.reduce((a,b)=>a+b,0),left=avail-fixed-gs,a=autos?left/autos:0,sp=splitInt(left,autos);let ai=0;const hs=[...Array(n)].map((_,i)=>isSet(i)?+cu[i]:sp[ai++]);
     let diff=0;if(!autos){diff=left;hs[n-1]+=diff}
     return{hs,nom:hs.slice(),diff,a,autos,isSet,gg,left,gs,raw:1}}
-  const a=autos?(avail-fixed)/autos:0,nom=[...Array(n)].map((_,i)=>isSet(i)?+cu[i]:a);
+  const a=autos?(avail-fixed)/autos:0,sp=splitInt(avail-fixed-autos*S.fuga,autos);let ai=0;const nom=[...Array(n)].map((_,i)=>isSet(i)?+cu[i]:sp[ai++]+S.fuga);
   let diff=0;if(!autos){diff=avail-fixed;nom[n-1]+=diff}
   return{hs:nom.map(v=>v-S.fuga),nom,diff,a,autos,isSet,gg};
 }
@@ -1209,7 +1210,7 @@ function buildDrawers(k,{S,T,tF,W,H,c,Dk,bIn,Wi,add,warn},ov){ // ov: чекме
   const bhSet=i=>k.bh&&k.bh[i]!=null&&k.bh[i]!==''&&+k.bh[i]>0; // своя височина за чекмеджето
   const bhDef=h=>+k.bhAll>0?+k.bhAll:Math.max(50,h-sl.hOff); // обща за всички или авто
   const bt=+mat(k.mx).t,bB=+mat(k.mxb).t;
-  const gl=!ov&&isGola(k);let z1=ov?ov.z1:gl?H-golaTopGap(k):H-S.fuga/2;const zTop=ov?ov.zMax:H-T;
+  const gl=!ov&&isGola(k);let z1=ov?ov.z1:gl&&gg?c+hs.reduce((a,b)=>a+b,0)+gg.reduce((a,b)=>a+b,0):H-S.fuga/2;const zTop=ov?ov.zMax:H-T;
   hs.forEach((h,i)=>{
     const z0=z1-h;
     add('Чело',h,W-S.fuga,k.mf,[1,1,1,1],[S.fuga/2,W-S.fuga/2,Dk+S.doorGap,Dk+S.doorGap+tF,z0,z1],'door');
