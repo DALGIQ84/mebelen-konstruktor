@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 14:15 · без делители при абсорбатор, без мъртво при Г-ъгъл</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 14:25 · отворена стая: стените са независими</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -517,7 +517,7 @@ function interior(j){ // вътрешен ъгъл при връх j, в гра�
 function setWallLen(i,L){const w=wallInfo(i),d=L-w.len;if(L<50)return;
   const dirs=[...Array(N())].map((_,j)=>wallInfo(j).u); // успоредната насрещна стена поема промяната
   for(let j=i+1;j<P.room.pts.length;j++){P.room.pts[j]=[P.room.pts[j][0]+w.u[0]*d,P.room.pts[j][1]+w.u[1]*d];
-    if(dirs[j]&&dirs[j][0]*w.u[0]+dirs[j][1]*w.u[1]<-0.99)break}}
+    if(!P.room.open&&dirs[j]&&dirs[j][0]*w.u[0]+dirs[j][1]*w.u[1]<-0.99)break}} /* отворена стая: следващите стени само се преместват — дължините им не се менят */
 function setAngle(j,deg){ // завърта всичко след връх j
   const d=(interior(j)-deg)*Math.PI/180,c=Math.cos(d),s=Math.sin(d),O=P.room.pts[j];
   for(let q=j+1;q<P.room.pts.length;q++){const v=[P.room.pts[q][0]-O[0],P.room.pts[q][1]-O[1]];P.room.pts[q]=[O[0]+v[0]*c-v[1]*s,O[1]+v[0]*s+v[1]*c]}}
