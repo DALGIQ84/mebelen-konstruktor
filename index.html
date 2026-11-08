@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 14:35 · П-образна отворена стая: подът правоъгълен</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 14:45 · Детайли: ал. профил под 45°</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -3120,6 +3120,7 @@ function pedSvg(k,ps,view){ // чертеж: front (x–z), side (y–z, отл�
     const col=on?'#f0b429':p.kind==='back'?'#c9a27a':dr?mat(p.m).color:p.kind==='drawer'?'#e4ddd0':'#d8d2c7';
     const st=p.kind==='virt'?`fill:none;stroke:${on?'#b4472c':'#2f7fc1'};stroke-width:${on?3:2};stroke-dasharray:7 5;vector-effect:non-scaling-stroke;cursor:pointer`:`fill:${col};fill-opacity:${on?(dr?.5:.9):dr?.55:.9};stroke:${on?'#b4472c':'#4a555c'};stroke-width:${on?2.5:1};vector-effect:non-scaling-stroke;cursor:pointer`;
     if(view==='front'&&p.fp)g+=`<polygon data-pk="${esc(p.key)}" points="${p.fp.map(([u,v])=>u+','+Y(v)).join(' ')}" style="${st}"><title>${esc(p.name)} ${fmt(p.L)} × ${fmt(p.Wd)}</title></polygon>`;
+    else if(view==='front'&&p.fr)g+=`<polygon data-pk="${esc(p.key)}" points="${miterPts(p.fr).map(([u,v])=>u+','+Y(v)).join(' ')}" style="${st}"><title>${esc(p.name)} ${fmt(p.L)} × ${fmt(p.Wd)}</title></polygon>`; /* ал. профил — под 45° */
     else if(view==='top'&&p.pl)g+=`<polygon data-pk="${esc(p.key)}" points="${p.pl.map(([x,y])=>x+','+y).join(' ')}" style="${st}"><title>${esc(p.name)} ${fmt(p.L)} × ${fmt(p.Wd)}</title></polygon>`;
     else g+=`<rect data-pk="${esc(p.key)}" x="${x0}" y="${Math.min(Y(y0),Y(y1))}" width="${Math.max(.5,x1-x0)}" height="${Math.max(.5,y1-y0)}" style="${st}"><title>${esc(p.name)} ${fmt(p.L)} × ${fmt(p.Wd)}</title></rect>`+
       (p.kind==='virt'?`<rect data-pk="${esc(p.key)}" x="${x0}" y="${Math.min(Y(y0),Y(y1))}" width="${Math.max(.5,x1-x0)}" height="${Math.max(.5,y1-y0)}" style="fill:none;stroke:#000;stroke-opacity:0;stroke-width:16;vector-effect:non-scaling-stroke;pointer-events:stroke;cursor:pointer"><title>${esc(p.name)}</title></rect>`:'')}
