@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 13:10 · вертикален Gola: страницата по-плитка и в 3D</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 13:20 · вертикален Gola и в плана</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2517,6 +2517,7 @@ function planSvg(){
       <rect width="${k.W}" height="${k.D}" style="fill:${mat(k.mf).color};fill-opacity:${k.upper?.1:.22};stroke:${on?'var(--mark)':'var(--fg)'};stroke-width:${on?14:5};${k.upper?'stroke-dasharray:40 24':''}"/>
       <line x1="0" y1="${Dk}" x2="${k.W}" y2="${Dk}" style="stroke:var(--fg);stroke-width:3;stroke-dasharray:20 14;opacity:.5"/>
       <line x1="0" y1="${k.D}" x2="${k.W}" y2="${k.D}" style="stroke:${mat(k.mf).color};stroke-width:22"/>
+      ${k.gV&&k.gV!=='none'?build(k).parts.filter(p=>p.pl&&/Gola C вертикален/.test(p.name)||/Летва Gola/.test(p.name)).map(p=>p.pl?`<polygon points="${p.pl.map(q=>q.join(',')).join(' ')}" style="fill:${p.col||'#9aa0a5'};stroke:var(--fg);stroke-width:1;vector-effect:non-scaling-stroke"/>`:`<rect x="${p.box[0]}" y="${p.box[2]}" width="${p.box[1]-p.box[0]}" height="${p.box[3]-p.box[2]}" style="fill:${mat(k.mc).color};stroke:var(--fg);stroke-width:1;vector-effect:non-scaling-stroke"/>`).join(''):''}
       ${k.W<150?'':`<text x="${k.W/2}" y="${k.D/2}" text-anchor="middle" font-size="${fs*.85}" font-family="IBM Plex Sans,sans-serif" font-weight="600" transform="rotate(${-k.rot} ${k.W/2} ${k.D/2})" style="fill:var(--fg)">${esc(k.name)}</text>
       <text x="${k.W/2}" y="${k.D/2+fs}" text-anchor="middle" font-size="${fs*.7}" font-family="IBM Plex Mono,monospace" transform="rotate(${-k.rot} ${k.W/2} ${k.D/2})" style="fill:var(--muted)">${k.W}</text>`}</g>`;
   }
