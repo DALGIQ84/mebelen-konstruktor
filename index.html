@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 14:45 · Детайли: ал. профил под 45°</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 14:55 · Детайли: рафтът не мести хоризонталния делител</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -781,7 +781,7 @@ function pedCell(k,ps,x,z){ // свободната секция (клетка) 
 const pedBelow=(ps,p,cx,z)=>pedHor(ps,cx,p).filter(q=>q.box[5]<=z+1).sort((u,w)=>w.box[5]-u.box[5])[0]; // детайлът точно под рафта (дъно/рафт)
 const pedAbove=(ps,p,cx,z)=>pedHor(ps,cx,p).filter(q=>q.box[4]>=z-1).sort((u,w)=>u.box[4]-w.box[4])[0];
 function smartDiv(k,ps,a,p){ // умен делител: между рафта отдолу и рафта отгоре, дълбочината — колкото тях
-  let cxq=null;if(a.eg&&a.eq){const ps2=ps.filter(q=>!(q.added&&((k.pAdd||[])[parseInt(q.key.split('#')[1])]||{}).eg===a.eg)),c=pedCell(k,ps2,+a.cx,+a.cz);
+  let cxq=null;if(a.eg&&a.eq){const pa=q=>q.added?((k.pAdd||[])[parseInt(q.key.split('#')[1])]||{}):{},ps2=ps.filter(q=>{const o=pa(q);return !(q.added&&(o.eg===a.eg||(o.smart===true&&!o.hd&&!o.eg)))}), /* рафтовете, сложени в секцията, не местят делителите */c=pedCell(k,ps2,+a.cx,+a.cz);
     if(c){const d0=ps.find(q=>q.kind==='door'&&!q.pl&&!q.added),JJ=pedJoints(c,d0?d0.box[2]:Math.min(c.L.box[3],c.R.box[3])+P.settings.doorGap);cxq=JJ.l+a.eq[0]*(JJ.r-JJ.l)/(a.eq[1]+1)}}
   if(cxq==null&&(a.anx==='l'||a.anx==='r')){const ps2=ps.filter(q=>q!==p&&!(a.eg&&q.added&&((k.pAdd||[])[parseInt(q.key.split('#')[1])]||{}).eg===a.eg)),v=pedVert(ps2,+a.cz,+a.cz,p),xr=+a.cxr,tt=a.virt?0:+mat(a.m).t; // светло отляво/отдясно — закачен за страницата/делителя до него
     const byK=a.axk?ps2.find(q=>q.key===a.axk&&!q.hidden):null,Lq=a.anx==='l'&&byK||v.filter(q=>(q.box[0]+q.box[1])/2<xr).sort((u,w)=>w.box[1]-u.box[1])[0],Rq=a.anx==='r'&&byK||v.filter(q=>(q.box[0]+q.box[1])/2>xr).sort((u,w)=>u.box[0]-w.box[0])[0];
@@ -792,7 +792,7 @@ function smartDiv(k,ps,a,p){ // умен делител: между рафта �
 function smartShelf(k,ps,a,p){ // „умен“ рафт: даваш светлото от детайла под него (ref) и секцията — ширината и дълбочината се взимат от страниците/делителите и гърба
   {const Lk=a.lk&&ps.find(q=>q.key===a.lk&&!q.hidden),Rk=a.rk&&ps.find(q=>q.key===a.rk&&!q.hidden);if(Lk&&Rk&&Rk.box[0]>Lk.box[1])a={...a,cx:(Lk.box[1]+Rk.box[0])/2}} // остава между същите страници/делители, ако се местят
   const rq=a.ref?ps.find(q=>q.key===a.ref&&!q.hidden&&q!==p):null;let zq=null;
-  if(a.eg&&a.eq){const ps2=ps.filter(q=>!(q.added&&((k.pAdd||[])[parseInt(q.key.split('#')[1])]||{}).eg===a.eg)),c=pedCell(k,ps2,+a.cx,+a.cz); // група равни делители — винаги делят секцията така, че челата са равни
+  if(a.eg&&a.eq){const pa=q=>q.added?((k.pAdd||[])[parseInt(q.key.split('#')[1])]||{}):{},ps2=ps.filter(q=>{const o=pa(q);return !(q.added&&(o.eg===a.eg||(o.smart===true&&!o.hd&&!o.eg)))}), /* рафтовете, сложени в секцията, не местят делителите */c=pedCell(k,ps2,+a.cx,+a.cz); // група равни делители — винаги делят секцията така, че челата са равни
     if(c){const d0=ps.find(q=>q.kind==='door'&&!q.pl&&!q.added),JJ=pedJoints(c,d0?d0.box[2]:Math.min(c.L.box[3],c.R.box[3])+P.settings.doorGap);zq=JJ.b+a.eq[0]*(JJ.t-JJ.b)/(a.eq[1]+1)-(a.virt?0:+mat(a.m).t)/2}}
   if(zq==null&&a.anc==='t'){const ps2=ps.filter(q=>q!==p&&!(a.eg&&q.added&&((k.pAdd||[])[parseInt(q.key.split('#')[1])]||{}).eg===a.eg)),ab=(a.atk&&ps2.find(q=>q.key===a.atk&&!q.hidden))||pedAbove(ps2,p,+a.cx,+a.cz);if(ab)zq=ab.box[4]-(+a.off||0)-(a.virt?0:+mat(a.m).t)} // светло отгоре — от детайла над него
   const S=P.settings,cl=a.hd?0:S.shelfClear,t=a.virt?0:+mat(a.m).t,z=zq!=null?zq:rq?rq.box[5]+(+a.gap||0):+a.z||0,cx=a.cx!=null?+a.cx:+k.W/2,live=ps.filter(q=>!q.hidden&&q!==p&&q.kind!=='door'&&q.kind!=='hw'&&q.kind!=='appl'&&!q.pl);
