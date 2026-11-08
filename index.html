@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 11:40 · Gola L и C — сечение по чертежа</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 11:45 · Gola: мъртвото лице колкото вратите</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1104,8 +1104,8 @@ function buildRaw(k){
   }
   const nd=noIn||opn?0:Math.max(0,k.doors|0);
   const dS=noIn||opn?'none':(k.deadSide||'none'),dW=dS==='none'?0:clamp(+k.deadW||0,k.deadOpen?0:50,W-100); // мъртво лице за ъгъл
-  if(dW&&!k.deadOpen){const dh=H-c-S.fuga,x=dS==='L'?0:W-dW; // мъртвото — без фуга в широчина (само във височина)
-    add('Мъртво лице',dh,dW,k.mf,[1,0,1,1],[x,x+dW,Dk+S.doorGap,Dk+S.doorGap+tF,c+S.fuga/2,c+S.fuga/2+dh],'door')}
+  if(dW&&!k.deadOpen){const gL=isGola(k),dh=gL?H-c-golaTopGap(k):H-c-S.fuga,dz=gL?c:c+S.fuga/2,x=dS==='L'?0:W-dW; // мъртвото — без фуга в широчина (само във височина); Gola — колкото вратите
+    add('Мъртво лице',dh,dW,k.mf,[1,0,1,1],[x,x+dW,Dk+S.doorGap,Dk+S.doorGap+tF,dz,dz+dh],'door')}
   if(nd&&+k.lift>0&&!dW){const nl=Math.max(1,k.lift|0),lh=(H-c-nl*S.fuga)/nl; // повдигащи се врати — една над друга, на цялата ширина
     for(let i=0;i<nl;i++){const z=c+S.fuga/2+i*(lh+S.fuga);add('Врата повдигаща',lh,W-S.fuga,k.mf,[1,1,1,1],[S.fuga/2,W-S.fuga/2,Dk+S.doorGap,Dk+S.doorGap+tF,z,z+lh],'door')}}
   else if(nd){const dx0=dS==='L'?dW:0,dw=(W-dW-nd*S.fuga)/nd, dh=isGola(k)?H-c-golaTopGap(k):H-c-S.fuga;
