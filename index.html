@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 11:55 · Gola ъгъл с мъртво: вътрешно парче + планка 60 на Г</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 12:00 · Gola ъгъл: мъртвото в цвета на корпуса, кант на първия размер</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1107,7 +1107,7 @@ function buildRaw(k){
   if(dW&&!k.deadOpen&&isGola(k)&&golaL(k)){ /* Gola ъгъл: вместо мъртво лице — вътрешно парче (мъртво − 18) под L-профила + планка 60 на Г за пантите; L се събира под 45° в ъгъла */
     const Lh=+S.golaLh||56,ph=Math.round(H-Lh-(c+T)),pw=dW-T,pb=+(S.golaDeadB??60)||60,L=dS==='L';
     const xa=L?T:W-dW,xb=L?dW-T:W-dW;
-    add('Мъртво (Gola)',ph,pw,k.mf,[1,1,1,1],[xa,xa+pw,Dk-T,Dk,c+T,c+T+ph]);
+    add('Мъртво (Gola)',ph,pw,k.mc,[1,0,0,0],[xa,xa+pw,Dk-T,Dk,c+T,c+T+ph]);
     add('Планка панти (Gola ъгъл)',ph,pb,k.mc,[1,0,0,0],[xb,xb+T,Dk-T-pb,Dk-T,c+T,c+T+ph]);
     warn.push(`Gola ъгъл: мъртвото е вътрешно парче ${fmt(pw)} × ${fmt(ph)} (мъртво − ${fmt(T)}, стъпва на дъното, горе − профила ${fmt(Lh)}) + планка ${fmt(pb)} мм на Г за пантите; L профилът се събира под 45° в ъгъла.`)}
   else if(dW&&!k.deadOpen){const gL=isGola(k),dh=gL?H-c-golaTopGap(k):H-c-S.fuga,dz=gL?c:c+S.fuga/2,x=dS==='L'?0:W-dW; // мъртвото — без фуга в широчина (само във височина); Gola — колкото вратите
