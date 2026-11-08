@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 13:45 · колона от 2 части (надстройка), обща или отделни врати</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 13:50 · колона от 2 части: страниците външни</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1038,7 +1038,7 @@ function buildRaw(k){
   const fl=k.upper?'none':k.floor||'none',fL=c>0&&(fl==='L'||fl==='both')&&half!=='R',fR=c>0&&(fl==='R'||fl==='both')&&half!=='L'; // страница до пода
   const extS=k.type==='col'||k.type==='fridge'; // колона: страниците са външни — дъното и таванът са между тях
   const up=!!k.upper&&k.type==='doors'; // горен шкаф: страници по цялата височина, дъно и таван между тях, без цокъл
-  const botIn=extS&&k.type!=='fridge'||up; // колона фурна: дъното между страниците; хладилник: дъното е външно
+  const botIn=extS&&k.type!=='fridge'||up||!!k._ext; // колона фурна: дъното между страниците; хладилник: дъното е външно
   const bx0=up?(half==='R'?0:T):fL||botIn?T:0,bx1=up?(half==='L'?W:W-T):fR||botIn?W-T:W;
   const nBR=noBack?Math.max(0,k.bRails??2)|0:0; // без гръб: задни летви отвътре
   const bIn=half||opn?T:nBR?T:k.backPos==='in'&&!noBack?B:0; // гръб/летви вътре в корпуса: всичко вътрешно започва след тях
@@ -1177,7 +1177,7 @@ function buildRaw(k){
 }
 function buildColSplit(k){ /* колона от 2 части: долна + надстройка (отделни корпуси, един върху друг); врати — общи или отделни */
   const S=P.settings,H=+k.H,aH=Math.min(+k.antH,H-+k.c-150),J=H-aH;
-  const lo=buildRaw({...k,_cs:1,H:J,top:'full'}),up=buildRaw({...k,_cs:1,c:J,H,plinth:false,floor:'none',sh:Math.max(0,k.antSh??1),deadSide:'none',gola:false,lift:0,dh:null});
+  const lo=buildRaw({...k,_cs:1,_ext:1,H:J,top:'full'}),up=buildRaw({...k,_cs:1,_ext:1,c:J,H,plinth:false,floor:'none',sh:Math.max(0,k.antSh??1),deadSide:'none',gola:false,lift:0,dh:null});
   for(const p of up.parts){p.name=p.name.replace(/^(Страница|Дъно|Таван|Гръб|Рафт|Делител|Бленда|Врата)/,'$1 надстройка')}
   let parts=[...lo.parts,...up.parts];const warn=[...lo.warn,...up.warn.filter(w=>!lo.warn.includes(w))];
   const doorsLo=lo.parts.filter(p=>p.kind==='door'&&p.name==='Врата'),doorsUp=up.parts.filter(p=>p.kind==='door'&&/^Врата/.test(p.name));
