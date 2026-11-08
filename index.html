@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 11:00 · цвят на Gola профила</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 11:10 · пълнеж и съдомиялна до Gola — наравно с вратите</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1018,14 +1018,14 @@ function buildRaw(k){
     finishParts(k,parts);return{parts,warn,Dk};
   }
   if(k.type==='filler'){ // пълнеж: 1 бр., кантиран навсякъде, с надмярка — на монтажа се дорязва, отпадъкът става летва
-    const dh=H-c-S.fuga,al=+(S.fillAllow??50),y0=Dk+S.doorGap;
-    add('Пълнеж',dh,W+al,k.mf,[1,1,1,1],[0,W,y0,y0+tF,c+S.fuga/2,c+S.fuga/2+dh],'door');
+    const gn=golaNb(k),dh=gn?H-c-golaTopGap(gn):H-c-S.fuga,z0=gn?c:c+S.fuga/2,al=+(S.fillAllow??50),y0=Dk+S.doorGap; /* до шкаф с Gola — наравно с вратите му */
+    add('Пълнеж',dh,W+al,k.mf,[1,1,1,1],[0,W,y0,y0+tF,z0,z0+dh],'door');if(gn)warn.push('Gola: пълнежът е наравно с вратите на съседа (горе − '+fmt(golaTopGap(gn))+' мм, долу наравно).');
     finishParts(k,parts);return{parts,warn,Dk};
   }
   if(k.type==='dw'){ // съдомиялна за вграждане: само врата, бленди и (по желание) цокъл
     if(W<300||H-c<300){warn.push('Размерите са твърде малки.');return{parts,warn,Dk}}
-    const dh=H-c-S.fuga;
-    add('Врата',dh,W-S.fuga,k.mf,[1,1,1,1],[S.fuga/2,W-S.fuga/2,Dk+S.doorGap,Dk+S.doorGap+tF,c+S.fuga/2,c+S.fuga/2+dh],'door');
+    const gn=golaNb(k),dh=gn?H-c-golaTopGap(gn):H-c-S.fuga,z0=gn?c:c+S.fuga/2; /* до шкаф с Gola — като вратите му */
+    add('Врата',dh,W-S.fuga,k.mf,[1,1,1,1],[S.fuga/2,W-S.fuga/2,Dk+S.doorGap,Dk+S.doorGap+tF,z0,z0+dh],'door');if(gn)warn.push('Gola: вратата на съдомиялната е като на съседите (горе − '+fmt(golaTopGap(gn))+' мм, долу наравно).');
     for(const y of[Dk-S.rail,0])for(const z of[H-T,H-2*T])add('Бленда',W,S.rail,k.mc,[1,0,0,0],[0,W,y,y+S.rail,z,z+T]); // 4 бленди горе: по 2 една под друга отпред и отзад
     add('Съдомиялна',0,0,'k2',[0,0,0,0],[3,W-3,20,Dk,Math.max(0,c-20),H-T-5],'hw');
     if(k.plinth&&c>0){const y=Dk-S.plinthBack;add('Цокъл',W,c,k.mf,[1,0,0,0],[0,W,y-T,y,0,c],'plinth')}
@@ -1173,6 +1173,8 @@ function finishParts(k,parts){
 /* ---------- Чекмеджета ---------- */
 const slideOf=k=>P.settings.slides.find(x=>x.id===k.slide)||P.settings.slides[0];
 const GOLA_COL={alu:['Алуминий (сребро)','#c4c9cd'],inox:['Инокс','#a9adae'],black:['Черен','#1d1e20'],anth:['Антрацит','#45494d'],white:['Бял','#f1f1ee'],gold:['Злато / шампанско','#c8a96a'],bronze:['Бронз','#8a6a45']};
+function golaNb(k){if(k.wall===null||k.wall===undefined||k.upper)return null;const a=+k.off,b=a+(+k.W); /* съсед на същата стена с Gola — пълнежът и съдомиялната го следват */
+  return P.cabinets.find(q=>q!==k&&q.wall===k.wall&&!q.upper&&isGola(q)&&(Math.abs(+q.off+(+q.W)-a)<5||Math.abs(b-+q.off)<5))||null}
 const isGola=k=>!!k.gola&&!k.upper&&['doors','drawers','oven'].includes(k.type||'doors'); // без дръжки — Gola L под плота, C между челата
 function capAbove(k){const NO=['top','plinthRun','splash','wpanel','wshelf','ubottom','acc','filler'];const onW=k.wall!==null&&k.wall!==undefined; /* има ли шкаф/модул точно отгоре (напр. фурна над чекмеджетата) */
   return P.cabinets.some(o=>o!==k&&!NO.includes(o.type)&&Math.abs(+o.c-+k.H)<=30&&(onW?o.wall===k.wall&&+o.off<+k.off+(+k.W)-5&&+o.off+(+o.W)>+k.off+5:Math.abs(o.x-k.x)<5&&Math.abs(o.y-k.y)<5))}
