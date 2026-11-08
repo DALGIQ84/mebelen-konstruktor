@@ -149,11 +149,11 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 18:05 · „Свободни детайли“ — отделно меню</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 18:20 · проектите — .kraft, отварят се с двоен клик от папката</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
-      <label class="item" id="lOpen" style="cursor:pointer"><span>Отвори проект…<kbd style="font-size:10px;opacity:.6;margin-left:6px">Ctrl+O</kbd></span><small>файл от компютъра</small><input type="file" id="openFile" accept=".json,.txt,application/json" hidden></label>
+      <label class="item" id="lOpen" style="cursor:pointer"><span>Отвори проект…<kbd style="font-size:10px;opacity:.6;margin-left:6px">Ctrl+O</kbd></span><small>файл от компютъра</small><input type="file" id="openFile" accept=".kraft,.json,.txt,application/json" hidden></label>
       <button class="item" id="bSave"><span>Запази<kbd style="font-size:10px;opacity:.6;margin-left:6px">Ctrl+S</kbd></span><small id="bSaveSm">като файл на компютъра</small></button>
       <button class="item" id="bSaveAs" hidden><span>Запази като…<kbd style="font-size:10px;opacity:.6;margin-left:6px">Ctrl+Shift+S</kbd></span><small>нов файл / друга папка</small></button>
       <div style="border-top:1px solid var(--line);margin:4px 0"></div>
@@ -287,7 +287,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
       <div class="acts">
         <button class="btn primary" id="pjCopy">Копирай текста</button>
         <button class="btn" id="pjLoad">Зареди от текста</button>
-        <label class="btn">Зареди .json файл<input type="file" id="pjFile" accept=".json,.txt,application/json" hidden></label>
+        <label class="btn">Зареди .json файл<input type="file" id="pjFile" accept=".kraft,.json,.txt,application/json" hidden></label>
       </div>
       <div class="acts">
         <button class="btn" id="pjSample">Зареди примерната кухня</button>
@@ -3362,8 +3362,8 @@ $('#fPdf').onclick=()=>{toggleFile(false);savePDF()};
 $('#fInst').onclick=()=>{toggleFile(false);saveInstallPDF()};
 let projFH=null; // отвореният файл (инсталираната програма) — Ctrl+S записва направо върху него
 const FSA=OFFLINE&&!!window.showSaveFilePicker;if(FSA)$('#bSaveAs').hidden=false;
-const pjTypes=[{description:'Мебелен проект',accept:{'application/json':['.json']}}];
-async function saveProj(as){const name=projBase()+'.json',data=JSON.stringify(P);
+const pjTypes=[{description:'Проект KRAFTPLAN',accept:{'application/x-kraftplan':['.kraft']}},{description:'Проект (стар формат .json)',accept:{'application/json':['.json']}}];
+async function saveProj(as){const name=projBase()+'.kraft',data=JSON.stringify(P);
   if(FSA){try{if(as||!projFH)projFH=await showSaveFilePicker({suggestedName:name,types:pjTypes,id:'mebeli-proj',startIn:projFH||'documents'});
       const w=await projFH.createWritable();await w.write(data);await w.close();recentAdd(projFH);markSaved();toast('Запазено: '+projFH.name);$('#bSaveSm').textContent=projFH.name;return true}
     catch(e){if(e&&e.name==='AbortError')return false;toast('Не можах да запиша: '+(e&&e.message||e))}}
@@ -3402,7 +3402,7 @@ document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.code==='Key
 $('#openFile').closest('label').addEventListener('click',async e=>{if(!(FSA&&window.showOpenFilePicker))return;e.preventDefault();toggleFile(false);
   try{const[h]=await showOpenFilePicker({types:pjTypes,id:'mebeli-proj',startIn:'documents'});const t=await (await h.getFile()).text();loadProject(t);projFH=h;recentAdd(h);$('#bSaveSm').textContent=h.name}catch(err){if(err&&err.name!=='AbortError')toast('Не можах да отворя файла')}});
 $('#bSave').onclick=async()=>{toggleFile(false);if(OFFLINE){await saveProj(false);return}
-  const name=((P.name||'проект').replace(/[\\/:*?"<>|]+/g,' ').trim()||'проект')+' '+new Date().toISOString().slice(0,10)+'.json';
+  const name=((P.name||'проект').replace(/[\\/:*?"<>|]+/g,' ').trim()||'проект')+' '+new Date().toISOString().slice(0,10)+'.kraft';
   const data=JSON.stringify(P);let dl=null;try{dl=await window.claude?.use?.('downloads')}catch(e){}
   if(dl){try{await dl.save({filename:name,data});toast('Проектът е запазен: '+name);return}catch(e){if(e&&e.code==='declined')return}}
   $('#pjText').value=JSON.stringify(P,null,1);$('#pjName').value=P.name||'';open('#ovProj');toast('Запазването на файл не е позволено тук — копирай текста')};
@@ -3554,6 +3554,9 @@ migrate();snapSplash();snapAcc();save();renderList();renderEditor();renderTable(
     $('#stRecent').onclick=async e=>{const b=e.target.closest('[data-rec]');if(!b)return;const o=l[+b.dataset.rec];
       try{if((await o.h.queryPermission({mode:'readwrite'}))!=='granted'&&(await o.h.requestPermission({mode:'readwrite'}))!=='granted')return;
         const t=await (await o.h.getFile()).text();loadProject(t);projFH=o.h;recentAdd(o.h);$('#bSaveSm').textContent=o.h.name;$('#ovStart').hidden=true}catch(err){toast('Файлът не е намерен — може да е преместен')}}}
-  $('#ovStart').hidden=false})();
+  if(!window._kpLaunched)$('#ovStart').hidden=false})();
+if('launchQueue' in window)launchQueue.setConsumer(async lp=>{ /* двоен клик върху .kraft файл в папката — отваря проекта направо */
+  if(!lp.files||!lp.files.length)return;const h=lp.files[0];window._kpLaunched=true;
+  try{const t=await (await h.getFile()).text();loadProject(t);projFH=h;recentAdd(h);$('#bSaveSm').textContent=h.name;markSaved&&markSaved();$('#ovStart').hidden=true}catch(err){toast('Файлът не може да се отвори')}});
 </script>
 <script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(()=>{}));</script></body></html>
