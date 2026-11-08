@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 10:25 · челата в цели мм (без десети)</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 10:35 · Gola: целият таван по-плитък с L-профила</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1049,8 +1049,8 @@ function buildRaw(k){
   if(half!=='R'){if(fL)add('Страница до пода',H,Dk,k.mc,[1,0,1,0],[0,T,0,Dk,0,H]);else add('Страница',sideH,Dk,k.mc,[1,0,0,0],[0,T,0,Dk,sz0,sTop])}
   if(half!=='L'){if(fR)add('Страница до пода',H,Dk,k.mc,[1,0,1,0],[W-T,W,0,Dk,0,H]);else add('Страница',sideH,Dk,k.mc,[1,0,0,0],[W-T,W,0,Dk,sz0,sTop])}
   if(k.type==='oven'){} // шкаф за фурна: без летви — фурната е директно под плота
-  else if(topOut) add('Таван',W,Dk-cds,k.mc,[1,0,0,0],[0,W,cds,Dk,H-T,H]);
-  else if(k.top==='full'||extS||up) add('Таван',iR-iL,Dk-cds,k.mc,[1,0,0,0],[iL,iR,cds,Dk,H-T,H]);
+  else if(topOut){const gb=isGola(k)?(+S.golaLw||26):0;add('Таван',W,Dk-cds-gb,k.mc,[1,0,0,0],[0,W,cds,Dk-gb,H-T,H])} /* Gola: таванът е по-плитък с L-профила */
+  else if(k.top==='full'||extS||up){const gb=isGola(k)?(+S.golaLw||26):0;add('Таван',iR-iL,Dk-cds-gb,k.mc,[1,0,0,0],[iL,iR,cds,Dk-gb,H-T,H])}
   else{
     {const gb=isGola(k)?(+S.golaLw||26):0;add('Бленда',iR-iL,S.rail,k.mc,[1,0,0,0],[iL,iR,Dk-gb-S.rail,Dk-gb,H-T,H])} // Gola: предната бленда е зад L-профила
     add('Бленда',iR-iL,S.rail,k.mc,[1,0,0,0],[iL,iR,bIn,bIn+S.rail,H-T,H]);
