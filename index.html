@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 18:20 · проектите — .kraft, отварят се с двоен клик от папката</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 18:40 · аксесоари: стенен аспиратор с комин</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -389,7 +389,8 @@ const ACC={ // уреди и аксесоари: free = стои на пода; 
   fridgeFS:{name:'Хладилник (свободностоящ)',W:600,D:650,h:1850,free:true},
   washer:{name:'Пералня',W:600,D:600,h:850,free:true},
   dwFS:{name:'Съдомиялна (свободностояща)',W:600,D:600,h:850,free:true},
-  dryer:{name:'Сушилня',W:600,D:600,h:850,free:true}};
+  dryer:{name:'Сушилня',W:600,D:600,h:850,free:true},
+  hoodW:{name:'Аспиратор (стенен, с комин)',W:900,D:500,h:950,free:true,up:true}};
 const ACOL={white:['Бял','#f3f4f4'],inox:['Инокс','#c4c9cc'],black:['Черен','#2b2e30']};
 const accOf=k=>ACC[k.acc]||ACC.sink;
 const isAcc=k=>k&&k.type==='acc';
@@ -1260,6 +1261,8 @@ function innerDrawers(k,parts){ /* вътрешни чекмеджета зад 
   for(let i=parts.length-1;i>=0;i--){const p=parts[i];if(p.name==='Рафт'&&!p.added&&p.box&&p.box[4]<zmax+20&&p.box[5]>zmin-5)parts.splice(i,1)} /* рафтовете в зоната на чекмеджетата отпадат */
   const ov=[];const so=[...L].map((q,i)=>({i,a:+q.z||0,b:(+q.z||0)+(+q.h||150)})).sort((u,v)=>u.a-v.a);for(let j=1;j<so.length;j++)if(so[j].a<so[j-1].b)ov.push(`${so[j-1].i+1} и ${so[j].i+1}`);
   W_(`Вътрешни чекмеджета: ${L.length} бр., водачи ${sl.name} ${NL||'—'} мм на страниците; чела ${fmt(Wi-2*g)} × ${L.map(q=>fmt(+q.h||150)).join(' / ')} мм (светло ${fmt(Wi)} − фуга ${fmt(2*g)}, ${fmt(set)} мм зад ръба на корпуса); от дъното: ${L.map(q=>fmt(+q.z||0)).join(' / ')} мм.`+(ov.length?` ВНИМАНИЕ: застъпват се ${ov.join(', ')}!`:''))}
+function hoodWallSvg(k,on,fs){const col=(ACOL[k.acol]||ACOL.white)[1],x=+k.off,W=+k.W,h=k.H-k.c,yb=-k.c,ch=60,py=Math.min(320,Math.max(120,h*0.3)),cw=Math.min(W*0.32,300),xc=x+W/2,yt=yb-ch-py,sk=`stroke:${on?'var(--mark)':'var(--fg)'};stroke-width:${on?3:1.2};vector-effect:non-scaling-stroke`; /* стенен аспиратор в изглед „Стени“ */
+  return `<g data-id="${k.id}" style="cursor:pointer"><rect x="${xc-cw/2}" y="${yb-h}" width="${cw}" height="${Math.max(0,h-ch-py)}" style="fill:${col};${sk}"/><polygon points="${x},${yb-ch} ${x+W},${yb-ch} ${xc+cw/2},${yt} ${xc-cw/2},${yt}" style="fill:${col};${sk}"/><rect x="${x}" y="${yb-ch}" width="${W}" height="${ch}" style="fill:${col};${sk}"/><text x="${xc}" y="${yt+py*0.6}" text-anchor="middle" font-size="${fs*0.55}" font-family="IBM Plex Sans,sans-serif" font-weight="600" style="fill:${on?'var(--mark)':'var(--fg)'}">${esc(k.name)}</text></g>`}
 function golaNb(k){if(k.wall===null||k.wall===undefined||k.upper)return null;const a=+k.off,b=a+(+k.W); /* съсед на същата стена с Gola — пълнежът и съдомиялната го следват */
   return P.cabinets.find(q=>q!==k&&q.wall===k.wall&&!q.upper&&isGola(q)&&(Math.abs(+q.off+(+q.W)-a)<5||Math.abs(b-+q.off)<5))||null}
 const UB_PROF={ /* профили за предния ръб на цялото дъно — сечение (x от ръба на плоскостта напред, z отдолу), по чертежите на Роси */
@@ -1486,7 +1489,7 @@ function renderEditor(){
     let h=`<label class="full">Име<input id="f_name" data-f="name" value="${v(k.name)}"></label>`+
       `<label>Вид<select id="f_acc" data-f="acc">${Object.entries(ACC).map(([id,o])=>`<option value="${id}" ${id===k.acc?'selected':''}>${o.name}</option>`).join('')}</select></label>`+
       `<label>Цвят<select id="f_acol" data-f="acol">${Object.entries(ACOL).map(([id,o])=>`<option value="${id}" ${id===k.acol?'selected':''}>${o[0]}</option>`).join('')}</select></label>`+
-      num('W','Ширина, мм',k.W)+num('D','Дълбочина, мм',k.D)+(inb?'':num('H','Височина, мм',Math.round(k.H-k.c)));
+      num('W','Ширина, мм',k.W)+num('D','Дълбочина, мм',k.D)+(a.up?num('c','Долен ръб от пода, мм',Math.round(k.c))+num('H','Горе (комин) до, мм от пода',Math.round(k.H)):inb?'':num('H','Височина, мм',Math.round(k.H-k.c)));
     if(k.acc==='sink')h+=`<label>Корита<select id="f_bowls" data-f="bowls"><option value="1" ${+k.bowls!==2&&+k.bowls!==3?'selected':''}>1 коритo</option><option value="3" ${+k.bowls===3?'selected':''}>1 корито + отцедник</option><option value="2" ${+k.bowls===2?'selected':''}>2 корита</option></select></label>`;
     if(k.acc==='hob')h+=`<label>Зони<select id="f_zones" data-f="zones"><option value="4" ${+k.zones!==5&&+k.zones!==2?'selected':''}>4</option><option value="5" ${+k.zones===5?'selected':''}>5</option><option value="2" ${+k.zones===2?'selected':''}>2 (домино)</option><option value="22" ${+k.zones===22?'selected':''}>двоен — 2 домино един до друг</option></select></label>`;
     if(inb)h+=k.onTop?`<p class="note full">Стои върху плота — височината се взима сама (${Math.round(k.c)} мм от пода).</p>`:num('c','Височина на плота, мм',k.c)+`<p class="note full">Няма плот под него — сложи плот на шкафовете или задай височината.</p>`;
@@ -2011,6 +2014,14 @@ function accModel(g,k,M,hl){ // проста, но разпознаваема ф
     const zz=+k.zones===2?[[.5,.3,.09],[.5,.72,.09]]:+k.zones===5?[[.2,.28,.08],[.2,.72,.09],[.5,.5,.12],[.8,.28,.09],[.8,.72,.08]]:[[.27,.3,.08],[.27,.72,.1],[.73,.3,.1],[.73,.72,.08]];
     for(const[a,b,r]of zz){const m=new THREE.Mesh(new THREE.RingGeometry(r*0.92,r,48),accMat('#6f777b',.4,0));m.rotation.x=-Math.PI/2;m.position.set(W*a,z0+th+0.001,D*b);g.add(m)}
     B(W*0.3,0.001,0.03,W/2,z0+th+0.001,D-0.03,accMat('#3a4044',.4,0))}
+  else if(t==='hoodW'){ /* стенен аспиратор: плоча отдолу + пирамида + комин до горе */
+    const ch=0.06,py=Math.min(0.32,Math.max(0.12,Hh*0.3)),cw=Math.min(W*0.32,0.3),cd=Math.min(D*0.55,0.26);
+    B(W,ch,D,W/2,z0+ch/2,D/2,body);B(W*0.92,0.004,D*0.85,W/2,z0-0.001,D*0.47,accMat('#5d6569',.35,.3));
+    {const y0=z0+ch,y1=y0+py,x0=W/2-cw/2,x1=W/2+cw/2,v=[[0,y0,0],[W,y0,0],[W,y0,D],[0,y0,D],[x0,y1,0],[x1,y1,0],[x1,y1,cd],[x0,y1,cd]]; /* пирамида: от плочата към комина */
+     const F=[[0,1,2,3],[4,7,6,5],[3,2,6,7],[1,5,6,2],[0,3,7,4],[0,4,5,1]],pos=[];for(const f of F)for(const t of[[f[0],f[1],f[2]],[f[0],f[2],f[3]]])for(const q of t)pos.push(...v[q]);
+     const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.computeVertexNormals();const m=new THREE.Mesh(geo,body);m.material.side=THREE.DoubleSide;g.add(m)}
+    const top=z0+ch+py;if(Hh>ch+py+0.02)B(cw,Hh-ch-py,cd,W/2,top+(Hh-ch-py)/2,cd/2,body);
+    B(W*0.25,0.012,0.004,W/2,z0+ch/2,D+0.002,dark)}
   else{ // свободностоящи
     const fz=D,inset=0.004;B(W,Hh,D,W/2,z0+Hh/2,D/2,body);
     if(t==='fridgeFS'){const sp=Hh*0.36;B(W-inset*2,0.006,0.004,W/2,z0+sp,fz+0.001,dark); // фуга между вратите
@@ -2291,7 +2302,7 @@ function blockOcc(i){ // свободни колони, долепени до с
 function occupancy(i){ // шкафове на стената (лице) и шкафове от съседни стени (профил)
   const w=wallInfo(i),out=[];
   for(const k of P.cabinets){
-    if(k.type==='plinthRun'||k.type==='top'||k.type==='splash'||k.type==='wpanel'||k.type==='wshelf'||k.type==='ubottom'||accIn(k))continue; // цокълът, плотът, мивката и котлонът не заемат място по стената
+    if(k.type==='plinthRun'||k.type==='top'||k.type==='splash'||k.type==='wpanel'||k.type==='wshelf'||k.type==='ubottom'||accIn(k)||(isAcc(k)&&accOf(k).up))continue; // цокълът, плотът, мивката и котлонът не заемат място по стената
     if(k.wall===i){out.push({k,s0:k.off,s1:k.off+k.W,front:true});continue}
     const c=corners(k),ss=c.map(p=>(p[0]-w.A[0])*w.u[0]+(p[1]-w.A[1])*w.u[1]),dd=c.map(p=>(p[0]-w.A[0])*w.n[0]+(p[1]-w.A[1])*w.n[1]);
     if(Math.min(...dd)<60&&Math.max(...dd)>0&&Math.max(...ss)>1&&Math.min(...ss)<w.len-1)out.push({k,s0:Math.min(...ss),s1:Math.max(...ss),front:false});
@@ -2343,6 +2354,7 @@ function wallSvg(){
     else if(it.type==='column')s+=`<rect x="${it.off}" y="${-H}" width="${it.w}" height="${H}" style="fill:var(--wall);opacity:.7"/>`;
     else if(isBox(it.type))s+=boxIcon(it.type,it.off,-(it.z+it.h),it.w,it.h);
   }
+  for(const k of P.cabinets.filter(q=>isAcc(q)&&accOf(q).up&&q.wall===wv))s+=hoodWallSvg(k,isSel(k.id),fs);
   for(const k of P.cabinets.filter(q=>['wpanel','wshelf','ubottom'].includes(q.type)&&q.wall===wv)){const on=isSel(k.id); // свободни детайли по стената
     s+=`<g data-id="${k.id}" style="cursor:pointer">`+build(k).parts.map(p=>p.fp?`<polygon points="${p.fp.map(([u,v])=>(k.off+u)+','+(-v)).join(' ')}" style="fill:${mat(p.m).color};stroke:${on?'var(--mark)':'var(--fg)'};stroke-width:${on?3:1};vector-effect:non-scaling-stroke"/>`:`<rect x="${k.off+p.box[0]}" y="${-p.box[5]}" width="${p.box[1]-p.box[0]}" height="${Math.max(4,p.box[5]-p.box[4])}" style="fill:${mat(p.m).color};stroke:${on?'var(--mark)':'var(--fg)'};stroke-width:${on?3:1};vector-effect:non-scaling-stroke"/>`).join('')+
       `<text x="${k.off+k.W/2}" y="${-(k.type==='wpanel'?k.c+(+k.fpH||700)/2:k.c)-fs*0.4}" text-anchor="middle" font-size="${fs*0.5}" font-family="IBM Plex Sans,sans-serif" style="fill:var(--fg)">${esc(k.name)}</text></g>`;
@@ -2954,10 +2966,13 @@ function setTab(t){if(t!=='room'&&drawRoom){if(drawRoom.pts.length>=2)drawFinish
 $('#tCab').onclick=()=>setTab('cab');$('#tRoom').onclick=()=>setTab('room');$('#tAcc').onclick=()=>setTab('acc');
 $('#accAdd').innerHTML=Object.entries(ACC).map(([id,a])=>`<button class="btn sm" data-addacc="${id}">+ ${a.name.replace(' (свободностоящ)','').replace(' (свободностояща)',' своб.')}</button>`).join('');
 $('#accAdd').addEventListener('click',e=>{const id=e.target.dataset.addacc;if(!id)return;const a=ACC[id];
-  const k=cabDef({type:'acc',acc:id,acol:id==='hob'?'black':id==='sink'?'inox':'white',name:a.name.replace(/ \(.*\)/,''),W:a.W,D:a.D,c:a.free?0:900,H:(a.free?0:900)+a.h,gap:a.gap||0,plinth:false,bowls:1,zones:4});
+  const hb=a.up?P.cabinets.find(q=>isAcc(q)&&(q.acc==='hob'||q.acc==='stove')&&q.wall!==null):null,c0=a.up?(hb?Math.round(+hb.H+650):1550):a.free?0:900;
+  const k=cabDef({type:'acc',acc:id,acol:id==='hob'?'black':id==='sink'||id==='hoodW'?'inox':'white',name:a.name.replace(/ \(.*\)/,''),W:a.W,D:a.D,c:c0,H:a.up?Math.max(c0+300,+P.room.h||2500):c0+a.h,gap:a.gap||0,plinth:false,bowls:1,zones:4});
   // вграденото — върху първия плот; свободното — на най-дългата стена след последния шкаф
   const tp=!a.free&&P.cabinets.find(t=>t.type==='top'&&t.wall!==null);let w=-1,off=0;
-  if(tp){w=tp.wall;off=tp.off+Math.max(0,(tp.W-a.W)/2)}
+  if(a.up&&hb){w=hb.wall;off=Math.max(0,hb.off+hb.W/2-a.W/2)}
+  else if(a.up){const ws=[...Array(N()).keys()].sort((a,b)=>wallInfo(b).len-wallInfo(a).len);w=ws[0];off=Math.max(0,wallInfo(w).len/2-a.W/2)}
+  else if(tp){w=tp.wall;off=tp.off+Math.max(0,(tp.W-a.W)/2)}
   else{const ws=[...Array(N()).keys()].sort((a,b)=>wallInfo(b).len-wallInfo(a).len); // най-дългата стена, на която има място след последния шкаф
     for(const i of ws){let o0=0;for(const o of occupancy(i))o0=Math.max(o0,o.s1);if(o0+k.W<=wallInfo(i).len+1){w=i;off=o0;break}}}
   if(w>=0&&off+k.W<=wallInfo(w).len+1){k.wall=w;k.off=off;place(k)}else{const b=roomBox();k.x=(b[0]+b[1])/2-k.W/2;k.y=(b[2]+b[3])/2-k.D/2}
