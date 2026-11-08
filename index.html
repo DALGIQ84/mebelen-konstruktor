@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 09:50 · Gola: избор между кои чела е C профилът</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 10:05 · Gola: L горе по избор (авто без L, ако отгоре стъпва модул)</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1108,18 +1108,18 @@ function buildRaw(k){
     add('Мъртво лице',dh,dW,k.mf,[1,0,1,1],[x,x+dW,Dk+S.doorGap,Dk+S.doorGap+tF,c+S.fuga/2,c+S.fuga/2+dh],'door')}
   if(nd&&+k.lift>0&&!dW){const nl=Math.max(1,k.lift|0),lh=(H-c-nl*S.fuga)/nl; // повдигащи се врати — една над друга, на цялата ширина
     for(let i=0;i<nl;i++){const z=c+S.fuga/2+i*(lh+S.fuga);add('Врата повдигаща',lh,W-S.fuga,k.mf,[1,1,1,1],[S.fuga/2,W-S.fuga/2,Dk+S.doorGap,Dk+S.doorGap+tF,z,z+lh],'door')}}
-  else if(nd){const dx0=dS==='L'?dW:0,dw=(W-dW-nd*S.fuga)/nd, dh=isGola(k)?H-c-(+S.golaTop||35):H-c-S.fuga;
+  else if(nd){const dx0=dS==='L'?dW:0,dw=(W-dW-nd*S.fuga)/nd, dh=isGola(k)?H-c-golaTopGap(k):H-c-S.fuga;
     if(dw<100)warn.push('Вратите стават по-тесни от 100 мм.');
     const dz0=isGola(k)?c:c+S.fuga/2;for(let i=0;i<nd;i++){const x=dx0+S.fuga/2+i*(dw+S.fuga); add('Врата',dh,dw,k.mf,[1,1,1,1],[x,x+dw,Dk+S.doorGap,Dk+S.doorGap+tF,dz0,dz0+dh],'door')}}
   if(isGola(k)){const Lw=+S.golaLw||26,Lh=+S.golaLh||56,Cw=+S.golaCw||26,Ch=+S.golaCh||73,sides=parts.filter(p=>/^Страница/.test(p.name)),top=Math.max(...sides.map(p=>p.box[5]));
     const fr=parts.filter(p=>p.kind==='door'&&p.name==='Чело').sort((a,b)=>b.box[4]-a.box[4]),cs=[],gG=golaGaps(k);for(let i=0;i+1<fr.length;i++)if(gG[i])cs.push((fr[i].box[4]+fr[i+1].box[5])/2);
-    const nt=[{n:'L',w:Lw,z0:top-Lh,z1:top}];for(const zc of cs)nt.push({n:'C',w:Cw,z0:zc-Ch/2,z1:zc+Ch/2});
+    const nt=golaL(k)?[{n:'L',w:Lw,z0:top-Lh,z1:top}]:[];for(const zc of cs)nt.push({n:'C',w:Cw,z0:zc-Ch/2,z1:zc+Ch/2});
     for(const p of sides){p.notch=nt.map(q=>({...q})); // изрези в страницата отпред (на циркуляра)
       const[,,y0,y1,z0,z1]=p.box,ns=nt.filter(q=>q.z1>z0&&q.z0<z1).sort((a,b)=>a.z0-b.z0),sp=[[y0,z0],[y1,z0]];let topCut=false; // контурът на страницата с изрезите — за 3D
       for(const q of ns){const a=Math.max(z0,q.z0),b=Math.min(z1,q.z1);sp.push([y1,a],[y1-q.w,a],[y1-q.w,b]);if(b<z1-0.1)sp.push([y1,b]);else topCut=true}
       if(!topCut)sp.push([y1,z1]);sp.push([y0,z1]);p.sp=sp}
     for(const q of nt)add(q.n==='L'?'Gola L профил':'Gola C профил',0,0,'k2',[0,0,0,0],[0,W,Dk-q.w,Dk-1,q.z0+(q.n==='L'?0:4),q.z1-(q.n==='L'?0:4)],'hw'); // профилът минава през изрезите в страниците
-    warn.push(`Gola (без дръжки): изрези отпред в страниците — L горе ${fmt(Lw)} × ${fmt(Lh)}`+(cs.length?`; C ${fmt(Cw)} × ${fmt(Ch)} на ${cs.map(z=>fmt(Math.round(top-z))).join(', ')} мм от горния ръб (до средата)`:'')+`. Профил L ${fmt(W)} мм`+(cs.length?`, C ${cs.length} × ${fmt(W)} мм`:'')+'.')}
+    warn.push(`Gola (без дръжки): изрези отпред в страниците — `+(golaL(k)?`L горе ${fmt(Lw)} × ${fmt(Lh)}`:'без L горе (отгоре стъпва модул)')+(cs.length?`; C ${fmt(Cw)} × ${fmt(Ch)} на ${cs.map(z=>fmt(Math.round(top-z))).join(', ')} мм от горния ръб (до средата)`:'')+`. Профил`+(golaL(k)?` L ${fmt(W)} мм`:'')+(cs.length?`, C ${cs.length} × ${fmt(W)} мм`:'')+'.')}
   if(half){add('Гръб',H-c-2*T,iR-iL,k.mc,[1,0,0,0],[iL,iR,0,T,c+T,H-T],'back')}
   else if(opn){add('Гръб',H-c-2*T,iR-iL,k.mc,[0,0,0,0],[iL,iR,0,T,c+T,H-T],'back')} // етажерка: гръб ПДЧ от корпуса, между страниците, дъното и тавана // твърд гръб от корпуса, между дъното и тавана
   else if(noBack){const rw=S.rail,z0=c+T,z1=H-T-rw;
@@ -1173,12 +1173,16 @@ function finishParts(k,parts){
 /* ---------- Чекмеджета ---------- */
 const slideOf=k=>P.settings.slides.find(x=>x.id===k.slide)||P.settings.slides[0];
 const isGola=k=>!!k.gola&&!k.upper&&['doors','drawers'].includes(k.type||'doors'); // без дръжки — Gola L под плота, C между челата
-function golaAuto(n){const g=Array(Math.max(0,n-1)).fill(false),sv=Array(n).fill(false);sv[0]=true; /* L обслужва първото; C е двоен — горното отдолу, долното отгоре */
-  for(let j=1;j<n;j++){if(sv[j])continue;if(j+1<n){g[j]=true;sv[j]=sv[j+1]=true}else{g[j-1]=true;sv[j]=true}}return g}
-function gcAuto(){const k=cab(sel);if(!k)return;delete k.gc;P.example=false;changed(false);renderEditor()}
-function golaGaps(k){const n=Math.max(1,k.dr|0),a=golaAuto(n),gc=k.gc||[];return a.map((v,i)=>gc[i]===true||gc[i]===false?gc[i]:v)}
+function capAbove(k){const NO=['top','plinthRun','splash','wpanel','wshelf','ubottom','acc','filler'];const onW=k.wall!==null&&k.wall!==undefined; /* има ли шкаф/модул точно отгоре (напр. фурна над чекмеджетата) */
+  return P.cabinets.some(o=>o!==k&&!NO.includes(o.type)&&Math.abs(+o.c-+k.H)<=30&&(onW?o.wall===k.wall&&+o.off<+k.off+(+k.W)-5&&+o.off+(+o.W)>+k.off+5:Math.abs(o.x-k.x)<5&&Math.abs(o.y-k.y)<5))}
+function golaL(k){return k.gL===true||k.gL===false?k.gL:!capAbove(k)} /* L горе: авто — не, ако отгоре стъпва друг модул */
+function golaTopGap(k){const S=P.settings;return golaL(k)?(+S.golaTop||35):S.fuga/2}
+function golaAuto(n,L=true){const g=Array(Math.max(0,n-1)).fill(false),sv=Array(n).fill(false);sv[0]=L; /* L обслужва първото; C е двоен — горното отдолу, долното отгоре */
+  for(let j=0;j<n;j++){if(sv[j])continue;if(j+1<n){g[j]=true;sv[j]=sv[j+1]=true}else{g[j-1]=true;sv[j]=true}}return g}
+function gcAuto(){const k=cab(sel);if(!k)return;delete k.gc;delete k.gL;P.example=false;changed(false);renderEditor()}
+function golaGaps(k){const n=Math.max(1,k.dr|0),a=golaAuto(n,golaL(k)),gc=k.gc||[];return a.map((v,i)=>gc[i]===true||gc[i]===false?gc[i]:v)}
 function golaGapH(k){const S=P.settings,g=golaGaps(k);return g.map(c=>c?(+S.golaMid||35):+S.fuga)}
-function frontAvail(k){if(isGola(k)){const S=P.settings;return k.H-k.c-(+S.golaTop||35)} /* Gola: от общата височина − 35 горе, долу наравно */return k.type==='col'?+k.lowH||760:k.H-k.c}
+function frontAvail(k){if(isGola(k)){return k.H-k.c-golaTopGap(k)} /* Gola: от общата височина − 35 горе, долу наравно */return k.type==='col'?+k.lowH||760:k.H-k.c}
 function frontHeights(k){ // въвеждат се реални размери (модул); челото = размер − фуга; празно = авто
   const S=P.settings,n=Math.max(1,k.dr|0),avail=frontAvail(k),cu=k.dh||[];
   const isSet=i=>cu[i]!==null&&cu[i]!==undefined&&cu[i]!==''&&+cu[i]>0;
@@ -1201,7 +1205,7 @@ function buildDrawers(k,{S,T,tF,W,H,c,Dk,bIn,Wi,add,warn},ov){ // ov: чекме
   const bhSet=i=>k.bh&&k.bh[i]!=null&&k.bh[i]!==''&&+k.bh[i]>0; // своя височина за чекмеджето
   const bhDef=h=>+k.bhAll>0?+k.bhAll:Math.max(50,h-sl.hOff); // обща за всички или авто
   const bt=+mat(k.mx).t,bB=+mat(k.mxb).t;
-  const gl=!ov&&isGola(k);let z1=ov?ov.z1:gl?H-(+S.golaTop||35):H-S.fuga/2;const zTop=ov?ov.zMax:H-T;
+  const gl=!ov&&isGola(k);let z1=ov?ov.z1:gl?H-golaTopGap(k):H-S.fuga/2;const zTop=ov?ov.zMax:H-T;
   hs.forEach((h,i)=>{
     const z0=z1-h;
     add('Чело',h,W-S.fuga,k.mf,[1,1,1,1],[S.fuga/2,W-S.fuga/2,Dk+S.doorGap,Dk+S.doorGap+tF,z0,z1],'door');
@@ -1438,7 +1442,7 @@ function renderEditor(){
         <button type="button" class="btn sm" data-wudel="${i}.${j}" title="Махни частта">×</button></div>`+((u.fill||'shelves')==='rod'?`<label style="margin-left:18px;font-size:12px;flex-direction:row;align-items:center;gap:6px;display:flex">Рафт над лоста — светло до тавана, мм<input type="number" data-wu="${i}.${j}" data-wk="rt" value="${+u.rt>0?u.rt:''}" placeholder="по лоста" style="width:90px"></label>`:'')).join('')}<button type="button" class="btn sm" data-wuadd="${i}" style="align-self:flex-start">+ Част</button></div>`:`<button type="button" class="btn sm" data-wusplit="${i}" style="margin-left:18px;align-self:flex-start">Раздели над чекмеджетата с делител</button>`):'')).join('')}<button type="button" class="btn sm" data-wsadd="1" style="align-self:flex-start">+ Секция</button></div>`}
     if(t==='split'){const ns=Math.max(0,k.sh|0);return `<label class="full">${l}<select id="${id}" data-f="split"><option value="0">не — една част</option>${[...Array(ns).keys()].map(i=>`<option value="${i+1}" ${+k.split===i+1?'selected':''}>рафт ${i+1} отдолу</option>`).join('')}</select></label>`}
     if(t==='divp'){const n=Math.max(0,k.div|0),R=k.divRef==='R';return `<div class="full" style="grid-column:1/-1;display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)">${l} — от ${R?'дясната':'лявата'} страница до ${n>1?'всеки делител':'делителя'}<div style="display:grid;grid-template-columns:repeat(${Math.min(4,Math.max(1,n))},1fr);gap:6px">${[...Array(n).keys()].map(i=>`<input id="f_dp${i}" data-dp="${i}" type="number" step="1" placeholder="авто ${divAuto(k,i)}" value="${k.divp&&k.divp[i]!=null&&k.divp[i]!==''?k.divp[i]:''}" aria-label="Делител ${i+1}">`).join('')}</div><span>${n>1?(R?'Първото поле е делителят най-близо до дясната страница. ':'Първото поле е делителят най-близо до лявата страница. '):''}Всяко поле е от вътрешната страна на страницата до делителя. Празно = поравно.</span></div>`}
-    if(t==='dh'){const fh=frontHeights(k);return `<div class="full" style="grid-column:1/-1;display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)">${l}<div style="display:grid;grid-template-columns:repeat(${Math.min(4,Math.max(1,k.dr|0))},1fr);gap:6px">${fh.nom.map((h,i)=>`<input id="f_dh${i}" data-dh="${i}" type="number" step="1" placeholder="авто ${fmt(h)}" value="${fh.isSet(i)?k.dh[i]:''}" aria-label="Чело ${i+1}">`).join('')}</div><span>Пишеш реалния размер, програмата вади фугата ${fmt(P.settings.fuga)} мм. Празно поле = авто. Сборът е ${fmt(frontAvail(k))} мм.</span><span id="dhReal" style="color:var(--fg)">Челата в детайлите: ${fh.hs.map(fmt).join(' · ')}</span>${isGola(k)&&(k.dr|0)>1?`<div style="margin-top:4px;color:var(--fg)">Gola C профил между челата (L горе хваща 1-во; C е двоен — хваща горното отдолу и долното отгоре):</div><div style="display:flex;flex-wrap:wrap;gap:4px 12px">${golaGaps(k).map((v,i)=>`<label style="display:flex;align-items:center;gap:4px;flex-direction:row"><input type="checkbox" data-gc="${i}" ${v?'checked':''}> ${i+1}–${i+2}${(k.gc||[])[i]===true||(k.gc||[])[i]===false?'':' <i>(авто)</i>'}</label>`).join('')}${(k.gc||[]).some(x=>x===true||x===false)?`<button type="button" onclick="gcAuto()" style="font-size:11px;padding:1px 6px">авто</button>`:''}</div><span>Без C — обикновена фуга ${fmt(P.settings.fuga)} мм (от Настройки).</span>`:''}</div>`}
+    if(t==='dh'){const fh=frontHeights(k);return `<div class="full" style="grid-column:1/-1;display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)">${l}<div style="display:grid;grid-template-columns:repeat(${Math.min(4,Math.max(1,k.dr|0))},1fr);gap:6px">${fh.nom.map((h,i)=>`<input id="f_dh${i}" data-dh="${i}" type="number" step="1" placeholder="авто ${fmt(h)}" value="${fh.isSet(i)?k.dh[i]:''}" aria-label="Чело ${i+1}">`).join('')}</div><span>Пишеш реалния размер, програмата вади фугата ${fmt(P.settings.fuga)} мм. Празно поле = авто. Сборът е ${fmt(frontAvail(k))} мм.</span><span id="dhReal" style="color:var(--fg)">Челата в детайлите: ${fh.hs.map(fmt).join(' · ')}</span>${isGola(k)?`<div style="margin-top:4px;color:var(--fg)">Gola профили (L горе хваща 1-во; C е двоен — хваща горното отдолу и долното отгоре):</div><div style="display:flex;flex-wrap:wrap;gap:4px 12px"><label style="display:flex;align-items:center;gap:4px;flex-direction:row"><input type="checkbox" data-gl="1" ${golaL(k)?'checked':''}> L горе${k.gL===true||k.gL===false?'':' <i>(авто'+(capAbove(k)?' — отгоре има модул':'')+')</i>'}</label>${golaGaps(k).map((v,i)=>`<label style="display:flex;align-items:center;gap:4px;flex-direction:row"><input type="checkbox" data-gc="${i}" ${v?'checked':''}> ${i+1}–${i+2}${(k.gc||[])[i]===true||(k.gc||[])[i]===false?'':' <i>(авто)</i>'}</label>`).join('')}${(k.gc||[]).some(x=>x===true||x===false)||k.gL===true||k.gL===false?`<button type="button" onclick="gcAuto()" style="font-size:11px;padding:1px 6px">авто</button>`:''}</div><span>Без C — обикновена фуга ${fmt(P.settings.fuga)} мм (от Настройки).</span>`:''}</div>`}
     if(t==='sub') return `<div class="sub">${l}</div>`;
     if(t==='chk') return `<label class="chk full"><input type="checkbox" id="${id}" data-f="${f}" ${k[f]?'checked':''}> ${l}</label>`;
     if(f==='backPos'&&k.mb==='none')return '';
@@ -1475,8 +1479,9 @@ $('#ed').addEventListener('input',e=>{
   if(e.target.dataset.ws!==undefined){const k=cab(sel);if(!k)return;const WK=e.target.closest('[data-wsk]')?.dataset.wsk||'secs';k[WK]=wSecs(k,WK).map(q=>({...q}));const q=k[WK][+e.target.dataset.ws],key=e.target.dataset.wk,v=e.target.value;if(key==='vit'){q.vit=e.target.checked||undefined;P.example=false;changed(true);return}if(key==='glSh'){q.glSh=v;P.example=false;changed(true);return}if(key==='ex'){q.ex=e.target.checked||undefined;P.example=false;changed(true);return}if(key==='exH'||key==='exBH'){q[key]=v.trim()||undefined;P.example=false;changed(false);return}if(key==='fill'){q.fill=v;if(/^drw/.test(v)&&!(q.dr>0))q.dr=2;if(/rodonly$/.test(v)||v==='rod2')q.sh=0;P.example=false;changed(true);return}q[key]=v===''?null:+v;P.example=false;changed(false);return}
   if(e.target.dataset.dp!==undefined){const k=cab(sel),i=+e.target.dataset.dp;k.divp=k.divp||[];const v=e.target.value;if(v!==''&&!isFinite(+v))return;k.divp[i]=v===''?null:+v;
     for(let j=0;j<(k.div|0);j++){const inp=$('#f_dp'+j);if(inp)inp.placeholder='авто '+divAuto(k,j)}P.example=false;changed(false);return}
+  if(e.target.dataset.gl!==undefined){const k=cab(sel);if(!k)return;k.gL=e.target.checked;P.example=false;changed(false);renderEditor();return}
   if(e.target.dataset.gc!==undefined){const k=cab(sel);if(!k)return;const n=Math.max(1,k.dr|0);k.gc=golaGaps(k);k.gc[+e.target.dataset.gc]=e.target.checked;
-    const sv=Array(n).fill(false);sv[0]=true;k.gc.forEach((c,i)=>{if(c){sv[i]=sv[i+1]=true}});const bad=sv.map((v,i)=>v?0:i+1).filter(x=>x);if(bad.length)toast&&toast('Чекмедже '+bad.join(', ')+' остава без хват (Gola)');
+    const sv=Array(n).fill(false);sv[0]=golaL(k);k.gc.forEach((c,i)=>{if(c){sv[i]=sv[i+1]=true}});const bad=sv.map((v,i)=>v?0:i+1).filter(x=>x);if(bad.length)toast&&toast('Чекмедже '+bad.join(', ')+' остава без хват (Gola)');
     P.example=false;changed(false);renderEditor();return}
   if(e.target.dataset.dh!==undefined){const k=cab(sel),i=+e.target.dataset.dh;k.dh=k.dh||[];const v=e.target.value;k.dh[i]=v===''?null:+v;
     const fh=frontHeights(k),sl=slideOf(k);const r=$('#dhReal');if(r)r.textContent='Челата в детайлите: '+fh.hs.map(fmt).join(' · ');fh.hs.forEach((h,j)=>{const inp=$('#f_dh'+j);if(inp)inp.placeholder='авто '+fmt(fh.nom[j]);const b=$('#f_bh'+j);if(b)b.placeholder=fmt(+k.bhAll>0?+k.bhAll:Math.max(50,h-sl.hOff))});P.example=false;changed(false);return}
