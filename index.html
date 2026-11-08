@@ -149,7 +149,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 12:15 · Gola ъгъл: рафтовете по-плитки до планката</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 12:20 · „Бленда панти“, рафтът с луфт 10 мм до нея</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -370,7 +370,7 @@ const SLIDES=[
   {id:'s1',name:'Телескопични',kind:'side',clear:26,lens:'250,300,350,400,450,500,550,600',lenDed:0,hOff:40,bottom:'under',bottomDed:5,groove:6},
   {id:'s2',name:'Скрити (Tandem/Movento)',kind:'under',clear:10,lens:'270,300,350,400,450,500,550,600',lenDed:10,hOff:50,bottom:'groove',botWAdd:20,botLenDed:5,fbRaise:10},
   {id:'s3',name:'Метални кутии (Tandembox)',kind:'metal',lens:'270,300,350,400,450,500,550,600',bW:75,bD:24,bkW:87,bkH:68,sideH:83}];
-const SETTINGS={slides:SLIDES,golaTop:35,golaMid:35,golaLw:26,golaLh:56,golaCw:26,golaCh:73,golaOvB:20,golaDeadB:60,fuga:3,drFuga:5,wDrSd:2,wDrIns:32,wDrFw:7,wDrGrip:35,wSlOv:30,wSlHd:40,wSlTrack:100,cdFuga:5,doorGap:2,rail:100,backIn:5,backTot:5,shelfFront:20,shelfGap:2,shelfClear:1,plinthBack:50,edgeOn:'1',edgeOff:'',cabInType:true,fillAllow:50,hfSet:40,boardDens:680,handleKg:0.3,alFuga:3,alW:42,alT:25,glassDed:7};
+const SETTINGS={slides:SLIDES,golaTop:35,golaMid:35,golaLw:26,golaLh:56,golaCw:26,golaCh:73,golaOvB:20,golaDeadB:60,golaDeadSh:10,fuga:3,drFuga:5,wDrSd:2,wDrIns:32,wDrFw:7,wDrGrip:35,wSlOv:30,wSlHd:40,wSlTrack:100,cdFuga:5,doorGap:2,rail:100,backIn:5,backTot:5,shelfFront:20,shelfGap:2,shelfClear:1,plinthBack:50,edgeOn:'1',edgeOff:'',cabInType:true,fillAllow:50,hfSet:40,boardDens:680,handleKg:0.3,alFuga:3,alW:42,alT:25,glassDed:7};
 const ITEM={
   window:{name:'Прозорец',color:'#5aa9d6',w:1200,h:1300,z:950},
   door:{name:'Врата',color:'#9b7b5a',w:900,h:2050,z:0,hinge:'L'},
@@ -1108,11 +1108,11 @@ function buildRaw(k){
     const Lh=+S.golaLh||56,ph=Math.round(H-Lh-(c+T)),pw=dW-T,pb=+(S.golaDeadB??60)||60,L=dS==='L';
     const xa=L?T:W-dW,xb=L?dW-T:W-dW;
     add('Мъртво (Gola)',ph,pw,k.mc,[1,0,0,0],[xa,xa+pw,Dk-T,Dk,c+T,c+T+ph]);
-    add('Планка панти (Gola ъгъл)',ph,pb,k.mc,[1,0,0,0],[xb,xb+T,Dk-T-pb,Dk-T,c+T,c+T+ph]);
-    {const nx0=xb,nx1=xb+T,fy=Dk-T-pb;let nn=0,d0=0; /* рафтовете — по-плитки, до планката за пантите */
+    add('Бленда панти (Gola ъгъл)',ph,pb,k.mc,[1,0,0,0],[xb,xb+T,Dk-T-pb,Dk-T,c+T,c+T+ph]);
+    {const nx0=xb,nx1=xb+T,fy=Dk-T-pb-(+(S.golaDeadSh??10)||0);let nn=0,d0=0; /* рафтовете — по-плитки, до блендата за пантите */
      for(const q of parts){if(q.name!=='Рафт'||!q.box)continue;const[sx0,sx1,sy0,sy1]=q.box;if(sx1<=nx0||sx0>=nx1||sy1<=fy)continue;d0=sy1-fy;q.box[3]=fy;q.Wd=Math.round(fy-sy0);nn++}
-     if(nn)warn.push(`Gola ъгъл: рафтовете (${nn} бр.) са по-плитки с ${fmt(Math.round(d0))} мм — до планката за пантите.`)}
-    warn.push(`Gola ъгъл: мъртвото е вътрешно парче ${fmt(pw)} × ${fmt(ph)} (мъртво − ${fmt(T)}, стъпва на дъното, горе − профила ${fmt(Lh)}) + планка ${fmt(pb)} мм на Г за пантите; L профилът се събира под 45° в ъгъла.`)}
+     if(nn)warn.push(`Gola ъгъл: рафтовете (${nn} бр.) са по-плитки с ${fmt(Math.round(d0))} мм — до блендата за пантите.`)}
+    warn.push(`Gola ъгъл: мъртвото е вътрешно парче ${fmt(pw)} × ${fmt(ph)} (мъртво − ${fmt(T)}, стъпва на дъното, горе − профила ${fmt(Lh)}) + бленда ${fmt(pb)} мм на Г за пантите; L профилът се събира под 45° в ъгъла.`)}
   else if(dW&&!k.deadOpen){const gL=isGola(k),dh=gL?H-c-golaTopGap(k):H-c-S.fuga,dz=gL?c:c+S.fuga/2,x=dS==='L'?0:W-dW; // мъртвото — без фуга в широчина (само във височина); Gola — колкото вратите
     add('Мъртво лице',dh,dW,k.mf,[1,0,1,1],[x,x+dW,Dk+S.doorGap,Dk+S.doorGap+tF,dz,dz+dh],'door')}
   if(nd&&+k.lift>0&&!dW){const nl=Math.max(1,k.lift|0),lh=(H-c-nl*S.fuga)/nl; // повдигащи се врати — една над друга, на цялата ширина
@@ -3323,7 +3323,7 @@ const SETF=[['settings.fuga','Фуга между врати, мм'],['settings.
   ['settings.hfSet','Blum HF: рафтове и делители по-плитки с, мм'],['settings.boardDens','Плътност на плочата (за теглото на вратите), кг/м³'],['settings.handleKg','Тегло на дръжка, кг'],
   ['settings.wDrIns','Гардероб, шкаф с чекмеджета: страниците навътре от тавана, мм'],['settings.wDrSd','Гардероб, шкаф с чекмеджета: страниците по-къси от тавана с (освен блендата), мм'],['settings.wDrFw','Гардероб, чело вътрешно: по-тясно от светлия отвор с, мм'],['settings.wDrGrip','Гардероб, чело вътрешно: фуга над него за пръстите (без дръжка), мм'],['settings.wSlOv','Гардероб, плъзгащи врати: застъпване, мм'],['settings.wSlHd','Гардероб, плъзгащи врати: по-ниски от отвора с, мм'],['settings.wSlTrack','Гардероб, плъзгащи врати: зона за релсите отпред, мм'],
   ['settings.cdFuga','Обща врата (2 шкафа един върху друг): по-къса с, мм'],['settings.drFuga','Чела и врати в секция (Детайли): фуга, мм'],
-  ['settings.golaDeadB','Gola ъгъл с мъртво: планка за пантите (на Г с вътрешното парче), мм'],['settings.golaOvB','Gola: шкаф за фурна — дъното по-плитко отпред (хват отдолу), мм'],['settings.golaTop','Gola: вратата/челото горе — под горния ръб на шкафа, мм'],['settings.golaMid','Gola: между челата (C-профил), мм'],['settings.golaLw','Gola L (горе): изрез в страницата — дълбочина, мм'],['settings.golaLh','Gola L (горе): изрез — височина, мм'],['settings.golaCw','Gola C (средата): изрез — дълбочина, мм'],['settings.golaCh','Gola C (средата): изрез — височина, мм'],
+  ['settings.golaDeadB','Gola ъгъл с мъртво: бленда за пантите (на Г с вътрешното парче), мм'],['settings.golaDeadSh','Gola ъгъл с мъртво: луфт между рафта и блендата за пантите, мм'],['settings.golaOvB','Gola: шкаф за фурна — дъното по-плитко отпред (хват отдолу), мм'],['settings.golaTop','Gola: вратата/челото горе — под горния ръб на шкафа, мм'],['settings.golaMid','Gola: между челата (C-профил), мм'],['settings.golaLw','Gola L (горе): изрез в страницата — дълбочина, мм'],['settings.golaLh','Gola L (горе): изрез — височина, мм'],['settings.golaCw','Gola C (средата): изрез — дълбочина, мм'],['settings.golaCh','Gola C (средата): изрез — височина, мм'],
   ['settings.alFuga','Витрина: фуга на ал. вратите, мм'],['settings.alW','Витрина: ширина на ал. профил, мм'],['settings.alT','Витрина: корпусът е по-плитък с, мм'],['settings.glassDed','Витрина: стъклото = размерът на ал. вратата минус, мм'],
   ['settings.edgeOn','Означение „има кант“','t'],['settings.edgeOff','Означение „няма кант“ (празно = нищо)','t']];
 const getP=p=>p.split('.').reduce((o,k)=>o[k],P);
