@@ -90,7 +90,10 @@ input:disabled{opacity:.6}
   input,select,textarea{font-size:16px!important;min-height:38px}input[type=checkbox],input[type=radio]{width:22px;height:22px;min-height:0}
   .ddm .item,.ddm .cat,#ctxMenu button,#ctxMenu .it{min-height:44px;padding-top:9px;padding-bottom:9px}
   .li{padding-top:10px;padding-bottom:10px}
-  body{-webkit-tap-highlight-color:transparent}}
+  body{-webkit-tap-highlight-color:transparent}
+  #ped{left:0!important;top:0!important;width:100vw!important;height:100vh!important;border-radius:0!important;resize:none!important}
+  #pedList{max-height:none!important}#pedList>div{padding-top:11px!important;padding-bottom:11px!important}}
+#ped svg[data-view]{touch-action:none}
 .hint{position:absolute;left:10px;right:10px;bottom:8px;font-size:12px;color:var(--muted);pointer-events:none}
 .tablewrap{overflow-x:auto}
 table{border-collapse:collapse;width:100%;font-size:13px}
@@ -155,7 +158,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.09 · 23:50 · таблет: дълго натискане = десен бутон, два пръста = мащаб в плана, по-големи бутони</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.09 · 23:59 · таблет: Детайли на цял екран, списъкът се скролва, два пръста = мащаб</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -3346,6 +3349,13 @@ $('#ped').addEventListener('change',e=>{const k=cab(pedK),t=e.target;if(t.id==='
   el.addEventListener('wheel',e=>{const sv=e.target.closest('svg[data-view]');if(!sv)return;e.preventDefault();const v=sv.dataset.view,z=pedZ[v]||(pedZ[v]={k:1,dx:0,dy:0}),b=base(sv),P0=pt(sv,e),vb=sv.viewBox.baseVal,f=e.deltaY<0?1.25:0.8,k2=clamp(z.k*f,1,40);
     const w2=b[2]/k2,h2=b[3]/k2,x2=P0.x-(P0.x-vb.x)*(w2/vb.width),y2=P0.y-(P0.y-vb.y)*(h2/vb.height);z.k=k2;z.dx=x2+w2/2-(b[0]+b[2]/2);z.dy=y2+h2/2-(b[1]+b[3]/2);if(k2===1){z.dx=0;z.dy=0}
     cancelAnimationFrame(raf);raf=requestAnimationFrame(renderPed)},{passive:false});
+  {const TT=new Map();let pz=null; /* таблет: два пръста = мащаб в Детайли */
+   el.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch')return;const sv=e.target.closest('svg[data-view]');if(!sv)return;TT.set(e.pointerId,[e.clientX,e.clientY]);
+     if(TT.size===2){const[a,b]=[...TT.values()],v=sv.dataset.view,z=pedZ[v]||(pedZ[v]={k:1,dx:0,dy:0});pn=null;pz={sv,v,d0:Math.hypot(a[0]-b[0],a[1]-b[1])||1,k0:z.k,P0:pt(sv,{clientX:(a[0]+b[0])/2,clientY:(a[1]+b[1])/2})};e.stopImmediatePropagation()}},true);
+   el.addEventListener('pointermove',e=>{if(!TT.has(e.pointerId))return;TT.set(e.pointerId,[e.clientX,e.clientY]);if(!pz||TT.size<2)return;e.stopImmediatePropagation();
+     const[a,b]=[...TT.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1])||1,z=pedZ[pz.v],bb=base(pz.sv),vb=pz.sv.viewBox.baseVal,k2=clamp(pz.k0*d/pz.d0,1,40),w2=bb[2]/k2,h2=bb[3]/k2,x2=pz.P0.x-(pz.P0.x-vb.x)*(w2/vb.width),y2=pz.P0.y-(pz.P0.y-vb.y)*(h2/vb.height);
+     z.k=k2;z.dx=x2+w2/2-(bb[0]+bb[2]/2);z.dy=y2+h2/2-(bb[1]+bb[3]/2);if(k2===1){z.dx=0;z.dy=0}vb.x=x2;vb.y=y2;vb.width=w2;vb.height=h2},true);
+   for(const n of['pointerup','pointercancel'])el.addEventListener(n,e=>{if(!TT.has(e.pointerId))return;TT.delete(e.pointerId);if(pz&&TT.size<2){pz=null;pedPanned=true;cancelAnimationFrame(raf);raf=requestAnimationFrame(renderPed)}},true)}
   el.addEventListener('pointerdown',e=>{const sv=e.target.closest('svg[data-view]');if(!sv)return;pn={sv,v:sv.dataset.view,x:e.clientX,y:e.clientY,moved:false,btn:e.button};if(e.button!==0)e.preventDefault()});
   el.addEventListener('pointermove',e=>{if(!pn)return;const dxp=e.clientX-pn.x,dyp=e.clientY-pn.y;if(!pn.moved&&Math.hypot(dxp,dyp)<5)return;
     if(!pn.moved){pn.moved=true;try{pn.sv.setPointerCapture(e.pointerId)}catch(_){}}
