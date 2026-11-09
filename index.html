@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 00:05 · таблет: менютата се скролват с пръст, без маркиране на текст</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 00:40 · „☑ Няколко“ — избор на няколко шкафа с докосване</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -196,7 +196,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 
     <div class="col" id="paneCab">
       <section class="card">
-        <h2><span id="listTitle">Шкафове</span> <span id="exTag"></span><span class="sp"><button class="btn sm" id="bMy" title="Запази избрания шкаф с всичките му настройки в „Кухни → Мои шкафове“">★ Мой</button> <button class="btn sm" id="bDup" title="Копие (Ctrl+D)">Копие</button></span></h2>
+        <h2><span id="listTitle">Шкафове</span> <span id="exTag"></span><span class="sp"><button class="btn sm" id="bMulti" title="Избор на няколко шкафа с докосване (вместо Ctrl + клик) — напр. за общ плот, цокъл, цяло дъно" aria-pressed="false">☑ Няколко</button><button class="btn sm" id="bMy" title="Запази избрания шкаф с всичките му настройки в „Кухни → Мои шкафове“">★ Мой</button> <button class="btn sm" id="bDup" title="Копие (Ctrl+D)">Копие</button></span></h2>
         <div class="lsBar" id="lsBar"><input type="search" id="lsQ" placeholder="Търси шкаф…" aria-label="Търси шкаф"></div>
         <div id="accAdd" class="accAdd" hidden></div>
         <div class="list" id="list"></div>
@@ -1658,7 +1658,8 @@ $('#ed').addEventListener('click',e=>{
   if(e.target.classList.contains('sure')){P.cabinets=P.cabinets.filter(c=>c.id!==sel);sel=P.cabinets[0]?.id||null;changed(true)}
   else{e.target.classList.add('sure');e.target.textContent='Натисни пак за изтриване'}
 });
-$('#list').addEventListener('click',e=>{const li=e.target.closest('.li[data-id]');if(!li)return;if(e.ctrlKey||e.metaKey)toggleMulti(li.dataset.id);else select(li.dataset.id)});
+let multiMode=false;const mk=e=>e.ctrlKey||e.metaKey||multiMode; // „☑ Няколко“ — избор на няколко с докосване (таблет)
+$('#list').addEventListener('click',e=>{const li=e.target.closest('.li[data-id]');if(!li)return;if(mk(e))toggleMulti(li.dataset.id);else select(li.dataset.id)});
 function frontOf(k){ // докъде стига шкафът отпред — по детайлите (и след „Детайли“: скъсена страница, преместен детайл…)
   if(k.type==='cornerL'||k.wCorner||k.corner2||k.half)return +k.D; // ъглов: рамо Б отива назад по другата стена — лицето е по рамо А
   const ps=build(k).parts.filter(p=>p.box&&!p.hidden&&!['hw','vis','virt','appl'].includes(p.kind));return ps.length?Math.max(...ps.map(p=>p.box[3])):+k.D}
@@ -2134,9 +2135,9 @@ canvas.addEventListener('pointerup',e=>{if(lpJust())return;
   const r=canvas.getBoundingClientRect(),ray=new THREE.Raycaster();
   ray.setFromCamera({x:(e.clientX-r.left)/r.width*2-1,y:-(e.clientY-r.top)/r.height*2+1},camera);
   const hit=ray.intersectObjects(world.children,true).find(h=>h.object.userData.cab&&h.object.visible);
-  if(hit&&(e.ctrlKey||e.metaKey)){toggleMulti(hit.object.userData.cab);return}
+  if(hit&&mk(e)){toggleMulti(hit.object.userData.cab);return}
   if(hit&&(hit.object.userData.cab!==sel||multiSel.size>1))select(hit.object.userData.cab);
-  else if(!hit&&!(e.ctrlKey||e.metaKey)&&(sel||multiSel.size))select(null);
+  else if(!hit&&!mk(e)&&(sel||multiSel.size))select(null);
 });
 
 /* ---------- Меню с десния бутон ---------- */
@@ -2903,7 +2904,7 @@ function svgPt(e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;retur
 let drag=null;
 svg.addEventListener('pointerdown',e=>{
   if(e.button===1||e.button===2){e.preventDefault();startPan(e);pan.btn=e.button;pan.id=e.target.closest('g[data-id]')?.dataset.id;pan.moved=0;return}
-  if(view==='wall'){const g=e.target.closest('g[data-id]');if(g){if(e.ctrlKey||e.metaKey)toggleMulti(g.dataset.id);else if(g.dataset.id!==sel||multiSel.size>1)select(g.dataset.id)}else startPan(e);return}
+  if(view==='wall'){const g=e.target.closest('g[data-id]');if(g){if(mk(e))toggleMulti(g.dataset.id);else if(g.dataset.id!==sel||multiSel.size>1)select(g.dataset.id)}else startPan(e);return}
   if(drawRoom&&view==='plan'){drawAdd(drawSnap(svgPt(e),e.shiftKey));return}
   const p=svgPt(e),v=e.target.closest('[data-v]');
   if(v&&tab==='room'){drag={v:+v.dataset.v,before:roomSnap()};svg.setPointerCapture(e.pointerId);return}
@@ -2912,7 +2913,7 @@ svg.addEventListener('pointerdown',e=>{
   const bg=e.target.closest('g[data-blk]');if(bg){const o=(P.room.blocks||[]).find(q=>q.id===bg.dataset.blk);if(o){const p=svgPt(e);selBlk=o.id;
     drag={blk:o,dx:p.x-o.cx,dy:p.y-o.cy,before:roomSnap()};svg.setPointerCapture(e.pointerId);if(tab==='room')renderItems();renderPlan();return}}
   const g=e.target.closest('g[data-id]');if(!g||tab==='room'){startPan(e);return}
-  if(e.ctrlKey||e.metaKey){toggleMulti(g.dataset.id);return}
+  if(mk(e)){toggleMulti(g.dataset.id);return}
   const k=cab(g.dataset.id);if(!multiSel.has(k.id)||multiSel.size<2){if(k.id!==sel||multiSel.size>1){multiSel=new Set([k.id]);sel=k.id;renderList();renderEditor();renderTable()}}
   drag={k,dx:p.x-k.x,dy:p.y-k.y};
   if(k.wall!==null){const w=wallInfo(k.wall);drag.g=(p.x-w.A[0])*w.u[0]+(p.y-w.A[1])*w.u[1]-k.off;drag.gn=(p.x-w.A[0])*w.n[0]+(p.y-w.A[1])*w.n[1]-(+k.gap||0)}
@@ -3568,6 +3569,7 @@ document.addEventListener('keydown',e=>{
 const MYKEY='mebel-konstruktor.my';
 let MY=(()=>{try{const a=JSON.parse(localStorage.getItem(MYKEY)||'[]');return Array.isArray(a)?a:[]}catch(e){return []}})();
 function saveMy(){try{localStorage.setItem(MYKEY,JSON.stringify(MY))}catch(e){toast('Не можа да се запази в браузъра')}}
+$('#bMulti').onclick=()=>{multiMode=!multiMode;const b=$('#bMulti');b.setAttribute('aria-pressed',String(multiMode));b.classList.toggle('primary',multiMode);toast(multiMode?'Избор на няколко: докосвай шкафовете един по един, после задръж пръст върху някой от тях за менюто (плот, цокъл…)':'Избор на един шкаф')};
 $('#bMy').onclick=()=>{const k=cab(sel);if(!k||isAcc(k)){toast('Избери шкаф');return}
   const p=JSON.parse(JSON.stringify(k));for(const f of ['id','x','y','wall','off','gap','rot','name'])delete p[f];
   const label=`${k.name} · ${k.W}×${r1(k.H-k.c)}×${k.D}`;MY.push({id:uid(),name:label,type:TYPE_BG[k.type]||'',p});saveMy();toast(`Запазен в „Кухни → Мои шкафове“`)};
@@ -3588,7 +3590,7 @@ svg.addEventListener('pointermove',e=>{if(!TP.has(e.pointerId))return;TP.set(e.p
   svg.setAttribute('viewBox',`${camV.x} ${camV.y} ${camV.w} ${camV.h}`);const pt=svg.createSVGPoint();pt.x=c[0];pt.y=c[1];const q=pt.matrixTransform(svg.getScreenCTM().inverse());
   camV.x+=pinch.p0.x-q.x;camV.y+=pinch.p0.y-q.y;svg.setAttribute('viewBox',`${camV.x} ${camV.y} ${camV.w} ${camV.h}`)},true);
 for(const n of['pointerup','pointercancel'])svg.addEventListener(n,e=>{if(!TP.has(e.pointerId))return;TP.delete(e.pointerId);if(pinch){if(TP.size<2){pinch=null;lpT=Date.now()-400}e.stopImmediatePropagation()}},true);
-longPress(svg,ev=>{const g=ev.target.closest&&ev.target.closest('g[data-id]');drag=null;pan=null;svg.style.cursor='';if(g&&tab!=='room')openCtx(g.dataset.id,ev.clientX,ev.clientY)}); // дълго натискане = десен бутон
+longPress(svg,ev=>{const g=ev.target.closest&&ev.target.closest('g[data-id]');drag=null;pan=null;svg.style.cursor='';if(g&&tab!=='room'){if(multiMode&&!multiSel.has(g.dataset.id)){multiSel.add(g.dataset.id);renderPlan();renderList()}openCtx(g.dataset.id,ev.clientX,ev.clientY)}}); // дълго натискане = десен бутон
 longPress(canvas,ev=>{const r=canvas.getBoundingClientRect(),ray=new THREE.Raycaster();ray.setFromCamera({x:(ev.clientX-r.left)/r.width*2-1,y:-(ev.clientY-r.top)/r.height*2+1},camera);
   const hit=ray.intersectObjects(world.children,true).find(h=>(h.object.userData.cab||h.object.userData.rdoor)&&h.object.visible);if(hit){if(hit.object.userData.rdoor)openDoorCtx(hit.object.userData.rdoor,ev.clientX,ev.clientY);else openCtx(hit.object.userData.cab,ev.clientX,ev.clientY)}});
 /* ---------- Старт ---------- */
