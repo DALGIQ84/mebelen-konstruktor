@@ -85,6 +85,12 @@ input:disabled{opacity:.6}
 .stage{position:relative;height:min(64vh,600px);min-height:340px;background:var(--stage);border-radius:0 0 8px 8px;overflow:hidden}
 #c3{width:100%;height:100%;display:block;touch-action:none}
 #plan{width:100%;height:100%;display:block;touch-action:none;user-select:none;cursor:grab}
+@media (pointer:coarse){ /* таблет: по-големи бутони и полета за пръст */
+  .btn{min-height:40px;padding-left:12px;padding-right:12px}.btn.sm{min-height:34px}
+  input,select,textarea{font-size:16px!important;min-height:38px}input[type=checkbox],input[type=radio]{width:22px;height:22px;min-height:0}
+  .ddm .item,.ddm .cat,#ctxMenu button,#ctxMenu .it{min-height:44px;padding-top:9px;padding-bottom:9px}
+  .li{padding-top:10px;padding-bottom:10px}
+  body{-webkit-tap-highlight-color:transparent}}
 .hint{position:absolute;left:10px;right:10px;bottom:8px;font-size:12px;color:var(--muted);pointer-events:none}
 .tablewrap{overflow-x:auto}
 table{border-collapse:collapse;width:100%;font-size:13px}
@@ -149,7 +155,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.08 · 18:45 · аспиратор: височина вместо „горе до“</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.09 · 23:50 · таблет: дълго натискане = десен бутон, два пръста = мащаб в плана, по-големи бутони</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2112,7 +2118,7 @@ $('#phSave').onclick=async()=>{const c=$('#phC');const blob=await new Promise(r=
   if(await saveFile(name,blob))return;$('#imgName').textContent=name;$('#imgPrev').src=c.toDataURL('image/jpeg',0.93);$('#imgPrev').hidden=false;$('#imgList').innerHTML='';open('#ovImg')};
 let down=null;
 canvas.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY]});
-canvas.addEventListener('pointerup',e=>{
+canvas.addEventListener('pointerup',e=>{if(lpJust())return;
   if(measOn&&e.button===0)return; // рулетката мери — без избор на шкаф
   if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>4)return;
   if(pedK&&e.button===0){const r=canvas.getBoundingClientRect(),ray=new THREE.Raycaster();ray.setFromCamera({x:(e.clientX-r.left)/r.width*2-1,y:-(e.clientY-r.top)/r.height*2+1},camera);
@@ -2936,7 +2942,7 @@ svg.addEventListener('pointermove',e=>{
   }
   renderPlan();
 });
-svg.addEventListener('pointerup',e=>{if(pan){const p0=pan;pan=null;svg.style.cursor='';if(p0.btn===2&&(p0.moved||0)<5&&p0.id)openCtx(p0.id,e.clientX,e.clientY);
+svg.addEventListener('pointerup',e=>{if(lpJust()){pan=null;drag=null;svg.style.cursor='';return}if(pan){const p0=pan;pan=null;svg.style.cursor='';if(p0.btn===2&&(p0.moved||0)<5&&p0.id)openCtx(p0.id,e.clientX,e.clientY);
     else if(!p0.btn&&(p0.moved||0)<5&&tab!=='room'&&(sel||multiSel.size)){select(null);selBlk=null} // клик в празното — нищо не е избрано
     return}if(!drag)return;
   if(drag.blk){pushUndo(drag.before);drag=null;P.example=false;save();rebuild3D();if(tab==='room')renderItems();return}const wasV=drag.v!==undefined,before=drag.before;drag=null;P.example=false;
@@ -2953,6 +2959,8 @@ const HINTS={'3d':'Ляв бутон = въртене · натиснато ко
   wall:'Колелце = мащаб · влачи празното място = местене · „Центрирай“ връща целия изглед · пунктир = шкаф от съседна стена · клик върху шкаф го избира',
   plan:'Колелце = мащаб · влачи празното = местене · двоен клик върху стена отваря изгледа ѝ · влачи шкафовете · близо до стена се залепват и се плъзгат по нея · цветната линия е лицето',
   room:'Влачи кръгчетата, за да местиш ъглите · клик върху стена я избира (новите елементи отиват на нея)'};
+if(matchMedia('(pointer:coarse)').matches)Object.assign(HINTS,{'3d':'Един пръст = въртене · два пръста = мащаб и местене · докосни шкаф = избор · задръж пръста върху шкаф = меню',wall:'Два пръста = мащаб · плъзни празното = местене · докосни шкаф = избор · задръж пръста = меню',plan:'Два пръста = мащаб · плъзни празното = местене · влачи шкафовете с пръст · задръж пръста върху шкаф = меню · двойно докосване на стена отваря изгледа ѝ'}); // таблет
+
 function setView(v){
   if(drawRoom&&v!=='plan'){if(drawRoom.pts.length>=2)drawFinish(true);if(drawRoom)drawCancel()} // смяна на изгледа завършва чертането
   view=v;$('#v3').classList.toggle('on',v==='3d');$('#vp').classList.toggle('on',v==='plan');$('#vw').classList.toggle('on',v==='wall');
@@ -3552,6 +3560,25 @@ $('#bMy').onclick=()=>{const k=cab(sel);if(!k||isAcc(k)){toast('Избери ш�
   const p=JSON.parse(JSON.stringify(k));for(const f of ['id','x','y','wall','off','gap','rot','name'])delete p[f];
   const label=`${k.name} · ${k.W}×${r1(k.H-k.c)}×${k.D}`;MY.push({id:uid(),name:label,type:TYPE_BG[k.type]||'',p});saveMy();toast(`Запазен в „Кухни → Мои шкафове“`)};
 
+/* ---------- Таблет / пръст ---------- */
+let lpT=0;const lpJust=()=>Date.now()-lpT<700; // току-що е имало дълго натискане — да не избира/влачи
+function longPress(el,fire){let t=null,x0=0,y0=0;const clr=()=>{if(t){clearTimeout(t);t=null}};
+  el.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch')return;clr();x0=e.clientX;y0=e.clientY;const ev={clientX:e.clientX,clientY:e.clientY,target:e.target};
+    t=setTimeout(()=>{t=null;if(TP.size>1)return;lpT=Date.now();try{navigator.vibrate&&navigator.vibrate(25)}catch(_){}fire(ev)},550)},true);
+  el.addEventListener('pointermove',e=>{if(t&&Math.hypot(e.clientX-x0,e.clientY-y0)>10)clr()},true);
+  for(const n of['pointerup','pointercancel'])el.addEventListener(n,clr,true)}
+const TP=new Map();let pinch=null; // пръстите върху плана/стените
+svg.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch')return;TP.set(e.pointerId,[e.clientX,e.clientY]);
+  if(TP.size===2&&camV){const[a,b]=[...TP.values()];drag=null;pan=null;const c=[(a[0]+b[0])/2,(a[1]+b[1])/2],pt=svg.createSVGPoint();pt.x=c[0];pt.y=c[1];const p0=pt.matrixTransform(svg.getScreenCTM().inverse());
+    pinch={d0:Math.hypot(a[0]-b[0],a[1]-b[1])||1,w0:camV.w,h0:camV.h,p0};e.stopImmediatePropagation();e.preventDefault()}},true);
+svg.addEventListener('pointermove',e=>{if(!TP.has(e.pointerId))return;TP.set(e.pointerId,[e.clientX,e.clientY]);if(!pinch||TP.size<2)return;e.stopImmediatePropagation();
+  const[a,b]=[...TP.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1])||1,c=[(a[0]+b[0])/2,(a[1]+b[1])/2],k=pinch.d0/d;camV.w=clamp(pinch.w0*k,200,200000);camV.h=camV.w*pinch.h0/pinch.w0;
+  svg.setAttribute('viewBox',`${camV.x} ${camV.y} ${camV.w} ${camV.h}`);const pt=svg.createSVGPoint();pt.x=c[0];pt.y=c[1];const q=pt.matrixTransform(svg.getScreenCTM().inverse());
+  camV.x+=pinch.p0.x-q.x;camV.y+=pinch.p0.y-q.y;svg.setAttribute('viewBox',`${camV.x} ${camV.y} ${camV.w} ${camV.h}`)},true);
+for(const n of['pointerup','pointercancel'])svg.addEventListener(n,e=>{if(!TP.has(e.pointerId))return;TP.delete(e.pointerId);if(pinch){if(TP.size<2){pinch=null;lpT=Date.now()-400}e.stopImmediatePropagation()}},true);
+longPress(svg,ev=>{const g=ev.target.closest&&ev.target.closest('g[data-id]');drag=null;pan=null;svg.style.cursor='';if(g&&tab!=='room')openCtx(g.dataset.id,ev.clientX,ev.clientY)}); // дълго натискане = десен бутон
+longPress(canvas,ev=>{const r=canvas.getBoundingClientRect(),ray=new THREE.Raycaster();ray.setFromCamera({x:(ev.clientX-r.left)/r.width*2-1,y:-(ev.clientY-r.top)/r.height*2+1},camera);
+  const hit=ray.intersectObjects(world.children,true).find(h=>(h.object.userData.cab||h.object.userData.rdoor)&&h.object.visible);if(hit){if(hit.object.userData.rdoor)openDoorCtx(hit.object.userData.rdoor,ev.clientX,ev.clientY);else openCtx(hit.object.userData.cab,ev.clientX,ev.clientY)}});
 /* ---------- Старт ---------- */
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',themeScene);
 new MutationObserver(themeScene).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
