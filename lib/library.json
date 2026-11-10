@@ -40,6 +40,18 @@
    "ar": 1.5,
    "rot": 0,
    "img": "lib/img/xangank.jpg"
+  },
+  {
+   "id": "k8sxtyy",
+   "ts": 1794342170988,
+   "folder": "Роси",
+   "name": "КРЕМ ГЛАНЦ",
+   "code": "9014",
+   "w": 1000,
+   "dir": "h",
+   "ar": 1,
+   "rot": 90,
+   "img": "lib/img/k8sxtyy.jpg"
   }
  ]
 }
