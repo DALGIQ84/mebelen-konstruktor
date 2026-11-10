@@ -1639,7 +1639,7 @@ $('#ed').addEventListener('input',e=>{
   let v=e.target.type==='checkbox'?e.target.checked:e.target.value;
   if(f==='wall'){if(v===''){k.wall=null}else{k.wall=+v;k.off=0;place(k)}P.example=false;changed(true);return}
   if(isAcc(k)&&f==='acc'){const a=ACC[v]||ACC.sink;k.acc=v;if(/^(Мивка|Котлон|Готварска|Хладилник|Пералня|Съдомиялна|Сушилня)/.test(k.name))k.name=a.name.replace(/ \(.*\)/,'');k.W=a.W;k.D=a.D;k.c=a.free?0:900;k.H=k.c+a.h;k.gap=a.gap||0;place(k);P.example=false;changed(true);return}
-  if(isAcc(k)&&f==='accZ'){pushUndo();k.accZ=v===''?0:Math.max(0,+v)||0;P.example=false;changed(true);return}
+  if(isAcc(k)&&f==='accZ'){k.accZ=v===''?0:Math.max(0,+v)||0;P.example=false;edPending=true;changed(false);return} /* пишеш спокойно — полето не се презарежда при всяка цифра */
   if(isAcc(k)&&(f==='acol'||f==='bowls'||f==='zones')){k[f]=f==='acol'?v:+v;if(f==='zones'){if(+v===22)k.W=Math.max(+k.W,600);else if(+v===2&&+k.W>400)k.W=300;else if(+k.W<500)k.W=590;P.example=false;changed(true);return}P.example=false;changed(false);return}
   if(['nsLeg','nsPlB','bMW','bML','bGap','bH','bSpl','bUp','bFl','bHBh','bHBw','lift','hoodD','hoodH','hoodStrip','vdoors','split','armB','W','H','D','c','div','sh','doors','dr','nl','bRails','deadW','ovenH','lowH','mwH','over','pc','topSh','fridgeH','frDoors','frLow','divShort','grooveD','grooveY','px','py','rot','off','gap'].includes(f)){v=+v;if(!isFinite(v))return;if(v<0&&!['px','py','rot','off'].includes(f))return}
   if(f==='upper'){const h=k.H-k.c;if(v){k.c=1450;k.H=1450+Math.min(h,900);if(+k.D>400)k.D=320;k.plinth=false;k.floor='none'}else{k.c=100;k.H=100+h;if(+k.D<500)k.D=580}}
