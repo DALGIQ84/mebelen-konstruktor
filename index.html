@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 22:15 · Преименуване без остатъчен .crswap</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 22:30 · Общ цокъл между външните страници</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2222,7 +2222,10 @@ function addPlinths(grp){ // по един общ цокъл за всяка с�
     q.plinth=false;const S=P.settings,T=+mat(q.mc).t,Dk=+q.D-S.doorGap-+mat(q.mf).t,e=Dk-S.plinthBack,aB=+q.armB||900;
     q.mirror=cornerMirror(q);const pa=cabDef({type:'plinthRun',name:'Цокъл',W:Math.round(+q.W-(e-T)),H:+q.c,c:+q.c,D:+q.D,mf:q.mf,mc:q.mc,wall:q.wall,off:q.mirror?q.off:q.off+(e-T),gap:+q.gap||0});place(pa);P.cabinets.push(pa);made.push(pa);
     const a=cornerAdj(q);if(a){const L=wallInfo(a.w).len,wb=Math.round(aB-e);const pb=cabDef({type:'plinthRun',name:'Цокъл',W:wb,H:+q.c,c:+q.c,D:+q.D,mf:q.mf,mc:q.mc,wall:a.w,off:a.atStart?e:L-aB,gap:0});place(pb);P.cabinets.push(pb);made.push(pb)}}
-  for(const w in byW){const g=byW[w],a0=Math.min(...g.map(q=>q.off)),a1=Math.max(...g.map(q=>q.off+q.W)),c=Math.max(...g.map(q=>+q.c)),D=Math.max(...g.map(q=>+q.D)),ref=g.find(q=>+q.D===D);
+  for(const w in byW){const g=byW[w],a0r=Math.min(...g.map(q=>q.off)),a1r=Math.max(...g.map(q=>q.off+q.W)),gb=g.filter(q=>q.type!=='endPanel'),c=Math.max(...gb.map(q=>+q.c),0),D=Math.max(...gb.map(q=>+q.D)),ref=gb.find(q=>+q.D===D)||g[0];
+    /* крайните страници до пода (външни) — цокълът е между тях, не под тях */
+    const lq=g.find(q=>q.off===a0r),rq=g.find(q=>q.off+q.W===a1r),flr=(q,s)=>(q.type==='endPanel'&&q.toFloor!==false)||q.floor===s||q.floor==='both';
+    const a0=a0r+(lq&&flr(lq,'L')?(lq.type==='endPanel'?+lq.W:+mat(lq.mc).t):0),a1=a1r-(rq&&flr(rq,'R')?(rq.type==='endPanel'?+rq.W:+mat(rq.mc).t):0);
     if(c<=0)continue;for(const q of g)q.plinth=false;
     const p=cabDef({type:'plinthRun',name:'Цокъл',W:Math.round(a1-a0),H:c,c,D,mf:ref.mf,mc:ref.mc,wall:+w,off:a0,gap:+ref.gap||0});place(p);P.cabinets.push(p);made.push(p)}
   if(!made.length){toast('Няма шкафове на стена с цокъл');return}
