@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 22:40 · Детайли: отмаркиране</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 22:50 · Кант: лявата и дясната страница поотделно</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1241,8 +1241,8 @@ function finishParts(k,parts){
   if(k.fgrain==='h')for(const p of parts)if(p.kind==='door')swap(p); // хоризонтална шарка на лицето: ширината става първи размер
   for(const p of parts)if(p.kind!=='hw'&&p.kind!=='alu'&&p.kind!=='glass'&&!PSEUDO[p.m]&&mat(p.m).grX)swap(p); // декор с хоризонтален фладер (от библиотеката) — ширината става първи размер
   const go=k.grainOv||{};for(const p of parts)if(go[p.name])swap(p); // обърнат на ръка
-  const ov=k.edgeOv||{};for(const p of parts)if(ov[p.name])p.e=[...ov[p.name]]; // кант, сменен на ръка
   for(const p of parts)if(/^Страница/.test(p.name)&&p.box)p.sd=(p.box[0]+p.box[1])/2<+k.W/2?'L':'R'; // лява / дясна страница
+  const ov=k.edgeOv||{};for(const p of parts){const q=(p.sd&&ov[p.name+'|'+p.sd])||ov[p.name];if(q)p.e=[...q]} // кант, сменен на ръка (лявата и дясната страница — отделно)
   const mo=k.matOv||{};for(const p of parts){const id=(p.sd&&mo[p.name+'|'+p.sd])||mo[p.name];if(id&&p.kind!=='hw'&&P.materials.some(m=>m.id===id)){p.m0=p.m;p.m=id}} // материал, сменен на ръка за този детайл
 }
 
@@ -1455,16 +1455,16 @@ $('#tbl').addEventListener('change',e=>{const t=e.target;if(!t.dataset.mov)retur
 $('#tbl').addEventListener('click',e=>{const k=cab(sel);if(!k||scope!=='cab')return;
   const mx=e.target.closest('[data-movx]');if(mx){const n=mx.dataset.movx,[nm,sd]=n.split('|');if(k.matOv){delete k.matOv[n];if(sd&&k.matOv[nm]){k.matOv[nm+'|'+(sd==='L'?'R':'L')]=k.matOv[nm];delete k.matOv[nm]}}P.example=false;changed(false);return}
   const gf=e.target.closest('[data-gflip]');if(gf){const n=gf.dataset.gflip;k.grainOv=k.grainOv||{};if(k.grainOv[n])delete k.grainOv[n];else k.grainOv[n]=true;
-    if(k.edgeOv&&k.edgeOv[n]){const q=k.edgeOv[n];k.edgeOv[n]=[q[2],q[3],q[0],q[1]]}P.example=false;changed(false);return}
-  const r=e.target.closest('[data-ereset]');if(r){if(k.edgeOv)delete k.edgeOv[r.dataset.ereset];P.example=false;changed(false);return}
+    if(k.edgeOv)for(const x of[n,n+'|L',n+'|R'])if(k.edgeOv[x]){const q=k.edgeOv[x];k.edgeOv[x]=[q[2],q[3],q[0],q[1]]}P.example=false;changed(false);return}
+  const r=e.target.closest('[data-ereset]');if(r){const n=r.dataset.ereset,[nm,sd]=n.split('|');if(k.edgeOv){delete k.edgeOv[n];if(sd&&k.edgeOv[nm]){k.edgeOv[nm+'|'+(sd==='L'?'R':'L')]=k.edgeOv[nm];delete k.edgeOv[nm]}}P.example=false;changed(false);return}
   const h=e.target.closest('[data-ep]');if(!h)return;const name=h.dataset.ep,i=+h.dataset.es;
-  const cur=build(k).parts.find(p=>p.name===name);if(!cur)return;const ne=[...cur.e];ne[i]=ne[i]?0:1;
-  k.edgeOv=k.edgeOv||{};k.edgeOv[name]=ne;P.example=false;changed(false)});
+  const[nm,sd]=name.split('|'),cur=build(k).parts.find(p=>p.name===nm&&(!sd||p.sd===sd));if(!cur)return;const ne=[...cur.e];ne[i]=ne[i]?0:1;
+  k.edgeOv=k.edgeOv||{};if(sd&&k.edgeOv[nm]){k.edgeOv[nm+'|'+(sd==='L'?'R':'L')]=k.edgeOv[nm];delete k.edgeOv[nm]} /* старото общо → остава за другата страница */k.edgeOv[name]=ne;P.example=false;changed(false)});
 function renderTable(){
   const list=scope==='all'?P.cabinets:P.cabinets.filter(c=>c.id===sel);
   const rs=rows(list,true);
   $('#tbl').innerHTML=`<thead><tr><th>Детайл</th><th class="n">Дължина</th><th class="n">Ширина</th><th class="n">Бр.</th>${scope==='cab'?'<th>Шарка</th>':''}<th>Кант${scope==='cab'?' <span style="font-weight:400">(клик по страна)</span>':''}</th><th>Материал</th></tr></thead><tbody>`+
-    (rs.length?rs.map(r=>`<tr><td>${esc(r.type)}</td><td class="n">${fmt(r.L)}</td><td class="n">${fmt(r.Wd)}</td><td class="n">${r.n}</td>${scope==='cab'?`<td><button class="btn sm" data-gflip="${esc(r.name)}" title="Обърни шарката — разменя дължина и ширина" aria-label="Обърни шарката на ${esc(r.name)}" style="padding:0 7px;${(cab(sel)?.grainOv||{})[r.name]?'border-color:var(--mark);color:var(--mark)':''}">⇄</button></td>`:''}<td>${scope==='cab'?edgeEdit(r.e,r.name,!!(cab(sel)?.edgeOv||{})[r.name]):edgeSvg(r.e)}</td><td>${scope==='cab'?matCell(r):esc(mLbl(mat(r.m)))}</td></tr>`).join('')
+    (rs.length?rs.map(r=>`<tr><td>${esc(r.type)}</td><td class="n">${fmt(r.L)}</td><td class="n">${fmt(r.Wd)}</td><td class="n">${r.n}</td>${scope==='cab'?`<td><button class="btn sm" data-gflip="${esc(r.name)}" title="Обърни шарката — разменя дължина и ширина" aria-label="Обърни шарката на ${esc(r.name)}" style="padding:0 7px;${(cab(sel)?.grainOv||{})[r.name]?'border-color:var(--mark);color:var(--mark)':''}">⇄</button></td>`:''}<td>${scope==='cab'?edgeEdit(r.e,r.ovKey||r.name,!!((cab(sel)?.edgeOv||{})[r.ovKey||r.name]||(cab(sel)?.edgeOv||{})[r.name])):edgeSvg(r.e)}</td><td>${scope==='cab'?matCell(r):esc(mLbl(mat(r.m)))}</td></tr>`).join('')
       :`<tr><td colspan="7" style="color:var(--muted)">${scope==='cab'&&isAcc(cab(sel))?'Уредите и аксесоарите нямат детайли за разкрой.':'Няма избран шкаф. Добави от меню „Кухни“.'}</td></tr>`)+'</tbody>';
   $('#tbl').querySelectorAll('[data-gflip^="Витрина"]').forEach(b=>b.remove());$('#tbl').querySelectorAll('[data-ep^="Витрина"]').forEach(r=>{const sv=r.closest('svg');if(sv)sv.parentElement.remove()}); // профил и стъкло — без шарка и кант
   const agg={};
