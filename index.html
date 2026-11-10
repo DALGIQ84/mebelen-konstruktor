@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 21:20 · Запис в същия файл и след повторно отваряне</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 21:25 · В детайлите — само кодът на плочата</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -489,7 +489,7 @@ const GLCOL={clear:['прозрачно','#cfe6ee',.28],grey:['сиво','#55595
 for(const[c,[n,col]]of Object.entries(GLCOL))PSEUDO['__glass_'+c]={id:'__glass_'+c,name:'Стъкло '+n,t:4,color:col};
 for(const[c,[n,col]]of Object.entries(ALCOL))PSEUDO['__alu'+c]={id:'__alu'+c,name:`Ал. профил 26L.101.${c} ${n}`,t:20,color:col};
 const mat=id=>PSEUDO[id]||P.materials.find(m=>m.id===id)||P.materials[0];
-const mLbl=m=>String(m&&m.decN||'').trim()||(m?m.name:''); /* в детайлите/разкроя — кодът на плочата (декора), ако е зададен; иначе името (Корпус, Лице…) */
+const mLbl=m=>{if(!m)return'';if(m.dec)try{const it=LIB.items.find(q=>q.id===m.dec);if(it&&it.code)return it.code}catch(e){}return String(m.decN||'').trim()||m.name}; /* в детайлите/разкроя — кодът на плочата (декора), ако е зададен; иначе името (Корпус, Лице…) */
 const cab=id=>P.cabinets.find(c=>c.id===id);
 
 /* ---------- Стаята: многоъгълник по часовника, вътрешността е отдясно на всяка стена ---------- */
@@ -3652,7 +3652,7 @@ function libAddSave(){const f=$('#lfI').files[0],name=$('#lfN').value.trim();if(
 async function libApply(it,mid,quiet){const m=P.materials.find(q=>q.id===mid);if(!m)return;const src=it.data||it.img;
   const img=new Image();img.crossOrigin='anonymous';img.onload=()=>{const sc=Math.min(1,1024/Math.max(img.width,img.height)),w=Math.round(img.width*sc),h=Math.round(img.height*sc),rt=!!it.rot,c=document.createElement('canvas');c.width=rt?h:w;c.height=rt?w:h;const g=c.getContext('2d');
     if(rt){g.translate(h,0);g.rotate(Math.PI/2)}g.drawImage(img,0,0,w,h); /* завъртяна снимка — фладерът изглежда както е избран */
-    pushUndo();m.tex=c.toDataURL('image/jpeg',0.82);m.texAR=c.height/c.width;m.texAvg=avgColor(c);m.texW=rt?Math.round((it.w||1000)*img.height/img.width):(it.w||1000);m.texDir=libLook(it);m.grX=libLook(it)==='h';m.dec=it.id;m.decN=(it.code?it.code+' ':'')+it.name;
+    pushUndo();m.tex=c.toDataURL('image/jpeg',0.82);m.texAR=c.height/c.width;m.texAvg=avgColor(c);m.texW=rt?Math.round((it.w||1000)*img.height/img.width):(it.w||1000);m.texDir=libLook(it);m.grX=libLook(it)==='h';m.dec=it.id;m.decN=it.code||it.name; /* в детайлите — само кодът */
     P.example=false;changed(true);renderLib();if(!quiet)toast(`„${m.name}“ — ${it.name}`)};img.onerror=()=>toast('Снимката не се зареди (няма интернет?)');img.src=src}
 $('#bLib').onclick=()=>{open('#ovLib');libMsg(libTok()?'':'Декорите се пазят на това устройство; за да отиват и на другите — „⚙ Синхронизация“ (веднъж).');renderLib();libLoad().then(renderLib)};
 $('#libQ').oninput=renderLib;
@@ -3672,7 +3672,7 @@ function libEdit(ch){ /* промяна на фладера/ширината н�
   renderLib();libPush()}
 $('#libSync').onclick=()=>{const cur=libTok();const t=prompt('Ключ за GitHub (веднъж на всяко устройство, от което ДОБАВЯШ декори; само за гледане не трябва).\n\nКак се прави: github.com → снимката горе вдясно → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token → Repository access: Only select repositories → mebelen-konstruktor → Permissions: Contents = Read and write → Generate → копирай и постави тук.\n\nПразно = махни ключа от това устройство.',cur);if(t===null)return;
   try{if(t.trim())localStorage.setItem(TOKK,t.trim());else localStorage.removeItem(TOKK)}catch(_){}libMsg(t.trim()?'Ключът е запазен — проверявам…':'Ключът е махнат.');if(t.trim())ghReq('lib/library.json').then(()=>{libMsg('Връзката с GitHub е наред ✓');libPush()}).catch(e=>libMsg('GitHub не приема ключа ('+e.message+') — провери правата: Contents = Read and write за mebelen-konstruktor.'))};
-setTimeout(()=>libLoad(),1500);
+setTimeout(()=>libLoad().then(()=>{if(P.materials.some(m=>m.dec))renderTable()}),1500);
 /* ---------- Таблет / пръст ---------- */
 let lpT=0;const lpJust=()=>Date.now()-lpT<700; // току-що е имало дълго натискане — да не избира/влачи
 function longPress(el,fire){let t=null,x0=0,y0=0;const clr=()=>{if(t){clearTimeout(t);t=null}};
