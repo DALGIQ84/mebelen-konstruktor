@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 23:05 · Огледалата — и в изгледите на стените (PDF)</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 23:15 · Преместен файл — не записва в старата папка</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -3444,6 +3444,7 @@ let projFH=null; // отвореният файл (инсталираната п
 const FSA=OFFLINE&&!!window.showSaveFilePicker;if(FSA)$('#bSaveAs').hidden=false;
 const pjTypes=[{description:'Проект KRAFTPLAN',accept:{'application/x-kraftplan':['.kraft']}},{description:'Проект (стар формат .json)',accept:{'application/json':['.json']}}];
 async function saveProj(as){const name=projBase()+'.kraft',data=JSON.stringify(P);
+  if(FSA&&!as&&projFH){try{await projFH.getFile()}catch(e){if(e&&e.name==='NotFoundError'){toast('Файлът е преместен или изтрит — избери къде да се запише');projFH=null;curSet(null)}}} /* преместен в друга папка — не записва в старата */
   if(FSA){let renTo=null;try{const nn=String(P.name||'').trim().replace(/[\\/:*?"<>|]+/g,' ').trim();
       if(!as&&projFH&&nn&&fStem(projFH.name)!==nn){const ext=(projFH.name.match(/\.(kraft|json|txt)$/i)||['.kraft'])[0],to=nn+ext; /* преименуван проект — и файлът се преименува */
         if(projFH.move)renTo=to;else as=true}
@@ -3739,7 +3740,7 @@ migrate();snapSplash();snapAcc();save();renderList();renderEditor();renderTable(
     $('#stRecent').onclick=async e=>{const b=e.target.closest('[data-rec]');if(!b)return;const o=l[+b.dataset.rec];
       try{if((await o.h.queryPermission({mode:'readwrite'}))!=='granted'&&(await o.h.requestPermission({mode:'readwrite'}))!=='granted')return;
         const t=await (await o.h.getFile()).text();loadProject(t);projFH=o.h;P.name=fStem(o.h.name);save();recentAdd(o.h);$('#bSaveSm').textContent=o.h.name;$('#ovStart').hidden=true}catch(err){toast('Файлът не е намерен — може да е преместен')}}}
-  if(FSA&&!projFH&&!P.example){const c=await curGet();if(c&&!projFH){projFH=c;P.name=fStem(c.name);save();$('#bSaveSm').textContent=c.name;setTitle()}} /* продължаваш последния проект — дискетата записва пак в неговия файл, без да пита */
+  if(FSA&&!projFH&&!P.example){let c=await curGet();if(c)try{await c.getFile()}catch(e){if(e&&e.name==='NotFoundError'){c=null;curSet(null)}}if(c&&!projFH){projFH=c;P.name=fStem(c.name);save();$('#bSaveSm').textContent=c.name;setTitle()}} /* продължаваш последния проект — дискетата записва пак в неговия файл, без да пита */
   if(!window._kpLaunched)$('#ovStart').hidden=false})();
 if('launchQueue' in window)launchQueue.setConsumer(async lp=>{ /* двоен клик върху .kraft файл в папката — отваря проекта направо */
   if(!lp.files||!lp.files.length)return;const h=lp.files[0];window._kpLaunched=true;
