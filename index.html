@@ -119,7 +119,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 .lh{padding:6px 14px 3px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--panel);border-bottom:1px solid var(--line)}
 .sub.cl{cursor:pointer;user-select:none}.sub.cl::after{content:" ▾";}.sub.cl.off::after{content:" ▸"}
 .accAdd{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line)}
-.mats{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) 62px 42px auto 30px;gap:6px;align-items:center}
+.mats{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) 62px 42px 92px auto 30px;gap:6px;align-items:center}
 .mats .tx{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;color:var(--muted);padding:0 0 6px 4px;border-bottom:1px dashed var(--line)}
 .mats .tx img{width:56px;height:36px;object-fit:cover;border-radius:4px;border:1px solid var(--line)}
 .mats .tx input,.mats .tx select{width:80px;background:var(--field);border:1px solid var(--line);border-radius:5px;padding:3px 6px;color:var(--fg)}
@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 23:25 · Светли отвори — без врати и на надстройките</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.11 · 00:40 · Фото: реалистичен рендер с лъчи</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -314,6 +314,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
     <div class="body">
       <canvas id="phC" style="width:100%;height:auto;border:1px solid var(--line);border-radius:6px;background:#fff"></canvas>
       <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <label class="tog">Вид <select id="phM"><option value="hd" selected>реалистично (лъчи)</option><option value="fast">бързо</option></select></label>
         <label class="tog">Качество <select id="phQ"><option value="96">бързо</option><option value="320" selected>добро</option><option value="700">най-добро (по-бавно)</option><option value="1400">максимално (бавно, по-голяма снимка)</option></select></label>
         <label class="tog">Светлина <select id="phL"><option value="day" selected>дневна</option><option value="warm">топла вечерна</option></select></label>
         <button class="btn sm" id="phAgain">Снимай пак</button>
@@ -1994,7 +1995,7 @@ function rebuild3D(){
         const d=[x1-x0,z1-z0,y1-y0],thin=d.indexOf(Math.min(...d)),em=meshMat(pm.texAvg||pm.color,op),fm=texMat(pm,op); // ръбовете — плътен цвят като кант
         if(p.kind!=='top')mesh.material=[0,0,1,1,2,2].map(ax=>ax===thin?fm:em)} // плотът е с декора и по ръбовете (постформинг)
       if(p.mir)mesh.material=accMat('#eef4f7',.08,.3); // огледало
-      mesh.userData.cab=k.id;mesh.userData.pk=p.key;const hiP=pedK===k.id&&(pedSel===p.key||pedMulti.has(p.key));if(hiP)mesh.material=meshMat('#f0b429',1);
+      mesh.userData.cab=k.id;mesh.userData.pk=p.key;mesh.userData.mid=p.m;mesh.userData.mir=!!p.mir;mesh.userData.knd=p.kind;const hiP=pedK===k.id&&(pedSel===p.key||pedMulti.has(p.key));if(hiP)mesh.material=meshMat('#f0b429',1);
       const ed=new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry),new THREE.LineBasicMaterial({color:hiP?'#b4472c':isSel(k.id)?selCol:lineCol,transparent:true,opacity:isSel(k.id)?1:.45}));
       ed.position.copy(mesh.position);ed.rotation.copy(mesh.rotation);g.add(ed);
     }
@@ -2090,7 +2091,46 @@ new ResizeObserver(resize).observe(canvas.parentElement);
   renderer.render(scene,camera)})();
 /* ---------- Фото: натрупване на много кадри с разместена светлина = меки сенки, засенчване в ъглите, гладки ръбове ---------- */
 const halton=(i,b)=>{let f=1,r=0;while(i>0){f/=b;r+=f*(i%b);i=Math.floor(i/b)}return r};
+let ptLoad=null;const loadPT=()=>ptLoad||(ptLoad=new Promise((ok,no)=>{if(window.KPT)return ok();const sc=document.createElement('script');sc.src=(window.KP_PT||'libs/pt.js');sc.onload=()=>ok();sc.onerror=()=>{ptLoad=null;no(new Error('pt'))};document.head.appendChild(sc)}));
+async function photoHD(){ /* истински фото-рендер: лъчите се проследяват — отражения, отразена светлина, меки сенки */
+  if(photoBusy)return;photoBusy=true;photoStop=false;const NFq=+$('#phQ').value||320,warm=$('#phL').value==='warm';
+  $('#ovPhoto').hidden=false;$('#phSave').disabled=true;$('#phInfo').textContent='зареждам…';
+  const keep={sel,onlySel,showDoors,ms:multiSel};let ok=false;
+  try{await loadPT();
+    const r=canvas.getBoundingClientRect(),W=NFq>=1400?2400:NFq>=700?1920:NFq>=320?1600:1200,H=Math.round(W*Math.max(0.4,Math.min(1.1,r.height/Math.max(1,r.width))));
+    sel=null;multiSel=new Set();onlySel=false;showDoors=true;rebuild3D();
+    for(const w of wallGroups)w.g.visible=showWalls&&((camera.position.x-w.cx)*w.ox+(camera.position.z-w.cz)*w.oz<0);
+    world.updateMatrixWorld(true);
+    const grp=new THREE.Group(),mc=new Map(),cm=(m,ud)=>{const kk=m.uuid+JSON.stringify(ud);if(mc.has(kk))return mc.get(kk);const n=m.clone();n.userData={...ud};if(!ud.keepR){const F=FIN[ud.fin]||FIN.mat;n.roughness=F[1];n.metalness=F[2]}mc.set(kk,n);return n};
+    world.traverse(o=>{if(!o.isMesh||!o.visible)return;let v=o;while(v){if(!v.visible)return;v=v.parent}
+      const u=o.userData,m0=mat(u.mid),glass=u.knd==='glass'&&!u.mir,ud=u.mid==null?{keepR:1}:u.knd==='hw'?{keepR:1}:{fin:m0.fin||'mat',glass,mirror:!!u.mir,gloss:(m0.fin==='gloss'),glassCol:glass?m0.color:undefined};
+      if([].concat(o.material).some(q=>q.transparent&&!glass&&q.opacity<.5))return;
+      const mm=new THREE.Mesh(o.geometry,Array.isArray(o.material)?o.material.map(q=>cm(q,ud)):cm(o.material,ud));mm.matrixAutoUpdate=false;mm.matrix.copy(o.matrixWorld);grp.add(mm)});
+    const M=1/1000,rb=roomBox(),cx=(rb[0]+rb[1])/2*M,cz=(rb[2]+rb[3])/2*M,rh=P.room.h*M,rw=(rb[1]-rb[0])*M,rd=(rb[3]-rb[2])*M;
+    const lights=[{p:[cx,rh-0.02,cz],t:[cx,0,cz],w:Math.max(.6,rw*.45),h:Math.max(.6,rd*.45),i:warm?3.2:4}]; // таванна светлина
+    const json=grp.toJSON(),q=camera.quaternion;
+    const total=window.KP_SAMPLES||(NFq>=1400?1200:NFq>=700?600:NFq>=320?260:90),pc=$('#phC');pc.width=W;pc.height=H;const g=pc.getContext('2d');const t0=performance.now();
+    await window.KPT.render({json,W,H,cam:{p:camera.position.toArray(),q:[q.x,q.y,q.z,q.w],fov:camera.fov},warm,samples:total,lights,envI:warm?.6:.8,exp:warm?.8:.85,
+      onFrame:(cv,n,tt,end)=>{g.drawImage(cv,0,0,W,H);$('#phInfo').textContent=end?'':`${Math.round(n/tt*100)} % · ${((performance.now()-t0)/1000).toFixed(0)} сек`;if(photoStop)window.KPT.stop()}});
+    const tx=(pName()?pName()+' · ':'')+'М Плюс Мебели';g.font='500 22px "IBM Plex Sans",Arial,sans-serif';const tw=g.measureText(tx).width;g.fillStyle='rgba(255,255,255,.75)';g.fillRect(W-tw-36,H-46,tw+24,32);g.fillStyle='#1a2227';g.fillText(tx,W-tw-24,H-22);
+    $('#phSave').disabled=false;$('#phInfo').textContent=photoStop?'спряно':`готово · ${((performance.now()-t0)/1000).toFixed(0)} сек`;ok=true}
+  catch(e){console.warn(e);toast('Реалистичното фото не тръгна — правя бързото');}
+  finally{({sel,onlySel,showDoors}=keep);multiSel=keep.ms;rebuild3D();resize();photoBusy=false}
+  if(!ok){$('#phM').value='fast';photoRender()}}
+const FIN={mat:['мат',.62,0,0],smat:['супермат',.9,0,0],gloss:['гланц',.06,0,.28],metal:['металик',.32,.7,.55]}; /* повърхност: име, грапавост, метал, отражение */
+function photoFinish(C){ /* отражения на стаята (снимка 360° от средата) + повърхността на всеки материал; огледалата — със собствена снимка 360° */
+  const done=[];try{
+  const pm=new THREE.PMREMGenerator(renderer),crt=new THREE.WebGLCubeRenderTarget(256,{type:THREE.HalfFloatType}),cc=new THREE.CubeCamera(.05,80,crt);cc.position.copy(C);scene.add(cc);cc.update(renderer,scene);scene.remove(cc);
+  const env=pm.fromCubemap(crt.texture).texture;done.push(()=>{env.dispose();crt.dispose();pm.dispose()});
+  const cache=new Map(),cl=(m,f,mir)=>{const kk=m.uuid+f;if(cache.has(kk))return cache.get(kk);const n=m.clone();if(mir){n.color=new THREE.Color('#ffffff');n.roughness=.02;n.metalness=1;n.envMapIntensity=1}else{const F=FIN[f]||FIN.mat;n.roughness=F[1];n.metalness=F[2];n.envMapIntensity=F[3]}n.envMap=env;n.needsUpdate=true;cache.set(kk,n);return n};
+  const mirs=[];world.traverse(o=>{if(!o.isMesh||o.userData.mid==null||o.userData.knd==='hw')return;const m=mat(o.userData.mid),gl=o.userData.knd==='glass'&&!o.userData.mir;if(gl)return;const f=m.fin||'mat';
+    if(o.userData.mir){mirs.push(o);return}o.material=Array.isArray(o.material)?o.material.map(q=>cl(q,f)):cl(o.material,f)});
+  for(const o of mirs.slice(0,12)){const rt=new THREE.WebGLCubeRenderTarget(512),cm=new THREE.CubeCamera(.03,80,rt);o.getWorldPosition(cm.position);o.visible=false;scene.add(cm);cm.update(renderer,scene);scene.remove(cm);o.visible=true;
+    const t=pm.fromCubemap(rt.texture).texture;const n=o.material.clone?o.material.clone():new THREE.MeshStandardMaterial();n.color=new THREE.Color('#f4f8fa');n.map=null;n.roughness=.01;n.metalness=1;n.envMap=t;n.envMapIntensity=1;n.transparent=false;n.opacity=1;n.needsUpdate=true;o.material=n;done.push(()=>{t.dispose();rt.dispose()})}
+  }catch(e){console.warn('photoFinish',e)}
+  return{dispose(){for(const f of done)try{f()}catch(e){}}}}
 async function photoRender(){
+  if($('#phM').value==='hd'&&window.WebGL2RenderingContext)return photoHD();
   if(photoBusy)return;photoBusy=true;photoStop=false;
   const NF=+$('#phQ').value||160,warm=$('#phL').value==='warm';
   const keep={sel,onlySel,showDoors,ms:multiSel},bg=scene.background,pr=renderer.getPixelRatio();
@@ -2099,7 +2139,7 @@ async function photoRender(){
   sel=null;multiSel=new Set();onlySel=false;showDoors=true;rebuild3D();
   for(const w of wallGroups)w.g.visible=showWalls&&((cam.position.x-w.cx)*w.ox+(cam.position.z-w.cz)*w.oz<0);
   const lineMat=new THREE.LineBasicMaterial({color:0x1c1c1c,transparent:true,opacity:.28});
-  world.traverse(o=>{if(o.isLineSegments)o.material=lineMat;if(o.isMesh){const tr=[].concat(o.material).some(m=>m.transparent);o.castShadow=!tr;o.receiveShadow=true}});
+  world.traverse(o=>{if(o.isLineSegments)o.visible=false;if(o.isMesh){const tr=[].concat(o.material).some(m=>m.transparent);o.castShadow=!tr;o.receiveShadow=true}}); /* без черни контури — като снимка */
   const hemi=scene.children.find(o=>o.isHemisphereLight),hI=hemi.intensity,sI=sun.intensity;
   hemi.intensity=warm?.22:.28;sun.intensity=0;
   const M=1/1000,rb=roomBox(),C=new THREE.Vector3((rb[0]+rb[1])/2*M,P.room.h*M/2,(rb[2]+rb[3])/2*M),RAD=Math.hypot(rb[1]-rb[0],rb[3]-rb[2],P.room.h)*M/2+0.5;
@@ -2107,6 +2147,7 @@ async function photoRender(){
     L.shadow.bias=-0.0004;L.shadow.normalBias=0.02;L.target.position.copy(C);scene.add(L);scene.add(L.target);return L};
   const sky=mkL(warm?0xdfe6ff:0xf4f7ff,warm?.5:.75),key=mkL(warm?0xffc98a:0xfff3e2,warm?.7:.5),bnc=mkL(warm?0xffe2c2:0xfff8f0,warm?.4:.45); // bnc = отразена светлина от всички посоки
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  const fx=photoFinish(C);
   const mats=new Set();world.traverse(o=>{if(o.isMesh)[].concat(o.material).forEach(m=>mats.add(m))});mats.forEach(m=>m.needsUpdate=true);
   scene.background=new THREE.Color(warm?'#e9e4dc':'#eef1f3');
   const rt=new THREE.WebGLRenderTarget(W,H),buf=new Uint8Array(W*H*4),acc=new Float32Array(W*H*3);
@@ -2133,7 +2174,7 @@ async function photoRender(){
       await new Promise(res=>setTimeout(res,8)); // всеки кадър дава път на менюто — да може да се сменя качеството/светлината
     }
   }finally{
-    rt.dispose();scene.remove(sky,sky.target,key,key.target,bnc,bnc.target);sky.dispose&&sky.dispose();key.dispose&&key.dispose();
+    rt.dispose();fx.dispose();scene.remove(sky,sky.target,key,key.target,bnc,bnc.target);sky.dispose&&sky.dispose();key.dispose&&key.dispose();
     renderer.shadowMap.enabled=false;mats.forEach(m=>m.needsUpdate=true);hemi.intensity=hI;sun.intensity=sI;scene.background=bg;renderer.setPixelRatio(pr);
     ({sel,onlySel,showDoors}=keep);multiSel=keep.ms;rebuild3D();resize();photoBusy=false}
   if(n){show(n);
@@ -2144,7 +2185,7 @@ async function photoRender(){
 $('#bPhoto').onclick=()=>{if(view!=='3d'){toast('Фото се прави от 3D изгледа');return}photoRender()};
 $('#phAgain').onclick=()=>{if(!photoBusy)photoRender()};
 async function photoRestart(){photoStop=true;while(photoBusy)await new Promise(r=>setTimeout(r,50));if(!$('#ovPhoto').hidden)photoRender()} // смяна на качество/светлина — снима наново веднага
-$('#phQ').addEventListener('change',photoRestart);$('#phL').addEventListener('change',photoRestart);
+$('#phQ').addEventListener('change',photoRestart);$('#phL').addEventListener('change',photoRestart);$('#phM').addEventListener('change',photoRestart);
 $('#phClose').onclick=()=>{photoStop=true;$('#ovPhoto').hidden=true};
 $('#ovPhoto').addEventListener('click',e=>{if(e.target.id==='ovPhoto'){photoStop=true;$('#ovPhoto').hidden=true}});
 $('#phSave').onclick=async()=>{const c=$('#phC');const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',0.93));const name=fname('фото').replace(/\.png$/,'.jpg');
@@ -3515,8 +3556,8 @@ const setP=(p,v)=>{const a=p.split('.');a.slice(0,-1).reduce((o,k)=>o[k],P)[a.at
 function renderSettings(){
   $('#setForm').innerHTML=SETF.map(([p,l,t])=>`<label>${l}<input id="s_${p.replace('.','_')}" data-p="${p}" type="${t?'text':'number'}" value="${esc(getP(p))}"></label>`).join('')+
     `<label class="chk full"><input type="checkbox" id="s_cab" ${P.settings.cabInType?'checked':''}> Името на шкафа пред детайла при „Целия проект“</label>`;
-  $('#mats').innerHTML='<span class="h">Име</span><span class="h">Код на плочата</span><span class="h">Дебелина</span><span class="h">Цвят</span><span class="h">Структура</span><span></span>'+P.materials.map((m,i)=>
-    `<input data-i="${i}" data-k="name" id="m_n${i}" value="${esc(m.name)}"><input data-i="${i}" data-k="decN" id="m_dc${i}" value="${esc(m.decN||'')}" placeholder="код на декора"><input data-i="${i}" data-k="t" id="m_t${i}" type="number" step="0.5" value="${m.t}"><input data-i="${i}" data-k="color" id="m_c${i}" type="color" value="${m.color}">`+
+  $('#mats').innerHTML='<span class="h">Име</span><span class="h">Код на плочата</span><span class="h">Дебелина</span><span class="h">Цвят</span><span class="h">Повърхност (Фото)</span><span class="h">Структура</span><span></span>'+P.materials.map((m,i)=>
+    `<input data-i="${i}" data-k="name" id="m_n${i}" value="${esc(m.name)}"><input data-i="${i}" data-k="decN" id="m_dc${i}" value="${esc(m.decN||'')}" placeholder="код на декора"><input data-i="${i}" data-k="t" id="m_t${i}" type="number" step="0.5" value="${m.t}"><input data-i="${i}" data-k="color" id="m_c${i}" type="color" value="${m.color}">`+(m.glass?`<span style="font-size:11.5px;color:var(--muted)">${m.mirror?'огледало':'стъкло'}</span>`:`<select data-i="${i}" data-k="fin" id="m_fin${i}" style="background:var(--field);border:1px solid var(--line);border-radius:5px;padding:3px 4px;color:var(--fg)">${Object.entries(FIN).map(([v,q])=>`<option value="${v}" ${(m.fin||'mat')===v?'selected':''}>${q[0]}</option>`).join('')}</select>`)+
     `<label class="btn sm" title="Зареди снимка на декора от компютъра">${m.tex?'Смени':'Зареди…'}<input type="file" accept="image/*" data-tex="${i}" id="m_f${i}" hidden></label>`+
     `<button class="btn sm" data-del="${i}" title="Махни материала" aria-label="Махни ${esc(m.name)}">×</button>`+
     (m.tex?`<div class="tx"><img src="${m.tex}" alt="${esc(m.name)}"><label>Снимката е широка, мм <input type="number" data-i="${i}" data-k="texW" id="m_w${i}" value="${m.texW||1000}"></label>
