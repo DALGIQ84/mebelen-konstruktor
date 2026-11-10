@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 21:00 · Фладер вертикален/хоризонтален — снимката се завърта сама</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 21:10 · Хоризонтален фладер важи и в проекта и в разкроя</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -857,7 +857,7 @@ function build(k){k._gvw=null;const r=buildCD(k);if(k._gvw&&r.warn)r.warn.push(.
 function buildCD(k){const r=buildRaw(k);if(k.type!=='doors')return r;const o=cdPartner(k);if(!o)return r;const f=+(P.settings.cdFuga??5);
   if(k.cdOf){r.parts=r.parts.filter(p=>p.kind!=='door');r.warn.push(`Вратата е обща с „${o.name}“ — тя е в неговите детайли.`);return r}
   const z0=Math.min(+k.c,+o.c),z1=Math.max(+k.H,+o.H),h=r1(z1-z0-f);
-  for(const p of r.parts)if(p.kind==='door'){p.box=[...p.box.slice(0,4),z0+f/2,z1-f/2];const sw=(k.fgrain==='h')!==!!(k.grainOv||{})[p.name];if(sw)p.Wd=h;else p.L=h}
+  for(const p of r.parts)if(p.kind==='door'){p.box=[...p.box.slice(0,4),z0+f/2,z1-f/2];const sw=(k.fgrain==='h')!==!!(k.grainOv||{})[p.name]!==!!mat(p.m).grX;if(sw)p.Wd=h;else p.L=h}
   r.warn.push(`Обща врата с „${o.name}“ — височина ${Math.round(h)} мм, броиш я тук.`+(h>2750?' Вратата е по-висока от плоскостта (2800) — провери.':''));return r}
 function buildRaw(k){
   if(k.upper&&!k._ub&&k.type!=='ubottom'&&k.wall!==null&&k.wall!==undefined){const ub=P.cabinets.find(q=>q.type==='ubottom'&&q.wall===k.wall&&Math.abs(+q.c-+k.c)<3&&+q.off<+k.off+(+k.W)-5&&+q.off+(+q.W)>+k.off+5);
@@ -878,7 +878,7 @@ function buildRaw(k){
     for(const p of ra.parts)p.name='А '+p.name;
     for(const p of rb.parts){const[x0,x1,y0,y1,z0,z1]=p.box;p.box=[y0,y1,aB-x1,aB-x0,z0,z1];p.name='Б '+p.name}
     const ex=[],cdC=!!k.wCD&&aHc>0&&k.wDoor!=='slide'&&k.wDoor!=='none'; // обща врата за долната част и надстройката
-    if(cdC){const c=Math.max(0,+k.c||0),f=+(S.cdFuga??5),h=r1(+k.H-c-f);for(const p of[...ra.parts,...rb.parts])if(p.kind==='door'){p.box[4]=c+f/2;p.box[5]=+k.H-f/2;const sw=(k.fgrain==='h')!==!!(k.grainOv||{})[p.name];if(sw)p.Wd=h;else p.L=h}
+    if(cdC){const c=Math.max(0,+k.c||0),f=+(S.cdFuga??5),h=r1(+k.H-c-f);for(const p of[...ra.parts,...rb.parts])if(p.kind==='door'){p.box[4]=c+f/2;p.box[5]=+k.H-f/2;const sw=(k.fgrain==='h')!==!!(k.grainOv||{})[p.name]!==!!mat(p.m).grX;if(sw)p.Wd=h;else p.L=h}
       ra.warn.push(`Обща врата за долната част и надстройката: ${Math.round(h)} мм`+(h>2750?' — по-висока от плоскостта (2800), провери.':'.'))}
     if(aHc){const top=+k.H-aHc,H=+k.H,fu=S.fuga,cl=S.shelfClear,bt=+(S.backTot??5),m=Math.max(0,k.antSh|0);
       const sup=(pre,len,noEnd,rigid,nd,dx0,dx1,mapB)=>{const out=[],ad=(name,L,Wd,mm,e,box,kind='')=>out.push({name:pre+name,L:r1(L),Wd:r1(Wd),t:+mat(mm).t,m:mm,e,box,kind});
@@ -1234,6 +1234,7 @@ function finishParts(k,parts){
   if(k.gV&&k.gV!=='none'&&!k.upper&&!k.open&&!['wardrobe','dw','endShelf','nstand'].includes(k.type))golaVert(k,parts);
   const swap=p=>{[p.L,p.Wd]=[p.Wd,p.L];p.e=[p.e[2],p.e[3],p.e[0],p.e[1]]};
   if(k.fgrain==='h')for(const p of parts)if(p.kind==='door')swap(p); // хоризонтална шарка на лицето: ширината става първи размер
+  for(const p of parts)if(p.kind!=='hw'&&p.kind!=='alu'&&p.kind!=='glass'&&!PSEUDO[p.m]&&mat(p.m).grX)swap(p); // декор с хоризонтален фладер (от библиотеката) — ширината става първи размер
   const go=k.grainOv||{};for(const p of parts)if(go[p.name])swap(p); // обърнат на ръка
   const ov=k.edgeOv||{};for(const p of parts)if(ov[p.name])p.e=[...ov[p.name]]; // кант, сменен на ръка
   for(const p of parts)if(/^Страница/.test(p.name)&&p.box)p.sd=(p.box[0]+p.box[1])/2<+k.W/2?'L':'R'; // лява / дясна страница
@@ -3541,7 +3542,7 @@ $('#mats').addEventListener('change',e=>{const i=e.target.dataset.tex;if(i===und
     c.getContext('2d').drawImage(img,0,0,c.width,c.height);const m=P.materials[+i];
     m.tex=c.toDataURL('image/jpeg',0.82);m.texAR=img.height/img.width;m.texAvg=avgColor(c);if(!m.texW)m.texW=1000;if(!m.texDir)m.texDir=grainOf(c)||(img.width>=img.height?'h':'v');
     renderSettings();changed(true);toast('Структурата е заредена')};img.onerror=()=>toast('Файлът не е картинка');img.src=r.result};r.readAsDataURL(f)});
-$('#mats').addEventListener('click',e=>{const nt=e.target.dataset.notex;if(nt!==undefined){const m=P.materials[+nt];delete m.tex;delete m.texAR;delete m.texAvg;renderSettings();changed(true);return}
+$('#mats').addEventListener('click',e=>{const nt=e.target.dataset.notex;if(nt!==undefined){const m=P.materials[+nt];delete m.tex;delete m.texAR;delete m.texAvg;delete m.grX;delete m.dec;renderSettings();changed(true);return}
   const i=e.target.dataset.del;if(i===undefined)return;const m=P.materials[i];
   if(P.cabinets.some(c=>[c.mc,c.mf,c.mb].includes(m.id))){toast('Материалът се ползва от шкаф');return}
   P.materials.splice(i,1);renderSettings();changed(true)});
@@ -3598,10 +3599,10 @@ const GH={o:'DALGIQ84',r:'mebelen-konstruktor',b:'main'},LIBK='kp.lib.local',TOK
 let LIB={folders:['Роси','Егер','Кроношпан'],items:[]},libF='',libOpenId=null;
 const libLocal=()=>{try{return JSON.parse(localStorage.getItem(LIBK)||'null')||{folders:[],items:[],del:[]}}catch(_){return{folders:[],items:[],del:[]}}},libLocalSet=o=>{try{localStorage.setItem(LIBK,JSON.stringify(o))}catch(_){toast('Няма място в паметта на браузъра')}};
 const libTok=()=>{try{return localStorage.getItem(TOKK)||''}catch(_){return''}};
-function libAll(){const L=libLocal(),del=new Set(L.del||[]),m=new Map();for(const it of LIB.items)if(!del.has(it.id))m.set(it.id,it);for(const it of L.items)if(!del.has(it.id))m.set(it.id,{...m.get(it.id),...it});
+function libAll(){const L=libLocal(),del=new Set(L.del||[]),m=new Map();for(const it of LIB.items)if(!del.has(it.id))m.set(it.id,it);for(const it of L.items){const b=m.get(it.id);if(!del.has(it.id)&&!(b&&(+b.ts||0)>(+it.ts||0)))m.set(it.id,{...b,...it})}
   return{folders:[...new Set([...LIB.folders,...(L.folders||[])])],items:[...m.values()]}}
 async function libLoad(){try{const r=await fetch('lib/library.json?t='+Date.now(),{cache:'no-store'});if(r.ok){const o=await r.json();LIB={folders:o.folders||[],items:o.items||[]};
-  const L=libLocal(),ids=new Set(LIB.items.map(q=>q.id));L.items=L.items.filter(q=>!(ids.has(q.id)&&!q.pend));L.del=(L.del||[]).filter(id=>ids.has(id));libLocalSet(L)}}catch(_){}}
+  const L=libLocal(),ids=new Set(LIB.items.map(q=>q.id));const lt=new Map(LIB.items.map(q=>[q.id,+q.ts||0]));L.items=L.items.filter(q=>!(ids.has(q.id)&&!q.pend&&lt.get(q.id)>=(+q.ts||0))); /* локалната промяна стои, докато в GitHub не излезе същата или по-нова */L.del=(L.del||[]).filter(id=>ids.has(id));libLocalSet(L)}}catch(_){}}
 const b64u=str=>btoa(unescape(encodeURIComponent(str)));
 async function ghReq(path,opt={}){const t=libTok();if(!t)throw new Error('notok');const r=await fetch(`https://api.github.com/repos/${GH.o}/${GH.r}/contents/${path}`+(opt.method?'':`?ref=${GH.b}&t=${Date.now()}`),{cache:'no-store',...opt,headers:{Authorization:'Bearer '+t,Accept:'application/vnd.github+json',...(opt.headers||{})}});
   if(r.status===404&&!opt.method)return null;if(!r.ok)throw new Error('gh '+r.status);return r.json()}
@@ -3614,7 +3615,7 @@ async function libPush1(){ /* качва чакащите декори и обн
   libMsg('Качване в GitHub…');try{
     for(const it of L.items.filter(q=>q.pend&&q.data)){await ghPut('lib/img/'+it.id+'.jpg',it.data.split(',')[1],'Библиотека: '+it.name);it.img='lib/img/'+it.id+'.jpg'}
     const cur=await ghReq('lib/library.json');let base={folders:['Роси','Егер','Кроношпан'],items:[]};if(cur&&cur.content)try{base=JSON.parse(decodeURIComponent(escape(atob(cur.content.replace(/\n/g,'')))))}catch(_){}
-    const del=new Set(L.del||[]),m=new Map();for(const q of base.items||[])if(!del.has(q.id))m.set(q.id,q);for(const q of L.items){const{data,pend,...rest}=q;if(!del.has(q.id))m.set(q.id,{...rest,img:q.img||('lib/img/'+q.id+'.jpg')})}
+    const del=new Set(L.del||[]),m=new Map();for(const q of base.items||[])if(!del.has(q.id))m.set(q.id,q);for(const q of L.items){const{data,pend,...rest}=q,b=m.get(q.id);if(del.has(q.id)||(b&&(+b.ts||0)>(+q.ts||0)))continue;m.set(q.id,{...b,...rest,img:q.img||('lib/img/'+q.id+'.jpg')})}
     const out={folders:[...new Set([...(base.folders||[]),...(L.folders||[])])].filter(f=>!(L.delF||[]).includes(f)),items:[...m.values()]};
     await ghReq('lib/library.json',{method:'PUT',body:JSON.stringify({message:'Библиотека: обновяване',content:b64u(JSON.stringify(out,null,1)),branch:GH.b,...(cur&&cur.sha?{sha:cur.sha}:{})})});
     for(const q of L.items)q.pend=false;libLocalSet(L);LIB=out;libMsg('Качено ✓ — до 1–2 минути се вижда и на другите компютри и таблета (след отваряне на програмата).');renderLib();return true}
@@ -3643,12 +3644,12 @@ function libFormHtml(){const A=libAll();return `<b style="grid-column:1/-1">Но
   <div style="grid-column:1/-1;display:flex;gap:6px"><button class="btn primary sm" id="lfSave">Запази</button><button class="btn sm" id="lfX">Откажи</button></div>`}
 function libAddSave(){const f=$('#lfI').files[0],name=$('#lfN').value.trim();if(!name){toast('Напиши име');return}if(!f){toast('Избери снимка');return}
   const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const sc=Math.min(1,1024/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);
-    c.getContext('2d').drawImage(img,0,0,c.width,c.height);const it={id:uid(),folder:$('#lfF').value,name,code:$('#lfC').value.trim(),w:+$('#lfW').value||1000,dir:grainOf(c)||(img.width>=img.height?'h':'v'),ar:img.height/img.width,data:c.toDataURL('image/jpeg',0.82),pend:true};
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);const it={id:uid(),ts:Date.now(),folder:$('#lfF').value,name,code:$('#lfC').value.trim(),w:+$('#lfW').value||1000,dir:grainOf(c)||(img.width>=img.height?'h':'v'),ar:img.height/img.width,data:c.toDataURL('image/jpeg',0.82),pend:true};
     it.rot=$('#lfD').value===it.dir?0:90;const L=libLocal();L.items.push(it);libLocalSet(L);$('#libForm').hidden=true;libOpenId=it.id;renderLib();libPush()};img.onerror=()=>toast('Файлът не е картинка');img.src=r.result};r.readAsDataURL(f)}
 async function libApply(it,mid,quiet){const m=P.materials.find(q=>q.id===mid);if(!m)return;const src=it.data||it.img;
   const img=new Image();img.crossOrigin='anonymous';img.onload=()=>{const sc=Math.min(1,1024/Math.max(img.width,img.height)),w=Math.round(img.width*sc),h=Math.round(img.height*sc),rt=!!it.rot,c=document.createElement('canvas');c.width=rt?h:w;c.height=rt?w:h;const g=c.getContext('2d');
     if(rt){g.translate(h,0);g.rotate(Math.PI/2)}g.drawImage(img,0,0,w,h); /* завъртяна снимка — фладерът изглежда както е избран */
-    pushUndo();m.tex=c.toDataURL('image/jpeg',0.82);m.texAR=c.height/c.width;m.texAvg=avgColor(c);m.texW=rt?Math.round((it.w||1000)*img.height/img.width):(it.w||1000);m.texDir=libLook(it);m.dec=it.id;m.decN=(it.code?it.code+' ':'')+it.name;
+    pushUndo();m.tex=c.toDataURL('image/jpeg',0.82);m.texAR=c.height/c.width;m.texAvg=avgColor(c);m.texW=rt?Math.round((it.w||1000)*img.height/img.width):(it.w||1000);m.texDir=libLook(it);m.grX=libLook(it)==='h';m.dec=it.id;m.decN=(it.code?it.code+' ':'')+it.name;
     P.example=false;changed(true);renderLib();if(!quiet)toast(`„${m.name}“ — ${it.name}`)};img.onerror=()=>toast('Снимката не се зареди (няма интернет?)');img.src=src}
 $('#bLib').onclick=()=>{open('#ovLib');libMsg(libTok()?'':'Декорите се пазят на това устройство; за да отиват и на другите — „⚙ Синхронизация“ (веднъж).');renderLib();libLoad().then(renderLib)};
 $('#libQ').oninput=renderLib;
@@ -3663,7 +3664,7 @@ $('#ovLib').addEventListener('click',e=>{const f=e.target.closest('[data-lf]');i
   if(e.target.id==='libRetry')libPush()});
 $('#ovLib').addEventListener('change',e=>{if(e.target.id==='libW'){const w=+e.target.value;if(w>0)setTimeout(()=>libEdit({w}),0)}});
 function libEdit(ch){ /* промяна на фладера/ширината на декор, който вече е в библиотеката — пази се и се качва за всички устройства; обновява и материалите в проекта с този декор */
-  const it=libAll().items.find(q=>q.id===libOpenId);if(!it)return;const L=libLocal(),i=L.items.findIndex(q=>q.id===it.id),nw={...it,...ch,pend:true};if(i<0)L.items.push(nw);else L.items[i]={...L.items[i],...ch,pend:true};libLocalSet(L);
+  const it=libAll().items.find(q=>q.id===libOpenId);if(!it)return;const L=libLocal(),i=L.items.findIndex(q=>q.id===it.id),ts=Date.now(),nw={...it,...ch,ts,pend:true};if(i<0)L.items.push(nw);else L.items[i]={...L.items[i],...ch,ts,pend:true};libLocalSet(L);
   const nit={...it,...ch};for(const m of P.materials.filter(m=>m.dec===it.id))libApply(nit,m.id,true);
   renderLib();libPush()}
 $('#libSync').onclick=()=>{const cur=libTok();const t=prompt('Ключ за GitHub (веднъж на всяко устройство, от което ДОБАВЯШ декори; само за гледане не трябва).\n\nКак се прави: github.com → снимката горе вдясно → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token → Repository access: Only select repositories → mebelen-konstruktor → Permissions: Contents = Read and write → Generate → копирай и постави тук.\n\nПразно = махни ключа от това устройство.',cur);if(t===null)return;
