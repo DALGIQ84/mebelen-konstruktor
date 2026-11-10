@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 00:40 · „☑ Няколко“ — избор на няколко шкафа с докосване</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 20:30 · Библиотека с декори (папки, снимки, синхронизация през GitHub)</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -187,7 +187,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
     </div></div>
   <div class="dd" id="ddKit"><button class="btn primary" id="bKit" aria-haspopup="true" aria-expanded="false">Кухни ▾</button><div class="ddm" id="kitMenu" hidden></div></div><div class="dd" id="ddWard"><button class="btn primary" id="bWard" aria-haspopup="true" aria-expanded="false">Гардероби ▾</button></div><div class="dd" id="ddBed"><button class="btn primary" id="bBed" aria-haspopup="true" aria-expanded="false">Легла ▾</button></div><div class="dd" id="ddFree"><button class="btn primary" id="bFree" aria-haspopup="true" aria-expanded="false">Свободни детайли ▾</button></div>
   <button class="btn" id="bUndoAll" title="Назад (Ctrl+Z)" aria-label="Назад">↶</button><button class="btn" id="bRedoAll" title="Напред (Ctrl+Y)" aria-label="Напред">↷</button>
-  <button class="btn" id="bQSave" title="Запази проекта (Ctrl+S)" aria-label="Запази проекта" style="margin-left:auto;padding-inline:10px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" style="display:block"><path d="M5 3h11l5 5v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M7 3v6h9V3"/><rect x="7" y="13" width="10" height="8"/></svg></button><button class="btn" id="bSet">Настройки</button><span class="dd"><button class="btn" id="bVer" title="За програмата" aria-label="За програмата" aria-expanded="false" style="width:36px;padding:0;border-radius:50%;font-weight:700">?</button><div class="ddm" id="verPop" hidden style="right:0;left:auto;min-width:300px;padding:12px 14px;font-size:13px;line-height:1.55"></div></span>
+  <button class="btn" id="bQSave" title="Запази проекта (Ctrl+S)" aria-label="Запази проекта" style="margin-left:auto;padding-inline:10px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" style="display:block"><path d="M5 3h11l5 5v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M7 3v6h9V3"/><rect x="7" y="13" width="10" height="8"/></svg></button><button class="btn" id="bLib" title="Библиотека с декори — папки Роси, Егер, Кроношпан…">Библиотека</button><button class="btn" id="bSet">Настройки</button><span class="dd"><button class="btn" id="bVer" title="За програмата" aria-label="За програмата" aria-expanded="false" style="width:36px;padding:0;border-radius:50%;font-weight:700">?</button><div class="ddm" id="verPop" hidden style="right:0;left:auto;min-width:300px;padding:12px 14px;font-size:13px;line-height:1.55"></div></span>
 </header>
 
 <main class="wrap">
@@ -324,6 +324,21 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
   </div>
 </div>
 
+<div id="ovLib" class="ov" hidden>
+  <div class="dlg" style="width:min(1150px,100%)">
+    <h3>Библиотека с декори <span style="display:flex;gap:6px"><button class="btn sm" id="libSync">⚙ Синхронизация</button><button class="btn sm" data-close>Затвори</button></span></h3>
+    <div class="body" style="display:grid;grid-template-columns:200px 1fr;gap:12px;min-height:60vh">
+      <div style="display:flex;flex-direction:column;gap:6px"><div id="libFolders" style="display:flex;flex-direction:column;gap:4px"></div><button class="btn sm" id="libAddF">+ Папка</button></div>
+      <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><input id="libQ" placeholder="Търси по име или код…" style="flex:1;min-width:160px"><button class="btn primary sm" id="libAdd">+ Декор</button></div>
+        <div id="libMsg" class="note" style="margin:0"></div>
+        <div id="libGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;align-content:start"></div>
+        <div id="libForm" hidden style="border:1px solid var(--line);border-radius:8px;padding:10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px"></div>
+        <div id="libDet" hidden style="border:1px solid var(--line);border-radius:8px;padding:10px"></div>
+      </div>
+    </div>
+  </div>
+</div>
 <div id="ovImg" class="ov" hidden>
   <div class="dlg" style="width:min(1100px,100%)">
     <h3><span id="imgName">Картинка</span> <button class="btn sm" data-close>Затвори</button></h3>
@@ -3574,6 +3589,69 @@ $('#bMy').onclick=()=>{const k=cab(sel);if(!k||isAcc(k)){toast('Избери ш�
   const p=JSON.parse(JSON.stringify(k));for(const f of ['id','x','y','wall','off','gap','rot','name'])delete p[f];
   const label=`${k.name} · ${k.W}×${r1(k.H-k.c)}×${k.D}`;MY.push({id:uid(),name:label,type:TYPE_BG[k.type]||'',p});saveMy();toast(`Запазен в „Кухни → Мои шкафове“`)};
 
+/* ---------- Библиотека с декори ---------- */
+const GH={o:'DALGIQ84',r:'mebelen-konstruktor',b:'main'},LIBK='kp.lib.local',TOKK='kp.ghtok';
+let LIB={folders:['Роси','Егер','Кроношпан'],items:[]},libF='',libOpenId=null;
+const libLocal=()=>{try{return JSON.parse(localStorage.getItem(LIBK)||'null')||{folders:[],items:[],del:[]}}catch(_){return{folders:[],items:[],del:[]}}},libLocalSet=o=>{try{localStorage.setItem(LIBK,JSON.stringify(o))}catch(_){toast('Няма място в паметта на браузъра')}};
+const libTok=()=>{try{return localStorage.getItem(TOKK)||''}catch(_){return''}};
+function libAll(){const L=libLocal(),del=new Set(L.del||[]),m=new Map();for(const it of LIB.items)if(!del.has(it.id))m.set(it.id,it);for(const it of L.items)if(!del.has(it.id))m.set(it.id,{...m.get(it.id),...it});
+  return{folders:[...new Set([...LIB.folders,...(L.folders||[])])],items:[...m.values()]}}
+async function libLoad(){try{const r=await fetch('lib/library.json?t='+Date.now(),{cache:'no-store'});if(r.ok){const o=await r.json();LIB={folders:o.folders||[],items:o.items||[]};
+  const L=libLocal(),ids=new Set(LIB.items.map(q=>q.id));L.items=L.items.filter(q=>!(ids.has(q.id)&&!q.pend));L.del=(L.del||[]).filter(id=>ids.has(id));libLocalSet(L)}}catch(_){}}
+const b64u=str=>btoa(unescape(encodeURIComponent(str)));
+async function ghReq(path,opt={}){const t=libTok();if(!t)throw new Error('notok');const r=await fetch(`https://api.github.com/repos/${GH.o}/${GH.r}/contents/${path}`+(opt.method?'':`?ref=${GH.b}`),{...opt,headers:{Authorization:'Bearer '+t,Accept:'application/vnd.github+json',...(opt.headers||{})}});
+  if(r.status===404&&!opt.method)return null;if(!r.ok)throw new Error('gh '+r.status);return r.json()}
+async function ghPut(path,b64,msg){const cur=await ghReq(path).catch(e=>{if(String(e.message).includes('404'))return null;throw e});
+  return ghReq(path,{method:'PUT',body:JSON.stringify({message:msg,content:b64,branch:GH.b,...(cur&&cur.sha?{sha:cur.sha}:{})})})}
+async function libPush(){ /* качва чакащите декори и обновява library.json в GitHub — оттам ги взимат всички компютри и таблетът */
+  const L=libLocal();if(!libTok()){libMsg('Декорите са запазени само на това устройство. За да отидат и на другите — „⚙ Синхронизация“.');return}
+  libMsg('Качване в GitHub…');try{
+    for(const it of L.items.filter(q=>q.pend&&q.data)){await ghPut('lib/img/'+it.id+'.jpg',it.data.split(',')[1],'Библиотека: '+it.name);it.img='lib/img/'+it.id+'.jpg'}
+    const cur=await ghReq('lib/library.json');let base={folders:['Роси','Егер','Кроношпан'],items:[]};if(cur&&cur.content)try{base=JSON.parse(decodeURIComponent(escape(atob(cur.content.replace(/\n/g,'')))))}catch(_){}
+    const del=new Set(L.del||[]),m=new Map();for(const q of base.items||[])if(!del.has(q.id))m.set(q.id,q);for(const q of L.items){const{data,pend,...rest}=q;if(!del.has(q.id))m.set(q.id,{...rest,img:q.img||('lib/img/'+q.id+'.jpg')})}
+    const out={folders:[...new Set([...(base.folders||[]),...(L.folders||[])])].filter(f=>!(L.delF||[]).includes(f)),items:[...m.values()]};
+    await ghReq('lib/library.json',{method:'PUT',body:JSON.stringify({message:'Библиотека: обновяване',content:b64u(JSON.stringify(out,null,1)),branch:GH.b,...(cur&&cur.sha?{sha:cur.sha}:{})})});
+    for(const q of L.items)q.pend=false;libLocalSet(L);LIB=out;libMsg('Качено ✓ — до 1–2 минути се вижда и на другите компютри и таблета (след отваряне на програмата).');renderLib()}
+  catch(e){libMsg(String(e.message).includes('401')||String(e.message).includes('403')?'GitHub не приема ключа — провери го в „⚙ Синхронизация“.':'Не успях да кача (няма интернет?). Остава на това устройство — опитай пак по-късно.')}}
+const libMsg=t=>{const e=$('#libMsg');if(e)e.textContent=t||''};
+function renderLib(){const A=libAll(),q=($('#libQ').value||'').toLowerCase().trim();
+  $('#libFolders').innerHTML=[['','Всички',A.items.length],...A.folders.map(f=>[f,f,A.items.filter(i=>i.folder===f).length])].map(([v,n,c])=>`<button class="btn sm${libF===v?' primary':''}" data-lf="${esc(v)}" style="justify-content:space-between;display:flex">${esc(n)} <span style="opacity:.7">${c}</span></button>`).join('');
+  const L=A.items.filter(i=>(!libF||i.folder===libF)&&(!q||(i.name+' '+(i.code||'')).toLowerCase().includes(q)));
+  $('#libGrid').innerHTML=L.length?L.map(i=>`<button data-li="${esc(i.id)}" style="display:flex;flex-direction:column;gap:4px;padding:6px;border:1px solid ${libOpenId===i.id?'var(--accent)':'var(--line)'};border-radius:8px;background:var(--panel);text-align:left;cursor:pointer">
+    <img src="${esc(i.data||i.img)}" alt="" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:5px;background:var(--field)"><b style="font-size:12.5px">${esc(i.name)}</b><span style="font-size:11.5px;color:var(--muted)">${esc(i.code||'')}${i.pend?' · само тук':''}</span></button>`).join(''):`<p class="note">${A.items.length?'Няма декори по това търсене.':'Още няма декори — натисни „+ Декор“.'}</p>`;
+  const it=A.items.find(i=>i.id===libOpenId),D=$('#libDet');if(!it){D.hidden=true;return}D.hidden=false;
+  const mats=P.materials.filter(m=>!m.glass&&!/^(HDF|ПДЧ 8)/.test(m.name));
+  D.innerHTML=`<div style="display:flex;gap:12px;flex-wrap:wrap"><img src="${esc(it.data||it.img)}" alt="" style="width:180px;height:180px;object-fit:cover;border-radius:6px"><div style="display:flex;flex-direction:column;gap:6px;min-width:220px;flex:1">
+    <b>${esc(it.name)}</b><span class="note" style="margin:0">${esc(it.folder)}${it.code?' · код '+esc(it.code):''} · снимката е широка ${fmt(it.w||1000)} мм, шарка ${it.dir==='v'?'вертикална':'хоризонтална'}</span>
+    <span style="font-size:12.5px">Сложи на материала:</span><div style="display:flex;gap:6px;flex-wrap:wrap">${mats.map(m=>`<button class="btn sm" data-lapply="${esc(m.id)}">${esc(m.name)}${m.dec===it.id?' ✓':''}</button>`).join('')}</div>
+    <div style="display:flex;gap:6px;margin-top:6px"><button class="btn sm" data-ldel="${esc(it.id)}">Изтрий от библиотеката</button>${it.pend?`<button class="btn sm" id="libRetry">Качи пак</button>`:''}</div></div></div>`}
+function libFormHtml(){const A=libAll();return `<b style="grid-column:1/-1">Нов декор</b>
+  <label>Папка<select id="lfF">${A.folders.map(f=>`<option ${f===libF?'selected':''}>${esc(f)}</option>`).join('')}</select></label>
+  <label>Име<input id="lfN" placeholder="напр. Дъб Халифакс"></label><label>Код<input id="lfC" placeholder="напр. H1180 ST37"></label>
+  <label>Снимката е широка, мм<input id="lfW" type="number" value="1000"></label><label>Шарката<select id="lfD"><option value="h">хоризонтална ↔</option><option value="v">вертикална ↕</option></select></label>
+  <label>Снимка<input id="lfI" type="file" accept="image/*"></label>
+  <div style="grid-column:1/-1;display:flex;gap:6px"><button class="btn primary sm" id="lfSave">Запази</button><button class="btn sm" id="lfX">Откажи</button></div>`}
+function libAddSave(){const f=$('#lfI').files[0],name=$('#lfN').value.trim();if(!name){toast('Напиши име');return}if(!f){toast('Избери снимка');return}
+  const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const sc=Math.min(1,1024/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);const it={id:uid(),folder:$('#lfF').value,name,code:$('#lfC').value.trim(),w:+$('#lfW').value||1000,dir:$('#lfD').value,ar:img.height/img.width,data:c.toDataURL('image/jpeg',0.82),pend:true};
+    const L=libLocal();L.items.push(it);libLocalSet(L);$('#libForm').hidden=true;libOpenId=it.id;renderLib();libPush()};img.onerror=()=>toast('Файлът не е картинка');img.src=r.result};r.readAsDataURL(f)}
+async function libApply(it,mid){const m=P.materials.find(q=>q.id===mid);if(!m)return;const src=it.data||it.img;
+  const img=new Image();img.crossOrigin='anonymous';img.onload=()=>{const sc=Math.min(1,1024/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    pushUndo();m.tex=c.toDataURL('image/jpeg',0.82);m.texAR=img.height/img.width;m.texAvg=avgColor(c);m.texW=it.w||1000;m.texDir=it.dir||'h';m.dec=it.id;m.decN=(it.code?it.code+' ':'')+it.name;
+    P.example=false;changed(true);renderLib();toast(`„${m.name}“ — ${it.name}`)};img.onerror=()=>toast('Снимката не се зареди (няма интернет?)');img.src=src}
+$('#bLib').onclick=()=>{open('#ovLib');libMsg(libTok()?'':'Декорите се пазят на това устройство; за да отиват и на другите — „⚙ Синхронизация“ (веднъж).');renderLib();libLoad().then(renderLib)};
+$('#libQ').oninput=renderLib;
+$('#libAddF').onclick=()=>{const n=(prompt('Име на новата папка (напр. Невилс):')||'').trim();if(!n)return;const L=libLocal();L.folders=[...new Set([...(L.folders||[]),n])];libLocalSet(L);libF=n;renderLib();libPush()};
+$('#libAdd').onclick=()=>{const F=$('#libForm');F.innerHTML=libFormHtml();F.hidden=false;$('#libDet').hidden=true;$('#lfN').focus()};
+$('#libForm').addEventListener('click',e=>{if(e.target.id==='lfSave')libAddSave();if(e.target.id==='lfX')$('#libForm').hidden=true});
+$('#ovLib').addEventListener('click',e=>{const f=e.target.closest('[data-lf]');if(f){libF=f.dataset.lf;renderLib();return}
+  const i=e.target.closest('[data-li]');if(i){libOpenId=libOpenId===i.dataset.li?null:i.dataset.li;renderLib();return}
+  const a=e.target.closest('[data-lapply]');if(a){const it=libAll().items.find(q=>q.id===libOpenId);if(it)libApply(it,a.dataset.lapply);return}
+  const d=e.target.closest('[data-ldel]');if(d){if(!confirm('Да изтрия ли декора от библиотеката? (В проектите остава.)'))return;const L=libLocal();L.del=[...new Set([...(L.del||[]),d.dataset.ldel])];L.items=L.items.filter(q=>q.id!==d.dataset.ldel||!q.pend);libLocalSet(L);libOpenId=null;renderLib();libPush();return}
+  if(e.target.id==='libRetry')libPush()});
+$('#libSync').onclick=()=>{const cur=libTok();const t=prompt('Ключ за GitHub (веднъж на всяко устройство, от което ДОБАВЯШ декори; само за гледане не трябва).\n\nКак се прави: github.com → снимката горе вдясно → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token → Repository access: Only select repositories → mebelen-konstruktor → Permissions: Contents = Read and write → Generate → копирай и постави тук.\n\nПразно = махни ключа от това устройство.',cur);if(t===null)return;
+  try{if(t.trim())localStorage.setItem(TOKK,t.trim());else localStorage.removeItem(TOKK)}catch(_){}libMsg(t.trim()?'Ключът е запазен — проверявам…':'Ключът е махнат.');if(t.trim())ghReq('lib/library.json').then(()=>{libMsg('Връзката с GitHub е наред ✓');libPush()}).catch(e=>libMsg('GitHub не приема ключа ('+e.message+') — провери правата: Contents = Read and write за mebelen-konstruktor.'))};
+setTimeout(()=>libLoad(),1500);
 /* ---------- Таблет / пръст ---------- */
 let lpT=0;const lpJust=()=>Date.now()-lpT<700; // току-що е имало дълго натискане — да не избира/влачи
 function longPress(el,fire){let t=null,x0=0,y0=0;const clr=()=>{if(t){clearTimeout(t);t=null}};
