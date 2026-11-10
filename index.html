@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.11 · 00:40 · Фото: реалистичен рендер с лъчи</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.11 · 00:55 · Мивка/котлон: височина от пода на ръка</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1527,7 +1527,8 @@ function renderEditor(){
       num('W','Ширина, мм',k.W)+num('D','Дълбочина, мм',k.D)+(a.up?num('c','Долен ръб от пода, мм',Math.round(k.c))+num('H','Височина на аспиратора (с комина), мм',Math.round(k.H-k.c)):inb?'':num('H','Височина, мм',Math.round(k.H-k.c)));
     if(k.acc==='sink')h+=`<label>Корита<select id="f_bowls" data-f="bowls"><option value="1" ${+k.bowls!==2&&+k.bowls!==3?'selected':''}>1 коритo</option><option value="3" ${+k.bowls===3?'selected':''}>1 корито + отцедник</option><option value="2" ${+k.bowls===2?'selected':''}>2 корита</option></select></label>`;
     if(k.acc==='hob')h+=`<label>Зони<select id="f_zones" data-f="zones"><option value="4" ${+k.zones!==5&&+k.zones!==2?'selected':''}>4</option><option value="5" ${+k.zones===5?'selected':''}>5</option><option value="2" ${+k.zones===2?'selected':''}>2 (домино)</option><option value="22" ${+k.zones===22?'selected':''}>двоен — 2 домино един до друг</option></select></label>`;
-    if(inb)h+=k.onTop?`<p class="note full">Стои върху плота — височината се взима сама (${Math.round(k.c)} мм от пода).</p>`:num('c','Височина на плота, мм',k.c)+`<p class="note full">Няма плот под него — сложи плот на шкафовете или задай височината.</p>`;
+    if(inb&&(k.onTop||+k.accZ>0))h+=`<label>Височина от пода, мм<input id="f_accZ" data-f="accZ" type="number" step="1" placeholder="авто" value="${+k.accZ>0?+k.accZ:''}"></label><p class="note full" style="margin-top:0">${+k.accZ>0?`Зададена на ръка — празно = пак върху плота${k._autoZ?` (${Math.round(k._autoZ)} мм)`:''}.`:`Стои върху плота — височината се взима сама (${Math.round(k.c)} мм от пода). Напиши друга, ако трябва.`}</p>`;
+    else if(inb)h+=k.onTop?'':num('c','Височина на плота, мм',k.c)+`<p class="note full">Няма плот под него — сложи плот на шкафовете или задай височината.</p>`;
     h+=`<div class="sub">Място в стаята</div><label>Стена<select id="f_wall" data-f="wall"><option value="">Свободно</option>${P.room.pts.map((_,i)=>`<option value="${i}" ${k.wall===i?'selected':''}>Стена ${i+1} · ${Math.round(wallInfo(i).len)}</option>`).join('')}</select></label>`+
       (onWall?num('off','От началото на стената, мм',Math.round(k.off))+num('gap','Отстъп от стената, мм',k.gap):num('px','X, мм',Math.round(k.x))+num('py','Y, мм',Math.round(k.y))+num('rot','Завъртане, °',Math.round(k.rot*10)/10))+
       `<div class="acts full"><button class="btn sm" id="bDel">Изтрий</button></div>`;
@@ -1638,6 +1639,7 @@ $('#ed').addEventListener('input',e=>{
   let v=e.target.type==='checkbox'?e.target.checked:e.target.value;
   if(f==='wall'){if(v===''){k.wall=null}else{k.wall=+v;k.off=0;place(k)}P.example=false;changed(true);return}
   if(isAcc(k)&&f==='acc'){const a=ACC[v]||ACC.sink;k.acc=v;if(/^(Мивка|Котлон|Готварска|Хладилник|Пералня|Съдомиялна|Сушилня)/.test(k.name))k.name=a.name.replace(/ \(.*\)/,'');k.W=a.W;k.D=a.D;k.c=a.free?0:900;k.H=k.c+a.h;k.gap=a.gap||0;place(k);P.example=false;changed(true);return}
+  if(isAcc(k)&&f==='accZ'){pushUndo();k.accZ=v===''?0:Math.max(0,+v)||0;P.example=false;changed(true);return}
   if(isAcc(k)&&(f==='acol'||f==='bowls'||f==='zones')){k[f]=f==='acol'?v:+v;if(f==='zones'){if(+v===22)k.W=Math.max(+k.W,600);else if(+v===2&&+k.W>400)k.W=300;else if(+k.W<500)k.W=590;P.example=false;changed(true);return}P.example=false;changed(false);return}
   if(['nsLeg','nsPlB','bMW','bML','bGap','bH','bSpl','bUp','bFl','bHBh','bHBw','lift','hoodD','hoodH','hoodStrip','vdoors','split','armB','W','H','D','c','div','sh','doors','dr','nl','bRails','deadW','ovenH','lowH','mwH','over','pc','topSh','fridgeH','frDoors','frLow','divShort','grooveD','grooveY','px','py','rot','off','gap'].includes(f)){v=+v;if(!isFinite(v))return;if(v<0&&!['px','py','rot','off'].includes(f))return}
   if(f==='upper'){const h=k.H-k.c;if(v){k.c=1450;k.H=1450+Math.min(h,900);if(+k.D>400)k.D=320;k.plinth=false;k.floor='none'}else{k.c=100;k.H=100+h;if(+k.D<500)k.D=580}}
@@ -1703,7 +1705,8 @@ function snapSplash(){ // гръбът на кухнята винаги стои
 function snapAcc(){ // мивката и котлонът стоят върху плота под тях
   for(const k of P.cabinets){if(!accIn(k))continue;const h=accOf(k).h;
     const ts=k.wall===null?[]:P.cabinets.filter(t=>t.type==='top'&&t.wall===k.wall&&t.off<k.off+k.W&&t.off+t.W>k.off);
-    if(ts.length){k.c=Math.max(...ts.map(t=>+t.c+(+mat(t.mf).t||38)));k.onTop=true}else k.onTop=false;
+    if(ts.length){k._autoZ=Math.max(...ts.map(t=>+t.c+(+mat(t.mf).t||38)));k.c=k._autoZ;k.onTop=true}else{k.onTop=false;k._autoZ=0}
+    if(+k.accZ>0)k.c=+k.accZ; /* височина от пода — зададена на ръка */
     k.H=+k.c+(k.acc==='sink'?30:h)}}
 function changed(full){if(pedK&&!cab(pedK))closePed();snapSplash();snapAcc();save();renderList();if(full)renderEditor();else{renderWarn();const li=$('#liftInfo'),k=cab(sel);if(li&&k)li.innerHTML=liftInfoHtml(k)}renderTable();rebuild3D();renderPlan()}
 const undoStack=[];
