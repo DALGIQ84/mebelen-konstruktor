@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 22:10 · Преименуван проект — и файлът се преименува</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 22:15 · Преименуване без остатъчен .crswap</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -3437,13 +3437,14 @@ let projFH=null; // отвореният файл (инсталираната п
 const FSA=OFFLINE&&!!window.showSaveFilePicker;if(FSA)$('#bSaveAs').hidden=false;
 const pjTypes=[{description:'Проект KRAFTPLAN',accept:{'application/x-kraftplan':['.kraft']}},{description:'Проект (стар формат .json)',accept:{'application/json':['.json']}}];
 async function saveProj(as){const name=projBase()+'.kraft',data=JSON.stringify(P);
-  if(FSA){try{const nn=String(P.name||'').trim().replace(/[\\/:*?"<>|]+/g,' ').trim();
+  if(FSA){let renTo=null;try{const nn=String(P.name||'').trim().replace(/[\\/:*?"<>|]+/g,' ').trim();
       if(!as&&projFH&&nn&&fStem(projFH.name)!==nn){const ext=(projFH.name.match(/\.(kraft|json|txt)$/i)||['.kraft'])[0],to=nn+ext; /* преименуван проект — и файлът се преименува */
-        let ok=false;if(projFH.move)try{if(projFH.queryPermission&&(await projFH.queryPermission({mode:'readwrite'}))!=='granted')await projFH.requestPermission({mode:'readwrite'});await projFH.move(to);ok=true;toast('Файлът е преименуван: '+to)}catch(e){}
-        if(!ok)as=true}
+        if(projFH.move)renTo=to;else as=true}
       if(as||!projFH)projFH=await showSaveFilePicker({suggestedName:name,types:pjTypes,id:'mebeli-proj',startIn:projFH||'documents'});
       if(projFH.queryPermission&&(await projFH.queryPermission({mode:'readwrite'}))!=='granted'&&(await projFH.requestPermission({mode:'readwrite'}))!=='granted')throw new Error('няма разрешение за запис във файла');
-      const w=await projFH.createWritable();await w.write(data);await w.close();recentAdd(projFH);markSaved();toast('Запазено: '+projFH.name);$('#bSaveSm').textContent=projFH.name;return true}
+      const w=await projFH.createWritable();await w.write(data);await w.close(); /* първо записва, после преименува — да не остава .crswap */
+      if(renTo)try{await projFH.move(renTo);toast('Файлът е преименуван: '+renTo)}catch(e){toast('Записано, но не можах да преименувам файла — „Запиши като“ с новото име')}
+      recentAdd(projFH);markSaved();toast('Запазено: '+projFH.name);$('#bSaveSm').textContent=projFH.name;return true}
     catch(e){if(e&&e.name==='AbortError')return false;toast('Не можах да запиша: '+(e&&e.message||e))}}
   if(OFFLINE){plainDownload(name,data);markSaved();toast('Запазено в „Изтеглени“: '+name);return true}
   return false}
