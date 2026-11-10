@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 23:15 · Преместен файл — не записва в старата папка</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 23:25 · Светли отвори — без врати и на надстройките</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2436,9 +2436,9 @@ function wallSvg(){
         if(p.fp){s+=`<polygon points="${p.fp.map(([u,v])=>(k.off+u)+','+(-v)).join(' ')}" style="fill:${mat(p.m).color};stroke:var(--fg);stroke-width:.8;vector-effect:non-scaling-stroke"/>`;continue}
         if(p.fr){s+=`<polygon points="${miterPts(p.fr).map(([u,v])=>(k.off+u)+','+(-v)).join(' ')}" style="fill:${mat(p.m).color};stroke:var(--fg);stroke-width:.6;vector-effect:non-scaling-stroke"/>`;continue}
         const back=/Гръб/.test(p.name);s+=`<rect x="${k.off+x0}" y="${-z1}" width="${x1-x0}" height="${z1-z0}" style="fill:${p.kind==='glass'&&p.glc&&p.glc!=='clear'&&GLCOL[p.glc]?GLCOL[p.glc][1]:mat(p.m).color};${p.kind==='glass'?'fill-opacity:'+(!p.glc||p.glc==='clear'?.35:.75)+';':''}${back?'filter:brightness(.8);':''}stroke:var(--fg);stroke-width:.6;stroke-opacity:.7;vector-effect:non-scaling-stroke"/>`}
-      for(const p of b.parts.filter(p=>p.kind==='door'&&!(k.hideD&&!noHideD)&&!(showClear&&b.cols))){const[x0,x1,,,z0,z1]=p.box;
+      for(const p of b.parts.filter(p=>p.kind==='door'&&!(k.hideD&&!noHideD)&&!showClear)){const[x0,x1,,,z0,z1]=p.box;
         s+=`<rect x="${k.off+x0}" y="${-z1}" width="${x1-x0}" height="${z1-z0}" style="fill:${mat(k.mf).color};stroke:var(--fg);stroke-width:.8;vector-effect:non-scaling-stroke"/>`}
-      for(const p of b.parts.filter(p=>p.mir&&!(k.hideD&&!noHideD)&&!(showClear&&b.cols))){const[x0,x1,,,z0,z1]=p.box,X=k.off+x0,w=x1-x0,h=z1-z0,d=Math.min(w,h)*.35; // огледало — върху вратата
+      for(const p of b.parts.filter(p=>p.mir&&!(k.hideD&&!noHideD)&&!showClear)){const[x0,x1,,,z0,z1]=p.box,X=k.off+x0,w=x1-x0,h=z1-z0,d=Math.min(w,h)*.35; // огледало — върху вратата
         s+=`<rect x="${X}" y="${-z1}" width="${w}" height="${h}" style="fill:#e6eef2;stroke:var(--fg);stroke-width:.8;vector-effect:non-scaling-stroke"/><line x1="${X+w*.2}" y1="${-z0-h*.55}" x2="${X+w*.2+d}" y2="${-z0-h*.55-d}" style="stroke:#9fb3bd;stroke-width:1.2;vector-effect:non-scaling-stroke"/><line x1="${X+w*.3}" y1="${-z0-h*.5}" x2="${X+w*.3+d*.7}" y2="${-z0-h*.5-d*.7}" style="stroke:#9fb3bd;stroke-width:1.2;vector-effect:non-scaling-stroke"/>`}
       s+=`<rect x="${k.off}" y="${-k.H}" width="${k.W}" height="${k.H-k.c}" style="fill:none;stroke:${on?'var(--mark)':'var(--fg)'};stroke-width:${on?3:1.2};vector-effect:non-scaling-stroke"/>`;
       if(showClear&&b.cols)s+=clearDims(k,colsFromParts(k,b),fs);
