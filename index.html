@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 20:40 · Кодът на плочата излиза в детайлите</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 20:45 · Фладер на декора се сменя от библиотеката</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -3623,7 +3623,9 @@ function renderLib(){const A=libAll(),q=($('#libQ').value||'').toLowerCase().tri
   const it=A.items.find(i=>i.id===libOpenId),D=$('#libDet');if(!it){D.hidden=true;return}D.hidden=false;
   const mats=P.materials.filter(m=>!m.glass&&!/^(HDF|ПДЧ 8)/.test(m.name));
   D.innerHTML=`<div style="display:flex;gap:12px;flex-wrap:wrap"><img src="${esc(it.data||it.img)}" alt="" style="width:180px;height:180px;object-fit:cover;border-radius:6px"><div style="display:flex;flex-direction:column;gap:6px;min-width:220px;flex:1">
-    <b>${esc(it.name)}</b><span class="note" style="margin:0">${esc(it.folder)}${it.code?' · код '+esc(it.code):''} · снимката е широка ${fmt(it.w||1000)} мм, шарка ${it.dir==='v'?'вертикална':'хоризонтална'}</span>
+    <b>${esc(it.name)}</b><span class="note" style="margin:0">${esc(it.folder)}${it.code?' · код '+esc(it.code):''} · снимката е широка ${fmt(it.w||1000)} мм, фладер ${it.dir==='v'?'вертикален':'хоризонтален'}</span>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font-size:12.5px">Фладер:</span><button class="btn sm${it.dir!=='v'?' primary':''}" data-ldir="h">↔ хоризонтален</button><button class="btn sm${it.dir==='v'?' primary':''}" data-ldir="v">↕ вертикален</button>
+      <label style="font-size:12.5px;display:flex;gap:4px;align-items:center;margin-left:6px">снимката е широка<input id="libW" type="number" value="${it.w||1000}" style="width:70px">мм</label></div>
     <span style="font-size:12.5px">Сложи на материала:</span><div style="display:flex;gap:6px;flex-wrap:wrap">${mats.map(m=>`<button class="btn sm" data-lapply="${esc(m.id)}">${esc(m.name)}${m.dec===it.id?' ✓':''}</button>`).join('')}</div>
     <div style="display:flex;gap:6px;margin-top:6px"><button class="btn sm" data-ldel="${esc(it.id)}">Изтрий от библиотеката</button>${it.pend?`<button class="btn sm" id="libRetry">Качи пак</button>`:''}</div></div></div>`}
 function libFormHtml(){const A=libAll();return `<b style="grid-column:1/-1">Нов декор</b>
@@ -3649,7 +3651,13 @@ $('#ovLib').addEventListener('click',e=>{const f=e.target.closest('[data-lf]');i
   const i=e.target.closest('[data-li]');if(i){libOpenId=libOpenId===i.dataset.li?null:i.dataset.li;renderLib();return}
   const a=e.target.closest('[data-lapply]');if(a){const it=libAll().items.find(q=>q.id===libOpenId);if(it)libApply(it,a.dataset.lapply);return}
   const d=e.target.closest('[data-ldel]');if(d){if(!confirm('Да изтрия ли декора от библиотеката? (В проектите остава.)'))return;const L=libLocal();L.del=[...new Set([...(L.del||[]),d.dataset.ldel])];L.items=L.items.filter(q=>q.id!==d.dataset.ldel||!q.pend);libLocalSet(L);libOpenId=null;renderLib();libPush();return}
+  const dr=e.target.closest('[data-ldir]');if(dr){libEdit({dir:dr.dataset.ldir});return}
   if(e.target.id==='libRetry')libPush()});
+$('#ovLib').addEventListener('change',e=>{if(e.target.id==='libW'){const w=+e.target.value;if(w>0)setTimeout(()=>libEdit({w}),0)}});
+function libEdit(ch){ /* промяна на фладера/ширината на декор, който вече е в библиотеката — пази се и се качва за всички устройства; обновява и материалите в проекта с този декор */
+  const it=libAll().items.find(q=>q.id===libOpenId);if(!it)return;const L=libLocal(),i=L.items.findIndex(q=>q.id===it.id),nw={...it,...ch,pend:true};if(i<0)L.items.push(nw);else L.items[i]={...L.items[i],...ch,pend:true};libLocalSet(L);
+  const ms=P.materials.filter(m=>m.dec===it.id);if(ms.length){pushUndo();for(const m of ms){if(ch.dir)m.texDir=ch.dir;if(ch.w)m.texW=ch.w}changed(true)}
+  renderLib();libPush()}
 $('#libSync').onclick=()=>{const cur=libTok();const t=prompt('Ключ за GitHub (веднъж на всяко устройство, от което ДОБАВЯШ декори; само за гледане не трябва).\n\nКак се прави: github.com → снимката горе вдясно → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token → Repository access: Only select repositories → mebelen-konstruktor → Permissions: Contents = Read and write → Generate → копирай и постави тук.\n\nПразно = махни ключа от това устройство.',cur);if(t===null)return;
   try{if(t.trim())localStorage.setItem(TOKK,t.trim());else localStorage.removeItem(TOKK)}catch(_){}libMsg(t.trim()?'Ключът е запазен — проверявам…':'Ключът е махнат.');if(t.trim())ghReq('lib/library.json').then(()=>{libMsg('Връзката с GitHub е наред ✓');libPush()}).catch(e=>libMsg('GitHub не приема ключа ('+e.message+') — провери правата: Contents = Read and write за mebelen-konstruktor.'))};
 setTimeout(()=>libLoad(),1500);
