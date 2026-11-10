@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.11 · 00:55 · Мивка/котлон: височина от пода на ръка</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.11 · 01:00 · Фото: декорите на плота и гърба се виждат</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2110,10 +2110,10 @@ async function photoHD(){ /* истински фото-рендер: лъчит�
       if([].concat(o.material).some(q=>q.transparent&&!glass&&q.opacity<.5))return;
       const mm=new THREE.Mesh(o.geometry,Array.isArray(o.material)?o.material.map(q=>cm(q,ud)):cm(o.material,ud));mm.matrixAutoUpdate=false;mm.matrix.copy(o.matrixWorld);grp.add(mm)});
     const M=1/1000,rb=roomBox(),cx=(rb[0]+rb[1])/2*M,cz=(rb[2]+rb[3])/2*M,rh=P.room.h*M,rw=(rb[1]-rb[0])*M,rd=(rb[3]-rb[2])*M;
-    const lights=[{p:[cx,rh-0.02,cz],t:[cx,0,cz],w:Math.max(.6,rw*.45),h:Math.max(.6,rd*.45),i:warm?3.2:4}]; // таванна светлина
+    const lights=[{p:[cx,rh-0.02,cz],t:[cx,0,cz],w:Math.max(.6,rw*.45),h:Math.max(.6,rd*.45),i:warm?4.5:5}]; // таванна светлина
     const json=grp.toJSON(),q=camera.quaternion;
     const total=window.KP_SAMPLES||(NFq>=1400?1200:NFq>=700?600:NFq>=320?260:90),pc=$('#phC');pc.width=W;pc.height=H;const g=pc.getContext('2d');const t0=performance.now();
-    await window.KPT.render({json,W,H,cam:{p:camera.position.toArray(),q:[q.x,q.y,q.z,q.w],fov:camera.fov},warm,samples:total,lights,envI:warm?.6:.8,exp:warm?.8:.85,
+    await window.KPT.render({json,W,H,cam:{p:camera.position.toArray(),q:[q.x,q.y,q.z,q.w],fov:camera.fov},warm,samples:total,lights,envI:warm?.7:.85,exp:warm?1:1.05,
       onFrame:(cv,n,tt,end)=>{g.drawImage(cv,0,0,W,H);$('#phInfo').textContent=end?'':`${Math.round(n/tt*100)} % · ${((performance.now()-t0)/1000).toFixed(0)} сек`;if(photoStop)window.KPT.stop()}});
     const tx=(pName()?pName()+' · ':'')+'М Плюс Мебели';g.font='500 22px "IBM Plex Sans",Arial,sans-serif';const tw=g.measureText(tx).width;g.fillStyle='rgba(255,255,255,.75)';g.fillRect(W-tw-36,H-46,tw+24,32);g.fillStyle='#1a2227';g.fillText(tx,W-tw-24,H-22);
     $('#phSave').disabled=false;$('#phInfo').textContent=photoStop?'спряно':`готово · ${((performance.now()-t0)/1000).toFixed(0)} сек`;ok=true}
