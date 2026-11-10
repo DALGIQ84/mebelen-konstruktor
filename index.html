@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 21:50 · Огледало: отстъп за всяка страна</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 22:00 · Името на проекта в лентата и в PDF-а</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1482,6 +1482,7 @@ async function saveFile(name,data){if(OFFLINE){plainDownload(name,data);toast('�
   let dl=null;try{dl=await window.claude?.use?.('downloads')}catch(e){}
   if(dl){try{await dl.save({filename:name,data});toast('Запазено: '+name);return true}catch(e){if(e&&e.code==='declined')return true}}
   return false}
+const pName=()=>String(P.name||'').trim()||(typeof projFH!=='undefined'&&projFH&&projFH.name?projFH.name.replace(/\.(kraft|json|txt)$/i,''):''); /* името на проекта: зададеното, иначе името на файла */
 const projBase=()=>((P.name||'проект').replace(/[\\/:*?"<>|]+/g,' ').trim()||'проект');
 
 /* ---------- Шкафове: списък и редактор ---------- */
@@ -2136,7 +2137,7 @@ async function photoRender(){
     renderer.shadowMap.enabled=false;mats.forEach(m=>m.needsUpdate=true);hemi.intensity=hI;sun.intensity=sI;scene.background=bg;renderer.setPixelRatio(pr);
     ({sel,onlySel,showDoors}=keep);multiSel=keep.ms;rebuild3D();resize();photoBusy=false}
   if(n){show(n);
-    g.fillStyle='rgba(255,255,255,.75)';g.font='500 22px "IBM Plex Sans",Arial,sans-serif';const tx=(P.name?P.name+' · ':'')+'М Плюс Мебели',tw=g.measureText(tx).width;
+    g.fillStyle='rgba(255,255,255,.75)';g.font='500 22px "IBM Plex Sans",Arial,sans-serif';const tx=(pName()?pName()+' · ':'')+'М Плюс Мебели',tw=g.measureText(tx).width;
     g.fillRect(W-tw-36,H-46,tw+24,32);g.fillStyle='#1a2227';g.fillText(tx,W-tw-24,H-22);
     $('#phSave').disabled=false;$('#phInfo').textContent=photoStop?'спряно':`готово · ${((performance.now()-t0)/1000).toFixed(0)} сек`}
 }
@@ -2466,7 +2467,7 @@ function wallSvg(){
   }
   s+=`<text x="${L/2}" y="${-H-fs*3.6-xU}" text-anchor="middle" font-size="${fs*0.85}" font-family="IBM Plex Sans Condensed,sans-serif" font-weight="600" style="fill:var(--fg)">${INSTALL?'План на точките · ':''}Стена ${wv+1} — гледана отвътре${showClear&&occupancy(wv).some(o=>o.front&&o.k.type==='wardrobe')?' · светли отвори':''}</text>`;
   if(EXP){
-    s+=`<text x="${-t-fs*4.5}" y="${-H-fs*6.3}" font-size="${fs*0.7}" font-family="IBM Plex Sans,sans-serif" style="fill:var(--muted)">${esc(P.name||'')}${P.name?' · ':''}${new Date().toLocaleDateString('bg-BG')} · размерите са в мм</text>`;
+    s+=`<text x="${-t-fs*4.5}" y="${-H-fs*6.3}" font-size="${fs*0.7}" font-family="IBM Plex Sans,sans-serif" style="fill:var(--muted)">${esc(pName())}${P.name?' · ':''}${new Date().toLocaleDateString('bg-BG')} · размерите са в мм</text>`;
     const types=[...new Set(items.map(q=>q.type))].filter(k=>['water','power','gas','window','door','radiator','panel','duct'].includes(k));
     const LG={water:'В — извод за вода',power:'Т — контакт (ток)',gas:'Г — газ',window:'прозорец',door:'врата',radiator:'радиатор',panel:'ел. табло',duct:'А — тръба за аспиратор'};
     let lx=-t-fs*4.5;const ly=fs*5.9;
@@ -2640,7 +2641,7 @@ function planSvg(){
       <text x="${k.W/2}" y="${k.D/2+fs}" text-anchor="middle" font-size="${fs*.7}" font-family="IBM Plex Mono,monospace" transform="rotate(${-k.rot} ${k.W/2} ${k.D/2})" style="fill:var(--muted)">${k.W}</text>`}</g>`;
   }
   if(tab==='room')R.pts.forEach((p,j)=>{s+=`<circle data-v="${j}" cx="${p[0]}" cy="${p[1]}" r="${fs*0.5}" style="fill:var(--panel);stroke:var(--accent);stroke-width:${fs*0.18};cursor:grab"/>`});
-  if(EXP)s+=`<text x="${vb[0]+fs}" y="${vb[1]+fs*1.4}" font-size="${fs*0.7}" font-family="IBM Plex Sans,sans-serif" style="fill:var(--muted)">${esc(P.name||'')}${P.name?' · ':''}${INSTALL?'План на точките · ':''}План · ${new Date().toLocaleDateString('bg-BG')} · мм</text>`;
+  if(EXP)s+=`<text x="${vb[0]+fs}" y="${vb[1]+fs*1.4}" font-size="${fs*0.7}" font-family="IBM Plex Sans,sans-serif" style="fill:var(--muted)">${esc(pName())}${P.name?' · ':''}${INSTALL?'План на точките · ':''}План · ${new Date().toLocaleDateString('bg-BG')} · мм</text>`;
   return{s,vb};
 }
 
@@ -2689,7 +2690,7 @@ function shot3D(w=2400,h=1500,cam=null,label='3D изглед'){
   for(const x of wallGroups)x.g.visible=showWalls&&((camera.position.x-x.cx)*x.ox+(camera.position.z-x.cz)*x.oz<0);
   renderer.render(scene,camera);
   const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,w,h);g.drawImage(renderer.domElement,0,0,w,h);
-  g.fillStyle='#1a2227';g.font='600 44px "IBM Plex Sans Condensed","IBM Plex Sans",Arial,sans-serif';g.fillText((P.name?P.name+' · ':'')+label,48,72);
+  g.fillStyle='#1a2227';g.font='600 44px "IBM Plex Sans Condensed","IBM Plex Sans",Arial,sans-serif';g.fillText((pName()?pName()+' · ':'')+label,48,72);
   g.fillStyle='#5a6870';g.font='26px "IBM Plex Sans",Arial,sans-serif';g.fillText(new Date().toLocaleDateString('bg-BG'),48,112);
   scene.background=bg;camera.position.copy(pos);controls.target.copy(tg);controls.update();renderer.setPixelRatio(pr);
   ({sel,onlySel,showDoors}=keep);noHideD=false;rebuild3D();resize();return c;
@@ -2788,7 +2789,7 @@ function cabInfo(k){const sl=slideOf(k),a=[];if(k.type==='nstand')return 'нощ
 function pageBase(title,sub){const c=document.createElement('canvas');c.width=PGW;c.height=PGH;const g=c.getContext('2d');
   g.fillStyle='#fff';g.fillRect(0,0,PGW,PGH);g.fillStyle='#1a2227';g.font=`600 54px ${FC}`;g.fillText(title,80,110);
   g.fillStyle='#5a6870';g.font=`30px ${FF}`;g.fillText(sub,80,160);
-  g.textAlign='right';g.fillText((P.name||'')+(P.name?' · ':'')+new Date().toLocaleDateString('bg-BG'),PGW-80,110);g.textAlign='left';
+  g.textAlign='right';g.fillText(pName()+(pName()?' · ':'')+new Date().toLocaleDateString('bg-BG'),PGW-80,110);g.textAlign='left';
   g.fillStyle='#d0d7db';g.fillRect(80,190,PGW-160,3);return{c,g}}
 function fitText(g,t,maxW){if(g.measureText(t).width<=maxW)return t;while(t.length>1&&g.measureText(t+'…').width>maxW)t=t.slice(0,-1);return t+'…'}
 const asmList=()=>P.cabinets.filter(k=>!isAcc(k)&&!NODOOR.includes(k.type)); // шкафове — с картинки за сглобяване
@@ -3457,7 +3458,7 @@ const KLOGO=`<svg width="70" height="72" viewBox="0 0 202 206" role="img" aria-l
 <path d="M118 112 A30 30 0 0 0 112 92" stroke="#7d8a94" stroke-width="1.6500000000000001"/><text x="-34" y="90" text-anchor="middle" transform="rotate(-90 -34 90)" style="font-family:Consolas,monospace;font-size:14px;fill:#7d8a94" stroke="none">720</text>
 <text x="56" y="222" text-anchor="middle" style="font-family:Consolas,monospace;font-size:14px;fill:#7d8a94" stroke="none">600</text>
 <text x="124" y="110" style="font-family:Consolas,monospace;font-size:14px;fill:#e3a21a" stroke="none">48°</text></g></g><text x="180" y="24.0" text-anchor="middle" style="font-family:Consolas,'Courier New',monospace;font-size:20px;font-weight:600;fill:#1d1d1f">K</text><text x="180" y="43.5" text-anchor="middle" style="font-family:Consolas,'Courier New',monospace;font-size:20px;font-weight:600;fill:#1d1d1f">R</text><text x="180" y="63.0" text-anchor="middle" style="font-family:Consolas,'Courier New',monospace;font-size:20px;font-weight:600;fill:#1d1d1f">A</text><text x="180" y="82.5" text-anchor="middle" style="font-family:Consolas,'Courier New',monospace;font-size:20px;font-weight:600;fill:#1d1d1f">F</text><text x="180" y="102.0" text-anchor="middle" style="font-family:Consolas,'Courier New',monospace;font-size:20px;font-weight:600;fill:#1d1d1f">T</text><text x="180" y="121.5" text-anchor="middle" style="font-family:Consolas,'Courier New',monospace;font-size:20px;font-weight:400;fill:#e3a21a">P</text><text x="180" y="141.0" text-anchor="middle" style="font-family:Consolas,'Courier New',monospace;font-size:20px;font-weight:400;fill:#e3a21a">L</text><text x="180" y="160.5" text-anchor="middle" style="font-family:Consolas,'Courier New',monospace;font-size:20px;font-weight:400;fill:#e3a21a">A</text><text x="180" y="180.0" text-anchor="middle" style="font-family:Consolas,'Courier New',monospace;font-size:20px;font-weight:400;fill:#e3a21a">N</text></svg>`;
-function setTitle(){const sa=matchMedia('(display-mode: standalone)').matches,f=projFH?projFH.name.replace(/\.(json|txt)$/i,''):'нов проект',d=typeof isDirty==='function'&&isDirty(); // в синята лента: кой файл е отворен (● — има незапазени промени)
+function setTitle(){const sa=matchMedia('(display-mode: standalone)').matches,f=pName()||'нов проект',d=typeof isDirty==='function'&&isDirty(); // в синята лента: кой файл е отворен (● — има незапазени промени)
   const t=(d?'● ':'')+f+(projFH?'':' (незапазен)');const nt=sa?t:'KRAFTPLAN · '+t;if(document.title!==nt)document.title=nt}
 setInterval(setTitle,1000);setTitle();
 $('#bVer').onclick=e=>{e.stopPropagation();const m=$('#verPop');if(m.hidden){const v=$('#appVer').textContent.trim().replace(/^версия\s*/,''),[d,t,...ch]=v.split(' · ');
