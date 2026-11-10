@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 20:55 · Фладер: разпознава се от снимката; по-сигурно качване</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 21:00 · Фладер вертикален/хоризонтален — снимката се завърта сама</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -3619,51 +3619,52 @@ async function libPush1(){ /* качва чакащите декори и обн
     await ghReq('lib/library.json',{method:'PUT',body:JSON.stringify({message:'Библиотека: обновяване',content:b64u(JSON.stringify(out,null,1)),branch:GH.b,...(cur&&cur.sha?{sha:cur.sha}:{})})});
     for(const q of L.items)q.pend=false;libLocalSet(L);LIB=out;libMsg('Качено ✓ — до 1–2 минути се вижда и на другите компютри и таблета (след отваряне на програмата).');renderLib();return true}
   catch(e){if(/gh (409|422)/.test(e.message))return false;libMsg(String(e.message).includes('401')||String(e.message).includes('403')?'GitHub не приема ключа — провери го в „⚙ Синхронизация“.':'Не успях да кача ('+e.message+'). Остава на това устройство — опитай пак по-късно с „Качи пак“.');return true}}
+const libLook=i=>(i.rot?(i.dir==='v'?'h':'v'):(i.dir||'h')),libRotCss=i=>i.rot?'transform:rotate(90deg);':''; /* как изглежда фладерът (след завъртане) */
 const libMsg=t=>{const e=$('#libMsg');if(e)e.textContent=t||''};
 function renderLib(){const A=libAll(),q=($('#libQ').value||'').toLowerCase().trim();
   $('#libFolders').innerHTML=[['','Всички',A.items.length],...A.folders.map(f=>[f,f,A.items.filter(i=>i.folder===f).length])].map(([v,n,c])=>`<button class="btn sm${libF===v?' primary':''}" data-lf="${esc(v)}" style="justify-content:space-between;display:flex">${esc(n)} <span style="opacity:.7">${c}</span></button>`).join('');
   const L=A.items.filter(i=>(!libF||i.folder===libF)&&(!q||(i.name+' '+(i.code||'')).toLowerCase().includes(q)));
   $('#libGrid').innerHTML=L.length?L.map(i=>`<button data-li="${esc(i.id)}" style="display:flex;flex-direction:column;gap:4px;padding:6px;border:1px solid ${libOpenId===i.id?'var(--accent)':'var(--line)'};border-radius:8px;background:var(--panel);text-align:left;cursor:pointer">
-    <img src="${esc(i.data||i.img)}" alt="" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:5px;background:var(--field)"><b style="font-size:12.5px">${esc(i.name)}</b><span style="font-size:11.5px;color:var(--muted)">${esc(i.code||'')}${i.pend?' · само тук':''}</span></button>`).join(''):`<p class="note">${A.items.length?'Няма декори по това търсене.':'Още няма декори — натисни „+ Декор“.'}</p>`;
+    <img src="${esc(i.data||i.img)}" alt="" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:5px;background:var(--field);${libRotCss(i)}"><b style="font-size:12.5px">${esc(i.name)}</b><span style="font-size:11.5px;color:var(--muted)">${esc(i.code||'')}${i.pend?' · само тук':''}</span></button>`).join(''):`<p class="note">${A.items.length?'Няма декори по това търсене.':'Още няма декори — натисни „+ Декор“.'}</p>`;
   const it=A.items.find(i=>i.id===libOpenId),D=$('#libDet');if(!it){D.hidden=true;return}D.hidden=false;
   const mats=P.materials.filter(m=>!m.glass&&!/^(HDF|ПДЧ 8)/.test(m.name));
-  D.innerHTML=`<div style="display:flex;gap:12px;flex-wrap:wrap"><img src="${esc(it.data||it.img)}" alt="" style="width:180px;height:180px;object-fit:cover;border-radius:6px"><div style="display:flex;flex-direction:column;gap:6px;min-width:220px;flex:1">
+  D.innerHTML=`<div style="display:flex;gap:12px;flex-wrap:wrap"><img src="${esc(it.data||it.img)}" alt="" style="width:180px;height:180px;object-fit:cover;border-radius:6px;${libRotCss(it)}"><div style="display:flex;flex-direction:column;gap:6px;min-width:220px;flex:1">
     <b>${esc(it.name)}</b><span class="note" style="margin:0">${esc(it.folder)}${it.code?' · код '+esc(it.code):''} · снимката е широка ${fmt(it.w||1000)} мм</span>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font-size:12.5px">Ивиците на снимката са:</span><button class="btn sm${it.dir!=='v'?' primary':''}" data-ldir="h">↔ легнали</button><button class="btn sm${it.dir==='v'?' primary':''}" data-ldir="v">↕ изправени</button>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font-size:12.5px">Фладер:</span><button class="btn sm${libLook(it)==='v'?' primary':''}" data-ldir="v">↕ вертикален</button><button class="btn sm${libLook(it)==='h'?' primary':''}" data-ldir="h">↔ хоризонтален</button>
       <label style="font-size:12.5px;display:flex;gap:4px;align-items:center;margin-left:6px">снимката е широка<input id="libW" type="number" value="${it.w||1000}" style="width:70px">мм</label></div>
-    <span class="note" style="margin:0">Избери както го виждаш на снимката вляво. В 3D и в разкроя фладерът винаги върви по дължината на детайла (първия размер); за отделен детайл — бутона ⇄ в „Детайли“.</span>
+    <span class="note" style="margin:0">Снимката се завърта сама — няма значение как е качена. В 3D фладерът върви по дължината на детайла (първия размер); за отделен детайл — бутона ⇄ в „Детайли“.</span>
     <span style="font-size:12.5px">Сложи на материала:</span><div style="display:flex;gap:6px;flex-wrap:wrap">${mats.map(m=>`<button class="btn sm" data-lapply="${esc(m.id)}">${esc(m.name)}${m.dec===it.id?' ✓':''}</button>`).join('')}</div>
     <div style="display:flex;gap:6px;margin-top:6px"><button class="btn sm" data-ldel="${esc(it.id)}">Изтрий от библиотеката</button>${it.pend?`<button class="btn sm" id="libRetry">Качи пак</button>`:''}</div></div></div>`}
 function libFormHtml(){const A=libAll();return `<b style="grid-column:1/-1">Нов декор</b>
   <label>Папка<select id="lfF">${A.folders.map(f=>`<option ${f===libF?'selected':''}>${esc(f)}</option>`).join('')}</select></label>
   <label>Име<input id="lfN" placeholder="напр. Дъб Халифакс"></label><label>Код<input id="lfC" placeholder="напр. H1180 ST37"></label>
-  <label>Снимката е широка, мм<input id="lfW" type="number" value="1000"></label><label>Ивиците на снимката са<select id="lfD"><option value="h">↔ легнали</option><option value="v">↕ изправени</option></select></label>
+  <label>Снимката е широка, мм<input id="lfW" type="number" value="1000"></label><label>Фладер<select id="lfD"><option value="v">↕ вертикален</option><option value="h">↔ хоризонтален</option></select></label>
   <label>Снимка<input id="lfI" type="file" accept="image/*"></label>
   <div style="grid-column:1/-1;display:flex;gap:6px"><button class="btn primary sm" id="lfSave">Запази</button><button class="btn sm" id="lfX">Откажи</button></div>`}
 function libAddSave(){const f=$('#lfI').files[0],name=$('#lfN').value.trim();if(!name){toast('Напиши име');return}if(!f){toast('Избери снимка');return}
   const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const sc=Math.min(1,1024/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);
-    c.getContext('2d').drawImage(img,0,0,c.width,c.height);const it={id:uid(),folder:$('#lfF').value,name,code:$('#lfC').value.trim(),w:+$('#lfW').value||1000,dir:$('#lfD').value,ar:img.height/img.width,data:c.toDataURL('image/jpeg',0.82),pend:true};
-    const L=libLocal();L.items.push(it);libLocalSet(L);$('#libForm').hidden=true;libOpenId=it.id;renderLib();libPush()};img.onerror=()=>toast('Файлът не е картинка');img.src=r.result};r.readAsDataURL(f)}
-async function libApply(it,mid){const m=P.materials.find(q=>q.id===mid);if(!m)return;const src=it.data||it.img;
-  const img=new Image();img.crossOrigin='anonymous';img.onload=()=>{const sc=Math.min(1,1024/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-    pushUndo();m.tex=c.toDataURL('image/jpeg',0.82);m.texAR=img.height/img.width;m.texAvg=avgColor(c);m.texW=it.w||1000;m.texDir=it.dir||'h';m.dec=it.id;m.decN=(it.code?it.code+' ':'')+it.name;
-    P.example=false;changed(true);renderLib();toast(`„${m.name}“ — ${it.name}`)};img.onerror=()=>toast('Снимката не се зареди (няма интернет?)');img.src=src}
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);const it={id:uid(),folder:$('#lfF').value,name,code:$('#lfC').value.trim(),w:+$('#lfW').value||1000,dir:grainOf(c)||(img.width>=img.height?'h':'v'),ar:img.height/img.width,data:c.toDataURL('image/jpeg',0.82),pend:true};
+    it.rot=$('#lfD').value===it.dir?0:90;const L=libLocal();L.items.push(it);libLocalSet(L);$('#libForm').hidden=true;libOpenId=it.id;renderLib();libPush()};img.onerror=()=>toast('Файлът не е картинка');img.src=r.result};r.readAsDataURL(f)}
+async function libApply(it,mid,quiet){const m=P.materials.find(q=>q.id===mid);if(!m)return;const src=it.data||it.img;
+  const img=new Image();img.crossOrigin='anonymous';img.onload=()=>{const sc=Math.min(1,1024/Math.max(img.width,img.height)),w=Math.round(img.width*sc),h=Math.round(img.height*sc),rt=!!it.rot,c=document.createElement('canvas');c.width=rt?h:w;c.height=rt?w:h;const g=c.getContext('2d');
+    if(rt){g.translate(h,0);g.rotate(Math.PI/2)}g.drawImage(img,0,0,w,h); /* завъртяна снимка — фладерът изглежда както е избран */
+    pushUndo();m.tex=c.toDataURL('image/jpeg',0.82);m.texAR=c.height/c.width;m.texAvg=avgColor(c);m.texW=rt?Math.round((it.w||1000)*img.height/img.width):(it.w||1000);m.texDir=libLook(it);m.dec=it.id;m.decN=(it.code?it.code+' ':'')+it.name;
+    P.example=false;changed(true);renderLib();if(!quiet)toast(`„${m.name}“ — ${it.name}`)};img.onerror=()=>toast('Снимката не се зареди (няма интернет?)');img.src=src}
 $('#bLib').onclick=()=>{open('#ovLib');libMsg(libTok()?'':'Декорите се пазят на това устройство; за да отиват и на другите — „⚙ Синхронизация“ (веднъж).');renderLib();libLoad().then(renderLib)};
 $('#libQ').oninput=renderLib;
 $('#libAddF').onclick=()=>{const n=(prompt('Име на новата папка (напр. Невилс):')||'').trim();if(!n)return;const L=libLocal();L.folders=[...new Set([...(L.folders||[]),n])];libLocalSet(L);libF=n;renderLib();libPush()};
 $('#libAdd').onclick=()=>{const F=$('#libForm');F.innerHTML=libFormHtml();F.hidden=false;$('#libDet').hidden=true;$('#lfN').focus()};
-$('#libForm').addEventListener('change',e=>{if(e.target.id!=='lfI'||!e.target.files[0])return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const g=grainOf(im);if(g&&$('#lfD'))$('#lfD').value=g};im.src=r.result};r.readAsDataURL(e.target.files[0])});
 $('#libForm').addEventListener('click',e=>{if(e.target.id==='lfSave')libAddSave();if(e.target.id==='lfX')$('#libForm').hidden=true});
 $('#ovLib').addEventListener('click',e=>{const f=e.target.closest('[data-lf]');if(f){libF=f.dataset.lf;renderLib();return}
   const i=e.target.closest('[data-li]');if(i){libOpenId=libOpenId===i.dataset.li?null:i.dataset.li;renderLib();return}
   const a=e.target.closest('[data-lapply]');if(a){const it=libAll().items.find(q=>q.id===libOpenId);if(it)libApply(it,a.dataset.lapply);return}
   const d=e.target.closest('[data-ldel]');if(d){if(!confirm('Да изтрия ли декора от библиотеката? (В проектите остава.)'))return;const L=libLocal();L.del=[...new Set([...(L.del||[]),d.dataset.ldel])];L.items=L.items.filter(q=>q.id!==d.dataset.ldel||!q.pend);libLocalSet(L);libOpenId=null;renderLib();libPush();return}
-  const dr=e.target.closest('[data-ldir]');if(dr){libEdit({dir:dr.dataset.ldir});return}
+  const dr=e.target.closest('[data-ldir]');if(dr){const it=libAll().items.find(q=>q.id===libOpenId);if(it)libEdit({rot:dr.dataset.ldir===(it.dir||'h')?0:90});return}
   if(e.target.id==='libRetry')libPush()});
 $('#ovLib').addEventListener('change',e=>{if(e.target.id==='libW'){const w=+e.target.value;if(w>0)setTimeout(()=>libEdit({w}),0)}});
 function libEdit(ch){ /* промяна на фладера/ширината на декор, който вече е в библиотеката — пази се и се качва за всички устройства; обновява и материалите в проекта с този декор */
   const it=libAll().items.find(q=>q.id===libOpenId);if(!it)return;const L=libLocal(),i=L.items.findIndex(q=>q.id===it.id),nw={...it,...ch,pend:true};if(i<0)L.items.push(nw);else L.items[i]={...L.items[i],...ch,pend:true};libLocalSet(L);
-  const ms=P.materials.filter(m=>m.dec===it.id);if(ms.length){pushUndo();for(const m of ms){if(ch.dir)m.texDir=ch.dir;if(ch.w)m.texW=ch.w}changed(true)}
+  const nit={...it,...ch};for(const m of P.materials.filter(m=>m.dec===it.id))libApply(nit,m.id,true);
   renderLib();libPush()}
 $('#libSync').onclick=()=>{const cur=libTok();const t=prompt('Ключ за GitHub (веднъж на всяко устройство, от което ДОБАВЯШ декори; само за гледане не трябва).\n\nКак се прави: github.com → снимката горе вдясно → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token → Repository access: Only select repositories → mebelen-konstruktor → Permissions: Contents = Read and write → Generate → копирай и постави тук.\n\nПразно = махни ключа от това устройство.',cur);if(t===null)return;
   try{if(t.trim())localStorage.setItem(TOKK,t.trim());else localStorage.removeItem(TOKK)}catch(_){}libMsg(t.trim()?'Ключът е запазен — проверявам…':'Ключът е махнат.');if(t.trim())ghReq('lib/library.json').then(()=>{libMsg('Връзката с GitHub е наред ✓');libPush()}).catch(e=>libMsg('GitHub не приема ключа ('+e.message+') — провери правата: Contents = Read and write за mebelen-konstruktor.'))};

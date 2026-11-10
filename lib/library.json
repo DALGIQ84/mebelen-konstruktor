@@ -11,9 +11,10 @@
    "name": "Орех Пасифик табак",
    "code": "H3702",
    "w": 1000,
-   "dir": "v",
+   "dir": "h",
    "ar": 0.5625,
-   "img": "lib/img/599xixt.jpg"
+   "img": "lib/img/599xixt.jpg",
+   "rot": 90
   }
  ]
 }
