@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 22:00 · Името на проекта в лентата и в PDF-а</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 22:10 · Преименуван проект — и файлът се преименува</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1482,7 +1482,7 @@ async function saveFile(name,data){if(OFFLINE){plainDownload(name,data);toast('�
   let dl=null;try{dl=await window.claude?.use?.('downloads')}catch(e){}
   if(dl){try{await dl.save({filename:name,data});toast('Запазено: '+name);return true}catch(e){if(e&&e.code==='declined')return true}}
   return false}
-const pName=()=>String(P.name||'').trim()||(typeof projFH!=='undefined'&&projFH&&projFH.name?projFH.name.replace(/\.(kraft|json|txt)$/i,''):''); /* името на проекта: зададеното, иначе името на файла */
+const fStem=n=>String(n||'').replace(/\.(kraft|json|txt)$/i,''),pName=()=>String(P.name||'').trim()||(typeof projFH!=='undefined'&&projFH?fStem(projFH.name):''); /* името на проекта (същото като на файла) */ /* името на проекта: зададеното, иначе името на файла */
 const projBase=()=>((P.name||'проект').replace(/[\\/:*?"<>|]+/g,' ').trim()||'проект');
 
 /* ---------- Шкафове: списък и редактор ---------- */
@@ -3437,7 +3437,11 @@ let projFH=null; // отвореният файл (инсталираната п
 const FSA=OFFLINE&&!!window.showSaveFilePicker;if(FSA)$('#bSaveAs').hidden=false;
 const pjTypes=[{description:'Проект KRAFTPLAN',accept:{'application/x-kraftplan':['.kraft']}},{description:'Проект (стар формат .json)',accept:{'application/json':['.json']}}];
 async function saveProj(as){const name=projBase()+'.kraft',data=JSON.stringify(P);
-  if(FSA){try{if(as||!projFH)projFH=await showSaveFilePicker({suggestedName:name,types:pjTypes,id:'mebeli-proj',startIn:projFH||'documents'});
+  if(FSA){try{const nn=String(P.name||'').trim().replace(/[\\/:*?"<>|]+/g,' ').trim();
+      if(!as&&projFH&&nn&&fStem(projFH.name)!==nn){const ext=(projFH.name.match(/\.(kraft|json|txt)$/i)||['.kraft'])[0],to=nn+ext; /* преименуван проект — и файлът се преименува */
+        let ok=false;if(projFH.move)try{if(projFH.queryPermission&&(await projFH.queryPermission({mode:'readwrite'}))!=='granted')await projFH.requestPermission({mode:'readwrite'});await projFH.move(to);ok=true;toast('Файлът е преименуван: '+to)}catch(e){}
+        if(!ok)as=true}
+      if(as||!projFH)projFH=await showSaveFilePicker({suggestedName:name,types:pjTypes,id:'mebeli-proj',startIn:projFH||'documents'});
       if(projFH.queryPermission&&(await projFH.queryPermission({mode:'readwrite'}))!=='granted'&&(await projFH.requestPermission({mode:'readwrite'}))!=='granted')throw new Error('няма разрешение за запис във файла');
       const w=await projFH.createWritable();await w.write(data);await w.close();recentAdd(projFH);markSaved();toast('Запазено: '+projFH.name);$('#bSaveSm').textContent=projFH.name;return true}
     catch(e){if(e&&e.name==='AbortError')return false;toast('Не можах да запиша: '+(e&&e.message||e))}}
@@ -3459,7 +3463,7 @@ const KLOGO=`<svg width="70" height="72" viewBox="0 0 202 206" role="img" aria-l
 <text x="56" y="222" text-anchor="middle" style="font-family:Consolas,monospace;font-size:14px;fill:#7d8a94" stroke="none">600</text>
 <text x="124" y="110" style="font-family:Consolas,monospace;font-size:14px;fill:#e3a21a" stroke="none">48°</text></g></g><text x="180" y="24.0" text-anchor="middle" style="font-family:Consolas,'Courier New',monospace;font-size:20px;font-weight:600;fill:#1d1d1f">K</text><text x="180" y="43.5" text-anchor="middle" style="font-family:Consolas,'Courier New',monospace;font-size:20px;font-weight:600;fill:#1d1d1f">R</text><text x="180" y="63.0" text-anchor="middle" style="font-family:Consolas,'Courier New',monospace;font-size:20px;font-weight:600;fill:#1d1d1f">A</text><text x="180" y="82.5" text-anchor="middle" style="font-family:Consolas,'Courier New',monospace;font-size:20px;font-weight:600;fill:#1d1d1f">F</text><text x="180" y="102.0" text-anchor="middle" style="font-family:Consolas,'Courier New',monospace;font-size:20px;font-weight:600;fill:#1d1d1f">T</text><text x="180" y="121.5" text-anchor="middle" style="font-family:Consolas,'Courier New',monospace;font-size:20px;font-weight:400;fill:#e3a21a">P</text><text x="180" y="141.0" text-anchor="middle" style="font-family:Consolas,'Courier New',monospace;font-size:20px;font-weight:400;fill:#e3a21a">L</text><text x="180" y="160.5" text-anchor="middle" style="font-family:Consolas,'Courier New',monospace;font-size:20px;font-weight:400;fill:#e3a21a">A</text><text x="180" y="180.0" text-anchor="middle" style="font-family:Consolas,'Courier New',monospace;font-size:20px;font-weight:400;fill:#e3a21a">N</text></svg>`;
 function setTitle(){const sa=matchMedia('(display-mode: standalone)').matches,f=pName()||'нов проект',d=typeof isDirty==='function'&&isDirty(); // в синята лента: кой файл е отворен (● — има незапазени промени)
-  const t=(d?'● ':'')+f+(projFH?'':' (незапазен)');const nt=sa?t:'KRAFTPLAN · '+t;if(document.title!==nt)document.title=nt}
+  const t=(d?'● ':'')+f+(projFH?'':' (незапазен)');{const h=document.getElementById('hdProj');const ht=P.example?'':(pName()?'· '+pName():'')+(d?' ●':'');if(h&&h.textContent!==ht)h.textContent=ht}const nt=sa?t:'KRAFTPLAN · '+t;if(document.title!==nt)document.title=nt}
 setInterval(setTitle,1000);setTitle();
 $('#bVer').onclick=e=>{e.stopPropagation();const m=$('#verPop');if(m.hidden){const v=$('#appVer').textContent.trim().replace(/^версия\s*/,''),[d,t,...ch]=v.split(' · ');
   m.innerHTML=`<div style="display:flex;gap:12px;align-items:center;margin-bottom:8px"><span style="width:70px;flex:none">${KLOGO}</span><div><b style="font-size:16px;letter-spacing:2px">KRAFT<span style="color:#e3a21a">PLAN</span></b><div style="color:var(--muted);font-size:11px;letter-spacing:1px">мебели по мярка · детайли · разкрой</div><div style="color:var(--muted);font-size:12px;margin-top:4px">М Плюс Мебели</div></div></div><div>Версия: <b>${esc(d||'')} · ${esc(t||'')}</b></div><div>Последна промяна: ${esc(ch.join(' · ')||'—')}</div><div style="margin-top:6px;color:var(--muted)">Отворен файл: ${esc(projFH?projFH.name:'нов проект (незапазен)')}</div>`}
@@ -3476,7 +3480,7 @@ $('#fName').onclick=()=>{$('#bProj').click();setTimeout(()=>{const n=$('#pjName'
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.code==='KeyO'&&!e.target.matches('input,select,textarea')){e.preventDefault();$('#lOpen').click()}});
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.code==='KeyS'){e.preventDefault();if(OFFLINE)saveProj(e.shiftKey);else $('#bSave').click()}});
 $('#openFile').closest('label').addEventListener('click',async e=>{if(!(FSA&&window.showOpenFilePicker))return;e.preventDefault();toggleFile(false);
-  try{const[h]=await showOpenFilePicker({types:pjTypes,id:'mebeli-proj',startIn:'documents'});const t=await (await h.getFile()).text();loadProject(t);projFH=h;recentAdd(h);$('#bSaveSm').textContent=h.name}catch(err){if(err&&err.name!=='AbortError')toast('Не можах да отворя файла')}});
+  try{const[h]=await showOpenFilePicker({types:pjTypes,id:'mebeli-proj',startIn:'documents'});const t=await (await h.getFile()).text();loadProject(t);projFH=h;P.name=fStem(h.name);save();recentAdd(h);$('#bSaveSm').textContent=h.name}catch(err){if(err&&err.name!=='AbortError')toast('Не можах да отворя файла')}});
 $('#bSave').onclick=async()=>{toggleFile(false);if(OFFLINE){await saveProj(false);return}
   const name=((P.name||'проект').replace(/[\\/:*?"<>|]+/g,' ').trim()||'проект')+' '+new Date().toISOString().slice(0,10)+'.kraft';
   const data=JSON.stringify(P);let dl=null;try{dl=await window.claude?.use?.('downloads')}catch(e){}
@@ -3725,11 +3729,11 @@ migrate();snapSplash();snapAcc();save();renderList();renderEditor();renderTable(
   if(l.length){$('#stRecent').innerHTML='<div style="font-size:12px;color:var(--muted);margin:4px 0">Последни файлове</div>'+l.map((o,i)=>`<button class="btn sm" data-rec="${i}" style="display:block;width:100%;text-align:left;margin-bottom:4px">${esc(o.name)} <small style="color:var(--muted)">${new Date(o.t).toLocaleDateString('bg-BG')}</small></button>`).join('');
     $('#stRecent').onclick=async e=>{const b=e.target.closest('[data-rec]');if(!b)return;const o=l[+b.dataset.rec];
       try{if((await o.h.queryPermission({mode:'readwrite'}))!=='granted'&&(await o.h.requestPermission({mode:'readwrite'}))!=='granted')return;
-        const t=await (await o.h.getFile()).text();loadProject(t);projFH=o.h;recentAdd(o.h);$('#bSaveSm').textContent=o.h.name;$('#ovStart').hidden=true}catch(err){toast('Файлът не е намерен — може да е преместен')}}}
+        const t=await (await o.h.getFile()).text();loadProject(t);projFH=o.h;P.name=fStem(o.h.name);save();recentAdd(o.h);$('#bSaveSm').textContent=o.h.name;$('#ovStart').hidden=true}catch(err){toast('Файлът не е намерен — може да е преместен')}}}
   if(FSA&&!projFH&&!P.example){const c=await curGet();if(c&&!projFH){projFH=c;$('#bSaveSm').textContent=c.name;setTitle()}} /* продължаваш последния проект — дискетата записва пак в неговия файл, без да пита */
   if(!window._kpLaunched)$('#ovStart').hidden=false})();
 if('launchQueue' in window)launchQueue.setConsumer(async lp=>{ /* двоен клик върху .kraft файл в папката — отваря проекта направо */
   if(!lp.files||!lp.files.length)return;const h=lp.files[0];window._kpLaunched=true;
-  try{const t=await (await h.getFile()).text();loadProject(t);projFH=h;recentAdd(h);$('#bSaveSm').textContent=h.name;markSaved&&markSaved();$('#ovStart').hidden=true}catch(err){toast('Файлът не може да се отвори')}});
+  try{const t=await (await h.getFile()).text();loadProject(t);projFH=h;P.name=fStem(h.name);save();recentAdd(h);$('#bSaveSm').textContent=h.name;markSaved&&markSaved();$('#ovStart').hidden=true}catch(err){toast('Файлът не може да се отвори')}});
 </script>
 <script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(()=>{}));</script></body></html>
