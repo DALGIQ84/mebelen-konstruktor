@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 22:30 · Общ цокъл между външните страници</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.10 · 22:40 · Детайли: отмаркиране</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -3322,10 +3322,11 @@ $('#ped').addEventListener('click',e=>{if(pedPanned){pedPanned=false;return}if(e
       if(!hp||hp.kind==='back'){const pt=sv.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const q=pt.matrixTransform(sv.getScreenCTM().inverse()),x=q.x,z=-q.y,r=pedCell(k,ps,x,z);
         if(r){const cx=Math.round((r.x0+r.x1)/2),cz=Math.round((r.z0+r.z1)/2),i=pedCells.findIndex(c=>{const r2=pedCell(k,ps,c.cx,c.cz);return r2&&Math.abs(r2.x0-r.x0)<1&&Math.abs(r2.z0-r.z0)<1&&Math.abs(r2.x1-r.x1)<1});
           if(e.ctrlKey||e.metaKey){if(i>=0)pedCells.splice(i,1);else pedCells.push({cx,cz})}else pedCells=[{cx,cz}];pedSel=null;renderPed();rebuild3D();return}
-        if(!hp){pedCells=[];renderPed();return}}}}
+        if(!hp){pedCells=[];pedSel=null;pedMulti=new Set();renderPed();rebuild3D();return}}}} /* клик на празно — отмаркира */
   if(e.target.closest('[data-pa="cClr"]')){pedCells=[];renderPed();return}
   const row=e.target.closest('[data-pk]');if(row){const key=row.dataset.pk;pedCells=[];
     if((e.ctrlKey||e.metaKey)&&pedSel){if(!pedMulti.size)pedMulti.add(pedSel);if(pedMulti.has(key)&&pedMulti.size>1){pedMulti.delete(key);if(pedSel===key)pedSel=[...pedMulti][0]}else{pedMulti.add(key);pedSel=key}} // Ctrl + клик — още детайли
+    else if(pedSel===key&&pedMulti.size<=1){pedSel=null;pedMulti=new Set()} /* втори клик върху маркирания — отмаркира */
     else{pedSel=key;pedMulti=new Set([key])}renderPed();rebuild3D();return}
   {const on=e.target.closest('[data-miron]'),of=e.target.closest('[data-mirx]');if(on||of){const k=cab(pedK);if(!k)return;pushUndo();k.mir={...(k.mir||{})};
     const keys=(pedMulti.size>1?[...pedMulti]:[on?on.dataset.miron:of.dataset.mirx]).map(x=>x.startsWith('Огледало@')?x.slice(9):x);
@@ -3406,7 +3407,8 @@ $('#ped').addEventListener('change',e=>{const k=cab(pedK),t=e.target;if(t.id==='
   el.addEventListener('pointerup',e=>{if(pn&&pn.moved){pedPanned=pn.btn===0;pn.sv.style.cursor=''}pn=null});
   el.addEventListener('contextmenu',e=>{if(e.target.closest('svg[data-view]'))e.preventDefault()});
   el.addEventListener('dblclick',e=>{const sv=e.target.closest('svg[data-view]');if(!sv)return;delete pedZ[sv.dataset.view];renderPed()});}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&pedK&&!measOn)closePed();
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&pedK&&!measOn&&(pedSel||pedCells.length||pedMulti.size)&&!e.target.matches('input,select,textarea')){pedSel=null;pedMulti=new Set();pedCells=[];renderPed();rebuild3D();e.stopImmediatePropagation();return} /* Esc — първо отмаркира, втори Esc затваря */
+  if(e.key==='Escape'&&pedK&&!measOn)closePed();
   if(e.key==='Delete'&&pedK&&pedSel&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement?.tagName||'')){const b=$('#ped [data-pa="del"]');if(b){e.preventDefault();b.click()}}});
 {let dg=null;const el=$('#ped');try{const v=JSON.parse(localStorage.getItem('mebel-konstruktor.ped')||'null');if(v)Object.assign(el.style,v)}catch(e){}
   const keep=()=>{try{localStorage.setItem('mebel-konstruktor.ped',JSON.stringify({left:el.style.left,top:el.style.top,width:el.style.width,height:el.style.height}))}catch(e){}};
