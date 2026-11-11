@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.12 · 01:35 · Детско легло: дъска към главата, без бленда</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.12 · 01:45 · Детайли: удълженият детайл скъсява застъпения</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -848,6 +848,13 @@ function relink(k,ps){ // „умните“ връзки след ръчна п
       const hGrew=!h0||!ovl(h0,v.box),vGrew=!v0||!ovl(h.box,v0);
       if(hGrew||!vGrew){const up=(h.box[4]+h.box[5])/2>(v.box[4]+v.box[5])/2;if(up)setAx(v,2,v.box[4],h.box[4]);else setAx(v,2,h.box[5],v.box[5])}
       else{const lf=(v.box[0]+v.box[1])/2<(h.box[0]+h.box[1])/2;if(lf)setAx(h,0,v.box[1],h.box[1]);else setAx(h,0,h.box[0],v.box[0])}}}
+  { // общо правило за всички плоскости (и легла, табли…): удълженият детайл застъпи друг — другият се скъсява с дебелината му откъм този край
+    const ix=(A,B,i)=>Math.min(A[2*i+1],B[2*i+1])-Math.max(A[2*i],B[2*i]),ovl=(A,B)=>ix(A,B,0)>0.5&&ix(A,B,1)>0.5&&ix(A,B,2)>0.5,b0=p=>p.added?null:p.box0||p.box,thin=p=>{const d=sz(p);const m=Math.min(...d);return m<=40?d.indexOf(m):-1};
+    const pl=live.filter(p=>p.kind!=='door'&&p.kind!=='hw'&&p.kind!=='appl'&&p.kind!=='vis'&&p.kind!=='drawer'&&!p.pl&&!p.fp&&thin(p)>=0);
+    for(const A of pl){if(!(A.ov||A.added))continue;const a0=b0(A),ta=thin(A);
+      for(const B of pl){if(B===A||!ovl(A.box,B.box))continue;if(a0&&ovl(a0,B.box))continue; // и преди са се застъпвали — не пипаме
+        if(thin(B)===ta)continue;const lo=B.box[2*ta],hi=B.box[2*ta+1],c=(A.box[2*ta]+A.box[2*ta+1])/2,tA=A.box[2*ta+1]-A.box[2*ta];
+        if(c-lo<=tA+1)setAx(B,ta,A.box[2*ta+1],hi);else if(hi-c<=tA+1)setAx(B,ta,lo,A.box[2*ta])}}}
   for(const d of live.filter(p=>p.kind==='door'&&!p.pl)){const b=d.box,cx=(b[0]+b[1])/2,cz=(b[4]+b[5])/2,zl=b[5]-b[4];
     for(const q of vert){if(!(q.ov||q.added)||q.box[3]<=b[2]+0.5)continue;const zo=Math.min(b[5],q.box[5])-Math.max(b[4],q.box[4]);if(zo<zl*0.5)continue;
       const qc=(q.box[0]+q.box[1])/2;if(qc<cx&&q.box[1]>b[0]-fu/2)setAx(d,0,q.box[1]+fu/2,d.box[1]);else if(qc>cx&&q.box[0]<b[1]+fu/2)setAx(d,0,d.box[0],q.box[0]-fu/2)}
