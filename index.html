@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.12 · 01:45 · Детайли: удълженият детайл скъсява застъпения</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.12 · 01:55 · Леглото застава пред таблата; без празна „Вътрешност“</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1667,7 +1667,9 @@ function renderEditor(){
   renderWarn();
 }
 let EDCL=(()=>{try{return JSON.parse(localStorage.getItem('mebel-konstruktor.cl')||'[]')}catch(e){return []}})();
-function applyCollapse(){let hide=false;for(const el of [...$('#ed').children]){if(el.classList.contains('sub')){const t=el.textContent.trim();el.classList.add('cl');hide=EDCL.includes(t);el.classList.toggle('off',hide);continue}el.hidden=hide}}
+function applyCollapse(){let hide=false;const ch=[...$('#ed').children];ch.forEach((el,i)=>{if(el.classList.contains('sub')){const t=el.textContent.trim();el.classList.add('cl');hide=EDCL.includes(t);el.classList.toggle('off',hide);
+  let j=i+1,any=false;while(j<ch.length&&!ch[j].classList.contains('sub')){if(ch[j].matches('input,select,textarea,button')||ch[j].querySelector('input,select,textarea,button'))any=true;j++}el.hidden=!any;return} /* празен раздел — без заглавие */
+  el.hidden=hide})}
 $('#ed').addEventListener('click',e=>{const h=e.target.closest('.sub.cl');if(!h)return;const t=h.textContent.trim();EDCL=EDCL.includes(t)?EDCL.filter(x=>x!==t):[...EDCL,t];try{localStorage.setItem('mebel-konstruktor.cl',JSON.stringify(EDCL))}catch(err){}applyCollapse()});
 const NOTE_CHIPS=['Push панти','Push водачи','Без дръжка','Дръжка профил','Плавно затваряне','LED осветление','Стъклена врата'];
 const noteInfo=k=>(String(k.note||'').trim()?'✎ '+String(k.note).trim()+' · ':'')+cabInfo(k); // забележката — първа, за да не се отреже
@@ -3269,6 +3271,11 @@ function addCab(o){
   let off=0;if(FREE.includes(k.type)){const a=zr(k);for(const o of P.cabinets)if(o.wall===w&&!isAcc(o)&&!['top','splash','plinthRun'].includes(o.type)){const b=zr(o);if(b[0]<a[1]&&a[0]<b[1])off=Math.max(off,o.off+o.W)}}
   else for(const o of P.cabinets)if(o.wall===w&&!!o.upper===!!k.upper&&!isAcc(o)&&!['top','splash','plinthRun',...FREE].includes(o.type))off=Math.max(off,o.off+o.W);
   if(off+k.W<=wallInfo(w).len){k.wall=w;k.off=off;place(k)}else{const b=roomBox();k.x=(b[0]+b[1])/2-k.W/2;k.y=(b[2]+b[3])/2-k.D/2}
+  { // легло и табла — леглото застава пред таблата (центрирано, на дебелината ѝ), а не до нея
+    const hb=k.type==='bed'?P.cabinets.find(o=>o.type==='hboard'&&o.wall!=null&&!P.cabinets.some(b=>b.type==='bed'&&b.wall===o.wall&&b.off<o.off+o.W&&b.off+b.W>o.off)):null;
+    const bd=k.type==='hboard'?P.cabinets.find(o=>o.type==='bed'&&o.wall!=null&&!P.cabinets.some(h=>h.type==='hboard'&&h.wall===o.wall&&h.off<o.off+o.W&&h.off+h.W>o.off)):null;
+    if(hb){k.wall=hb.wall;k.off=Math.max(0,hb.off+(hb.W-k.W)/2);k.gap=(+hb.gap||0)+(+hb.D||18);place(k)}
+    else if(bd){k.wall=bd.wall;k.off=Math.max(0,bd.off+(bd.W-k.W)/2);k.gap=+bd.gap||0;place(k);bd.gap=(+bd.gap||0)+(+k.D||18);place(bd)}}
   P.cabinets.push(k);P.example=false;sel=k.id;if(tab!=='cab')setTab('cab');changed(true)};
 $('#bDup').onclick=()=>{const s=cab(sel);if(!s)return;const k={...s,id:uid(),name:s.name+' копие',secs:s.secs?JSON.parse(JSON.stringify(s.secs)):s.secs,dh:[...(s.dh||[])],bh:[...(s.bh||[])],edgeOv:JSON.parse(JSON.stringify(s.edgeOv||{})),matOv:{...(s.matOv||{})},grainOv:{...(s.grainOv||{})}};
   if(k.wall!==null){k.off=s.off+s.W;place(k)}else{const b=bbox(s);k.x+=b[1]-b[0];snapFree(k)}
