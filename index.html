@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.11 · 23:58 · Ракла: делители и рафт вътре</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.12 · 00:00 · Ракла: кант на страниците при клапа отгоре</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1391,8 +1391,9 @@ function buildNstand(k){const S=P.settings,parts=[],warn=[],add=(name,L,Wd,m,e,b
   if(H-z0<2*T+60){warn.push('Шкафчето е твърде ниско.');return{parts,warn,Dk}}
   // корпус
   const sz0=mt==='sides'?0:botUnder?z0+T:z0,sz1=lid?Hc:topOver?H-T:H;
-  add(mt==='sides'?'Страница до пода':'Страница',sz1-sz0,Dk-yb,k.mc,mt==='sides'?[1,0,1,0]:[1,0,0,0],[0,T,yb,Dk,sz0,sz1]);
-  add(mt==='sides'?'Страница до пода':'Страница',sz1-sz0,Dk-yb,k.mc,mt==='sides'?[1,0,1,0]:[1,0,0,0],[W-T,W,yb,Dk,sz0,sz1]);
+  const eS=lid?[1,0,1,1]:mt==='sides'?[1,0,1,0]:[1,0,0,0]; // ракла с клапа отгоре — страниците: 1 по първия + 2 по втория
+  add(mt==='sides'?'Страница до пода':'Страница',sz1-sz0,Dk-yb,k.mc,eS,[0,T,yb,Dk,sz0,sz1]);
+  add(mt==='sides'?'Страница до пода':'Страница',sz1-sz0,Dk-yb,k.mc,eS,[W-T,W,yb,Dk,sz0,sz1]);
   if(lid){add('Клапа отгоре',D-fu,W-fu,k.mf,[1,1,1,1],[fu/2,W-fu/2,0,D-fu,Hc,H],'door');parts.at(-1).lid=true;warn.push('Клапа отгоре — панти за ракла и амортисьор/ограничител.')} // капакът застъпва страниците и челото
   else if(topOver)add('Таван',W,Dk-yb,k.mc,[1,0,1,1],[0,W,yb,Dk,H-T,H]);else add('Таван',W-2*T,Dk-yb,k.mc,[1,0,0,0],[T,W-T,yb,Dk,H-T,H]);
   if(botUnder)add('Дъно',W,Dk-yb,k.mc,mt==='wall'?[1,0,1,1]:[1,0,0,0],[0,W,yb,Dk,z0,z0+T]);else add('Дъно',W-2*T,Dk-yb,k.mc,[1,0,0,0],[T,W-T,yb,Dk,z0,z0+T]);
