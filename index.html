@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.11 · 22:50 · Легло: Кош 1 и 2, дъно HDF, кантове на облицовката</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.11 · 23:00 · Легло: чело на цялата ширина, кош −2 мм</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1005,7 +1005,7 @@ function buildRaw(k){
     return{parts:all,warn:[...ra.warn,...rb.warn],Dk}}
   if(k.type==='nstand')return buildNstand(k);
   if(k.type==='bed'){ // легло с ракла: вътрешен кош от 2 части (глава + крака), облечен отвън; табла по избор; ламелна рамка с механизъм — купува се
-    const d=bedDims(k),{t,tf,tb,W,D,H,up,fl,Hb,Wi,Lb,Lh,Lf}=d,X0=tf,X1=W-tf,zs=0; // страниците на коша са на цялата му височина — фазерът се заковава отдолу и не се приспада
+    const d=bedDims(k),{t,tf,tb,W,D,H,up,fl,Hb,Wi,Lb,Lh,Lf,gp}=d,X0=tf+gp/2,X1=W-tf-gp/2,zs=0; // страниците на коша са на цялата му височина — фазерът се заковава отдолу и не се приспада
     const same=Math.abs(Lh-Lf)<0.5; // двете части еднакви — детайлите се обединяват (Кош 1 и 2)
     for(const[nm,yy,LL]of[['1',0,Lh],['2',Lh,Lf]]){ // кош 1 — към главата, кош 2 — към краката: 2 дълги + 2 къси между тях + дъно (общо 5 мм по-малко — заковано)
       const N=same?'Кош 1 и 2':'Кош '+nm,Nk='Кош 1 и 2';
@@ -1013,11 +1013,11 @@ function buildRaw(k){
       add(`${Nk} — къса`,Wi-2*t,Hb-zs,k.mc,[1,0,0,0],[X0+t,X1-t,yy,yy+t,zs,Hb]);add(`${Nk} — къса`,Wi-2*t,Hb-zs,k.mc,[1,0,0,0],[X0+t,X1-t,yy+LL-t,yy+LL,zs,Hb]);
       if(k.mb!=='none'&&tb)add(`${N} — дъно`,LL-5,Wi-5,k.mb,[0,0,0,0],[X0+2.5,X1-2.5,yy+2.5,yy+LL-2.5,0,tb])}
     if(k.bMech!==false&&k.bMech!=='off'){const mL=Math.min(+k.bMechL||680,Lh-2*t),mH=Math.min(+k.bMechH||150,Hb-zs); // за механизма — само в частта към главата, от вътрешната страна на дългите
-      add('Кош 1 — за механизма',mL,mH,k.mc,[0,0,0,0],[X0+t,X0+2*t,t,t+mL,Hb-mH,Hb]);add('Кош 1 — за механизма',mL,mH,k.mc,[0,0,0,0],[X1-2*t,X1-t,t,t+mL,Hb-mH,Hb])}
-    add('Облицовка страна',D,H-fl,k.mf,[1,0,0,0],[0,tf,0,D,fl,H]);add('Облицовка страна',D,H-fl,k.mf,[1,0,0,0],[W-tf,W,0,D,fl,H]); // страните застъпват челото
-    add('Облицовка чело (крака)',Wi,H-fl,k.mf,[1,0,1,1],[tf,W-tf,D-tf,D,fl,H]);
+      add('Кош 1 — за механизма',mL,mH,k.mc,[1,0,1,0],[X0+t,X0+2*t,t,t+mL,Hb-mH,Hb]);add('Кош 1 — за механизма',mL,mH,k.mc,[1,0,1,0],[X1-2*t,X1-t,t,t+mL,Hb-mH,Hb])}
+    add('Облицовка страна',D-tf,H-fl,k.mf,[1,0,0,0],[0,tf,0,D-tf,fl,H]);add('Облицовка страна',D-tf,H-fl,k.mf,[1,0,0,0],[W-tf,W,0,D-tf,fl,H]); // челото е на цялата ширина, страните опират в него
+    add('Облицовка чело (крака)',W,H-fl,k.mf,[1,0,1,1],[0,W,D-tf,D,fl,H]);
     add(`Ламелна рамка с повдигащ механизъм ≈ ${fmt(Wi)} × ${fmt(Lb)}`,0,0,'k2',[0,0,0,0],[X0+3,X1-3,3,Lb-3,Hb,Hb+40],'hw'); // купува се — само за картинката
-    warn.push(`Легло ${fmt(W)} × ${fmt(D)} × ${fmt(H)}: кошът ${fmt(Wi)} × ${fmt(Lb)} × ${fmt(Hb)} от 2 части — глава ${fmt(Lh)} и крака ${fmt(Lf)} мм; облицовката е ${fmt(up)} мм над коша${fl?`, ${fmt(fl)} мм от пода`:', до пода'}.`,`Ламелна рамка с повдигащ механизъм ≈ ${fmt(Wi)} × ${fmt(Lb)} — купува се.`);
+    warn.push(`Легло ${fmt(W)} × ${fmt(D)} × ${fmt(H)}: кошът ${fmt(Wi)} × ${fmt(Lb)} × ${fmt(Hb)} (по ${fmt(gp)} мм по-малък от облицовката) от 2 части — глава ${fmt(Lh)} и крака ${fmt(Lf)} мм; облицовката е ${fmt(up)} мм над коша${fl?`, ${fmt(fl)} мм от пода`:', до пода'}.`,`Ламелна рамка с повдигащ механизъм ≈ ${fmt(Wi)} × ${fmt(Lb)} — купува се.`);
     if(D>2800||W>2800)warn.push('Облицовката е по-дълга от плоскостта (2800) — провери.');
     finishParts(k,parts);return{parts,warn,Dk:+k.D}}
   if(k.type==='wpanel'){ // панел на стената (облицовка, декоративен)
@@ -1413,9 +1413,9 @@ function buildNstand(k){const S=P.settings,parts=[],warn=[],add=(name,L,Wd,m,e,b
   finishParts(k,parts);return{parts,warn,Dk}}
 function bedDims(k){ // легло с ракла (както го прави Евгени): външен размер; вътрешен кош от бяло ПДЧ от 2 части (глава + крака), дъно фазер; облечен отвън — 2 страни + челото към краката
   const t=+mat(k.mc).t||18,tf=+mat(k.mf).t||18,tb=k.mb==='none'?0:+mat(k.mb).t||3,W=Math.max(300,+k.W||1640),D=Math.max(500,+k.D||2040),H=Math.max(150,+k.H||400);
-  const up=clamp(+(k.bUp??100),0,H-80),fl=clamp(+(k.bFl??0),0,H-60),Hb=H-up,Wi=W-2*tf,Lb=D-tf,Lh=clamp(+k.bSpl>0?+k.bSpl:Math.round(Lb/2),4*t,Lb-4*t),Lf=Lb-Lh;
+  const gp=Math.max(0,+(k.bGapK??2)),up=clamp(+(k.bUp??100),0,H-80),fl=clamp(+(k.bFl??0),0,H-60),Hb=H-up,Wi=W-2*tf-gp,Lb=D-tf-gp, /* вътрешният кош — по 2 мм по-малко в дължина и ширина, да не излезе по-голям от облицовката */Lh=clamp(+k.bSpl>0?+k.bSpl:Math.round(Lb/2),4*t,Lb-4*t),Lf=Lb-Lh;
   k.W=r1(W);k.D=r1(D);k.H=r1(H);k.c=0;
-  return{t,tf,tb,W,D,H,up,fl,Hb,Wi,Lb,Lh,Lf}}
+  return{t,tf,tb,W,D,H,up,fl,Hb,Wi,Lb,Lh,Lf,gp}}
 const FCN=[['TL','горе вляво'],['TR','горе вдясно'],['BL','долу вляво'],['BR','долу вдясно']];
 function fcutOf(k,W,h){ // скосявания на панела: по хоризонталния и по вертикалния ръб от всеки ъгъл
   const o={};for(const[key]of FCN){const q=(k.fcut||{})[key]||{};o[key]={x:clamp(+q.x||0,0,W),y:clamp(+q.y||0,0,h)}}
