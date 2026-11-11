@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.11 · 22:45 · Легло: фазерът не се приспада от височината на коша</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.11 · 22:50 · Легло: Кош 1 и 2, дъно HDF, кантове на облицовката</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -393,8 +393,7 @@ const MATS=[
   {id:'plbs',name:'Гръб кухня',t:10,color:'#c9b99f'},
   {id:'gl4',name:'Стъкло 4',t:4,color:'#cfe6ee',glass:true},
   {id:'gl6',name:'Стъкло 6',t:6,color:'#cfe6ee',glass:true},
-  {id:'mir4',name:'Огледало 4',t:4,color:'#d6dee2',glass:true,mirror:true},
-  {id:'fz4',name:'Фазер 4',t:4,color:'#c9a878'}];
+  {id:'mir4',name:'Огледало 4',t:4,color:'#d6dee2',glass:true,mirror:true}];
 const SLIDES=[
   {id:'s1',name:'Телескопични',kind:'side',clear:26,lens:'250,300,350,400,450,500,550,600',lenDed:0,hOff:40,bottom:'under',bottomDed:5,groove:6},
   {id:'s2',name:'Скрити (Tandem/Movento)',kind:'under',clear:10,lens:'270,300,350,400,450,500,550,600',lenDed:10,hOff:50,bottom:'groove',botWAdd:20,botLenDed:5,fbRaise:10},
@@ -506,7 +505,7 @@ function mergeCorners(){ // старите „ъгъл А“ + „ъгъл Б“
     P.cabinets=P.cabinets.filter(q=>q!==B);n++}
   if(n)setTimeout(()=>toast(n>1?`${n} ъглови шкафа са събрани в един`:'Ъгловият шкаф е събран в един'),300);return n}
 function migrate(){mergeCorners();for(const g of MATS.filter(m=>m.glass))if(!P.materials.some(m=>m.id===g.id))P.materials.push({...g});for(const q of P.cabinets)if(q.type==='wardrobe'&&q.wPl==null)q.wPl=true;for(const q of P.cabinets)if(q.type==='endShelf'&&q.eFloor==null)q.eFloor=true;for(const q of P.cabinets)if(q.upper&&q.hood&&!q.hsV2){if(q.hoodStrip!=null&&+q.c===1490)q.c=1450;q.hsV2=true}for(const[kk,vv]of[['wDrSd',2],['wDrGrip',35],['wDrFw',7],['wDrIns',32],['wSlOv',30],['wSlHd',40],['wSlTrack',100],['backTot',5],['cdFuga',5],['drFuga',5],['hfSet',40],['boardDens',680],['handleKg',0.3],['alFuga',3],['alW',42],['alT',25],['glassDed',7]])if(P.settings[kk]==null)P.settings[kk]=vv;if(+P.settings.glassDed===70)P.settings.glassDed=7;if(+P.settings.alT===20)P.settings.alT=25; // стъклото = вратата − 7 мм
-  for(const m of MATS.filter(m=>m.id.startsWith('pl')||m.id==='fz4'))if(!P.materials.some(q=>q.id===m.id))P.materials.push({...m});
+  for(const m of MATS.filter(m=>m.id.startsWith('pl')))if(!P.materials.some(q=>q.id===m.id))P.materials.push({...m});
   if(!P.materials.some(m=>m.id==='p8'||m.name==='ПДЧ 8'))P.materials.push({id:'p8',name:'ПДЧ 8',t:8,color:'#cfc8bb'});
   P.settings={...SETTINGS,...P.settings};if(!P.settings.faFix){if(+P.settings.fillAllow===20)P.settings.fillAllow=50;P.settings.faFix=true}if(!P.settings.eoFix){if(P.settings.edgeOff==='0')P.settings.edgeOff='';P.settings.eoFix=true} // без кант = празно поле (OptiCut)if(P.settings.slides===SLIDES)P.settings.slides=SLIDES.map(x=>({...x}));
   const s1=P.settings.slides.find(x=>x.id==='s1'&&x.name==='Сачма странични');if(s1){s1.name='Телескопични';s1.lens='250,300,350,400,450,500,550,600'}
@@ -1007,14 +1006,16 @@ function buildRaw(k){
   if(k.type==='nstand')return buildNstand(k);
   if(k.type==='bed'){ // легло с ракла: вътрешен кош от 2 части (глава + крака), облечен отвън; табла по избор; ламелна рамка с механизъм — купува се
     const d=bedDims(k),{t,tf,tb,W,D,H,up,fl,Hb,Wi,Lb,Lh,Lf}=d,X0=tf,X1=W-tf,zs=0; // страниците на коша са на цялата му височина — фазерът се заковава отдолу и не се приспада
-    for(const[nm,yy,LL]of[['глава',0,Lh],['крака',Lh,Lf]]){ // всяка част: 2 дълги + 2 къси между тях + дъно фазер (общо 5 мм по-малко — заковано)
-      add(`Кош ${nm} — дълга`,LL,Hb-zs,k.mc,[1,0,0,0],[X0,X0+t,yy,yy+LL,zs,Hb]);add(`Кош ${nm} — дълга`,LL,Hb-zs,k.mc,[1,0,0,0],[X1-t,X1,yy,yy+LL,zs,Hb]);
-      add(`Кош ${nm} — къса`,Wi-2*t,Hb-zs,k.mc,[1,0,0,0],[X0+t,X1-t,yy,yy+t,zs,Hb]);add(`Кош ${nm} — къса`,Wi-2*t,Hb-zs,k.mc,[1,0,0,0],[X0+t,X1-t,yy+LL-t,yy+LL,zs,Hb]);
-      if(k.mb!=='none'&&tb)add(`Дъно ${nm}`,LL-5,Wi-5,k.mb,[0,0,0,0],[X0+2.5,X1-2.5,yy+2.5,yy+LL-2.5,0,tb])}
+    const same=Math.abs(Lh-Lf)<0.5; // двете части еднакви — детайлите се обединяват (Кош 1 и 2)
+    for(const[nm,yy,LL]of[['1',0,Lh],['2',Lh,Lf]]){ // кош 1 — към главата, кош 2 — към краката: 2 дълги + 2 къси между тях + дъно (общо 5 мм по-малко — заковано)
+      const N=same?'Кош 1 и 2':'Кош '+nm,Nk='Кош 1 и 2';
+      add(`${N} — дълга`,LL,Hb-zs,k.mc,[1,0,0,0],[X0,X0+t,yy,yy+LL,zs,Hb]);add(`${N} — дълга`,LL,Hb-zs,k.mc,[1,0,0,0],[X1-t,X1,yy,yy+LL,zs,Hb]);
+      add(`${Nk} — къса`,Wi-2*t,Hb-zs,k.mc,[1,0,0,0],[X0+t,X1-t,yy,yy+t,zs,Hb]);add(`${Nk} — къса`,Wi-2*t,Hb-zs,k.mc,[1,0,0,0],[X0+t,X1-t,yy+LL-t,yy+LL,zs,Hb]);
+      if(k.mb!=='none'&&tb)add(`${N} — дъно`,LL-5,Wi-5,k.mb,[0,0,0,0],[X0+2.5,X1-2.5,yy+2.5,yy+LL-2.5,0,tb])}
     if(k.bMech!==false&&k.bMech!=='off'){const mL=Math.min(+k.bMechL||680,Lh-2*t),mH=Math.min(+k.bMechH||150,Hb-zs); // за механизма — само в частта към главата, от вътрешната страна на дългите
-      add('За механизма',mL,mH,k.mc,[0,0,0,0],[X0+t,X0+2*t,t,t+mL,Hb-mH,Hb]);add('За механизма',mL,mH,k.mc,[0,0,0,0],[X1-2*t,X1-t,t,t+mL,Hb-mH,Hb])}
-    add('Облицовка страна',D,H-fl,k.mf,[1,1,1,1],[0,tf,0,D,fl,H]);add('Облицовка страна',D,H-fl,k.mf,[1,1,1,1],[W-tf,W,0,D,fl,H]); // страните застъпват челото
-    add('Облицовка чело (крака)',Wi,H-fl,k.mf,[1,1,0,0],[tf,W-tf,D-tf,D,fl,H]);
+      add('Кош 1 — за механизма',mL,mH,k.mc,[0,0,0,0],[X0+t,X0+2*t,t,t+mL,Hb-mH,Hb]);add('Кош 1 — за механизма',mL,mH,k.mc,[0,0,0,0],[X1-2*t,X1-t,t,t+mL,Hb-mH,Hb])}
+    add('Облицовка страна',D,H-fl,k.mf,[1,0,0,0],[0,tf,0,D,fl,H]);add('Облицовка страна',D,H-fl,k.mf,[1,0,0,0],[W-tf,W,0,D,fl,H]); // страните застъпват челото
+    add('Облицовка чело (крака)',Wi,H-fl,k.mf,[1,0,1,1],[tf,W-tf,D-tf,D,fl,H]);
     add(`Ламелна рамка с повдигащ механизъм ≈ ${fmt(Wi)} × ${fmt(Lb)}`,0,0,'k2',[0,0,0,0],[X0+3,X1-3,3,Lb-3,Hb,Hb+40],'hw'); // купува се — само за картинката
     warn.push(`Легло ${fmt(W)} × ${fmt(D)} × ${fmt(H)}: кошът ${fmt(Wi)} × ${fmt(Lb)} × ${fmt(Hb)} от 2 части — глава ${fmt(Lh)} и крака ${fmt(Lf)} мм; облицовката е ${fmt(up)} мм над коша${fl?`, ${fmt(fl)} мм от пода`:', до пода'}.`,`Ламелна рамка с повдигащ механизъм ≈ ${fmt(Wi)} × ${fmt(Lb)} — купува се.`);
     if(D>2800||W>2800)warn.push('Облицовката е по-дълга от плоскостта (2800) — провери.');
@@ -1411,7 +1412,7 @@ function buildNstand(k){const S=P.settings,parts=[],warn=[],add=(name,L,Wd,m,e,b
   if(nDoor)warn.push(`Вратата е с панти ${(k.nsHinge||'L')==='L'?'отляво':'отдясно'}.`);
   finishParts(k,parts);return{parts,warn,Dk}}
 function bedDims(k){ // легло с ракла (както го прави Евгени): външен размер; вътрешен кош от бяло ПДЧ от 2 части (глава + крака), дъно фазер; облечен отвън — 2 страни + челото към краката
-  const t=+mat(k.mc).t||18,tf=+mat(k.mf).t||18,tb=k.mb==='none'?0:+mat(k.mb).t||4,W=Math.max(300,+k.W||1640),D=Math.max(500,+k.D||2040),H=Math.max(150,+k.H||400);
+  const t=+mat(k.mc).t||18,tf=+mat(k.mf).t||18,tb=k.mb==='none'?0:+mat(k.mb).t||3,W=Math.max(300,+k.W||1640),D=Math.max(500,+k.D||2040),H=Math.max(150,+k.H||400);
   const up=clamp(+(k.bUp??100),0,H-80),fl=clamp(+(k.bFl??0),0,H-60),Hb=H-up,Wi=W-2*tf,Lb=D-tf,Lh=clamp(+k.bSpl>0?+k.bSpl:Math.round(Lb/2),4*t,Lb-4*t),Lf=Lb-Lh;
   k.W=r1(W);k.D=r1(D);k.H=r1(H);k.c=0;
   return{t,tf,tb,W,D,H,up,fl,Hb,Wi,Lb,Lh,Lf}}
@@ -3143,7 +3144,7 @@ const KITCHEN=[
     {name:'Ъглов гардероб Г — от 2 части',p:{type:'wardrobe',wPl:true,wCorner:true,armB:1600,W:1600,H:2400,D:600,c:100,wDoor:'hinge',doors:2,doorsB:2,wRod:1800,wDrH:180,secs:[{fill:'empty',sh:0}],secsB:[{fill:'empty',sh:0}]}},
     {name:'Гардероб с плъзгащи врати',p:{type:'wardrobe',wPl:true,W:1800,H:2400,D:650,c:100,wDoor:'slide',doors:2,wRod:1800,wDrH:180,secs:[{fill:'empty',sh:0}]}}]}];
 KITCHEN.push({cat:'Легла',items:[
-    {name:'Легло с ракла (кош + облицовка)',p:{type:'bed',name:'Легло',W:1640,D:2040,H:400,bUp:100,bFl:0,bSpl:0,bMech:true,bMechL:680,bMechH:150,mc:'k1',mf:'l1',mb:'fz4',plinth:false}},
+    {name:'Легло с ракла (кош + облицовка)',p:{type:'bed',name:'Легло',W:1640,D:2040,H:400,bUp:100,bFl:0,bSpl:0,bMech:true,bMechL:680,bMechH:150,mc:'k1',mf:'l1',mb:'hdf',plinth:false}},
     {name:'Нощно шкафче',p:{type:'nstand',name:'Нощно шкафче',W:450,H:550,D:400,nsMount:'legs',nsLeg:100,nsTop:'over',nsBot:'between',nsSecs:[{t:'dr'},{t:'dr'}],mb:'hdf',plinth:false}}]}); // леглата — по-късно, както ги прави Евгени
 const BED0={bMW:1600,bML:2000,bGap:10,bH:300,bSpl:0,bUp:0,bFl:10,bHB:'board',bHBh:1100,bHBw:0,c:20,plinth:false,mb:'hdf'};
 function addBedSet(p){const ns={type:'drawers',name:'Нощно шкафче',W:450,H:550,D:400,c:100,dr:2,plinth:false,top:'full'};
