@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.12 · 00:00 · Ракла: кант на страниците при клапа отгоре</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.12 · 00:05 · Ракла: твърд гръб вътре</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1397,7 +1397,7 @@ function buildNstand(k){const S=P.settings,parts=[],warn=[],add=(name,L,Wd,m,e,b
   if(lid){add('Клапа отгоре',D-fu,W-fu,k.mf,[1,1,1,1],[fu/2,W-fu/2,0,D-fu,Hc,H],'door');parts.at(-1).lid=true;warn.push('Клапа отгоре — панти за ракла и амортисьор/ограничител.')} // капакът застъпва страниците и челото
   else if(topOver)add('Таван',W,Dk-yb,k.mc,[1,0,1,1],[0,W,yb,Dk,H-T,H]);else add('Таван',W-2*T,Dk-yb,k.mc,[1,0,0,0],[T,W-T,yb,Dk,H-T,H]);
   if(botUnder)add('Дъно',W,Dk-yb,k.mc,mt==='wall'?[1,0,1,1]:[1,0,0,0],[0,W,yb,Dk,z0,z0+T]);else add('Дъно',W-2*T,Dk-yb,k.mc,[1,0,0,0],[T,W-T,yb,Dk,z0,z0+T]);
-  if(!noB){if(hdf)add('Гръб',Hc-z0-bt,W-bt,k.mb,[0,0,0,0],[bt/2,W-bt/2,-B,0,z0+bt/2,Hc-bt/2],'back');else add('Гръб',Hc-z0-(lid?T:2*T),W-2*T,k.mb,[0,0,0,0],[T,W-T,0,B,z0+T,lid?Hc:Hc-T],'back')}
+  if(!noB){if(hdf)add('Гръб',Hc-z0-bt,W-bt,k.mb,[0,0,0,0],[bt/2,W-bt/2,-B,0,z0+bt/2,Hc-bt/2],'back');else add('Гръб',Hc-z0-(lid?T:2*T),W-2*T,k.mb,lid?[0,0,1,0]:[0,0,0,0],[T,W-T,0,B,z0+T,lid?Hc:Hc-T],'back')} /* твърд гръб — вътре между страниците, дъното и тавана; при клапа отгоре — кант към клапата */
   if(mt==='legs'){const lg=40;for(const[x,y]of[[30,yb+30],[W-30-lg,yb+30],[30,Dk-30-lg],[W-30-lg,Dk-30-lg]])parts_hw(add,'Краче',[x,x+lg,y,y+lg,0,z0]);warn.push(`На 4 крачета ${fmt(z0)} мм.`)}
   const plOn=mt==='plinth'||(mt!=='wall'&&!!k.plinth);if(plOn&&z0>0){const pb=Math.max(0,+(k.nsPlB??30)),tP=+mat(k.mf).t||18,x0=mt==='sides'?T:0,x1=mt==='sides'?W-T:W;add('Цокъл',x1-x0,z0,k.mf,[1,0,0,0],[x0,x1,Dk-pb-tP,Dk-pb,0,z0])}
   if(mt==='wall')warn.push(`Висящо — долният ръб на ${fmt(z0)} мм от пода.`);
@@ -3154,7 +3154,7 @@ const KITCHEN=[
     {name:'Гардероб с плъзгащи врати',p:{type:'wardrobe',wPl:true,W:1800,H:2400,D:650,c:100,wDoor:'slide',doors:2,wRod:1800,wDrH:180,secs:[{fill:'empty',sh:0}]}}]}];
 KITCHEN.push({cat:'Легла',items:[
     {name:'Легло с механизъм (кош + облицовка)',p:{type:'bed',name:'Легло',W:1640,D:2040,H:400,bUp:100,bFl:0,bSpl:0,bMech:true,bMechL:680,bMechH:150,mc:'k1',mf:'l1',mb:'hdf',plinth:false}},
-    {name:'Ракла (сандък)',p:{type:'nstand',name:'Ракла',W:1000,H:450,D:450,nsMount:'plinth',nsLeg:60,chOpen:'top',nsBot:'between',chest:true,mb:'hdf',plinth:false}},
+    {name:'Ракла (сандък)',p:{type:'nstand',name:'Ракла',W:1000,H:450,D:450,nsMount:'plinth',nsLeg:60,chOpen:'top',nsBot:'between',chest:true,mb:'k1',plinth:false}},
     {name:'Нощно шкафче',p:{type:'nstand',name:'Нощно шкафче',W:450,H:550,D:400,nsMount:'legs',nsLeg:100,nsTop:'over',nsBot:'between',nsSecs:[{t:'dr'},{t:'dr'}],mb:'hdf',plinth:false}}]}); // леглата — по-късно, както ги прави Евгени
 const BED0={bMW:1600,bML:2000,bGap:10,bH:300,bSpl:0,bUp:0,bFl:10,bHB:'board',bHBh:1100,bHBw:0,c:20,plinth:false,mb:'hdf'};
 function addBedSet(p){const ns={type:'drawers',name:'Нощно шкафче',W:450,H:550,D:400,c:100,dr:2,plinth:false,top:'full'};
