@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.11 · 22:40 · Легло с ракла (кош от 2 части + облицовка)</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.11 · 22:45 · Легло: фазерът не се приспада от височината на коша</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1006,7 +1006,7 @@ function buildRaw(k){
     return{parts:all,warn:[...ra.warn,...rb.warn],Dk}}
   if(k.type==='nstand')return buildNstand(k);
   if(k.type==='bed'){ // легло с ракла: вътрешен кош от 2 части (глава + крака), облечен отвън; табла по избор; ламелна рамка с механизъм — купува се
-    const d=bedDims(k),{t,tf,tb,W,D,H,up,fl,Hb,Wi,Lb,Lh,Lf}=d,X0=tf,X1=W-tf,zs=tb; // кошът стъпва на дъното (фазер отдолу)
+    const d=bedDims(k),{t,tf,tb,W,D,H,up,fl,Hb,Wi,Lb,Lh,Lf}=d,X0=tf,X1=W-tf,zs=0; // страниците на коша са на цялата му височина — фазерът се заковава отдолу и не се приспада
     for(const[nm,yy,LL]of[['глава',0,Lh],['крака',Lh,Lf]]){ // всяка част: 2 дълги + 2 къси между тях + дъно фазер (общо 5 мм по-малко — заковано)
       add(`Кош ${nm} — дълга`,LL,Hb-zs,k.mc,[1,0,0,0],[X0,X0+t,yy,yy+LL,zs,Hb]);add(`Кош ${nm} — дълга`,LL,Hb-zs,k.mc,[1,0,0,0],[X1-t,X1,yy,yy+LL,zs,Hb]);
       add(`Кош ${nm} — къса`,Wi-2*t,Hb-zs,k.mc,[1,0,0,0],[X0+t,X1-t,yy,yy+t,zs,Hb]);add(`Кош ${nm} — къса`,Wi-2*t,Hb-zs,k.mc,[1,0,0,0],[X0+t,X1-t,yy+LL-t,yy+LL,zs,Hb]);
