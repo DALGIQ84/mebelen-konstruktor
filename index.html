@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.12 · 01:55 · Леглото застава пред таблата; без празна „Вътрешност“</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.12 · 02:05 · Завъртяно легло не се завърта само до стената</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -581,6 +581,7 @@ function autoAttach(k,byCorner){
     const px=byCorner?k.x:cx,py=byCorner?k.y:cy,v=[px-w.A[0],py-w.A[1]];
     const s=v[0]*w.u[0]+v[1]*w.u[1],dist=v[0]*w.n[0]+v[1]*w.n[1];
     const ok=byCorner?Math.abs(dist)<100&&s>-50&&s<w.len:dist>0&&dist<k.D/2+150&&s>0&&s<w.len;
+    if(ok&&['bed','nstand','hboard'].includes(k.type)&&!byCorner){const dr=((k.rot-w.ang*180/Math.PI)%360+540)%360-180;if(Math.abs(dr)>10)continue} // завъртяно легло/ракла — стои свободно до стената, не се завърта само
     if(ok&&(!best||Math.abs(dist)<best.d))best={i,d:Math.abs(dist),s};}
   if(!best)return false;k.wall=best.i;k.off=Math.round(byCorner?best.s:best.s-k.W/2);place(k);return true;
 }
