@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.13 · 23:10 · Растер: летви 2 в 1 с два канта по първия размер</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.13 · 23:20 · Стени: детайлите зад растера се рисуват отзад</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2549,7 +2549,8 @@ function wallSvg(){
     else if(isBox(it.type))s+=boxIcon(it.type,it.off,-(it.z+it.h),it.w,it.h);
   }
   for(const k of P.cabinets.filter(q=>isAcc(q)&&accOf(q).up&&q.wall===wv))s+=hoodWallSvg(k,isSel(k.id),fs);
-  for(const k of P.cabinets.filter(q=>['wpanel','wshelf','ubottom'].includes(q.type)&&q.wall===wv)){const on=isSel(k.id); // свободни детайли по стената
+  const wDep=k=>{const c=corners(k);return Math.min(...c.map(p=>(p[0]-w.A[0])*w.n[0]+(p[1]-w.A[1])*w.n[1]))}; // по-близкото до стената се рисува първо (отзад)
+  for(const k of P.cabinets.filter(q=>['wpanel','wshelf','ubottom'].includes(q.type)&&q.wall===wv).sort((a,b)=>wDep(a)-wDep(b))){const on=isSel(k.id); // свободни детайли по стената
     s+=`<g data-id="${k.id}" style="cursor:pointer">`+build(k).parts.map(p=>p.fp?`<polygon points="${p.fp.map(([u,v])=>(k.off+u)+','+(-v)).join(' ')}" style="fill:${mat(p.m).color};stroke:${on?'var(--mark)':'var(--fg)'};stroke-width:${on?3:1};vector-effect:non-scaling-stroke"/>`:`<rect x="${k.off+p.box[0]}" y="${-p.box[5]}" width="${p.box[1]-p.box[0]}" height="${Math.max(4,p.box[5]-p.box[4])}" style="fill:${mat(p.m).color};stroke:${on?'var(--mark)':'var(--fg)'};stroke-width:${on?3:1};vector-effect:non-scaling-stroke"/>`).join('')+
       `<text x="${k.off+k.W/2}" y="${-(k.type==='wpanel'?k.c+(+k.fpH||700)/2:k.c)-fs*0.4}" text-anchor="middle" font-size="${fs*0.5}" font-family="IBM Plex Sans,sans-serif" style="fill:var(--fg)">${esc(k.name)}</text></g>`;
     if(showDims){const ps=build(k).parts,zt=Math.max(...ps.map(p=>p.box[5])),zs=k.type==='wshelf'?ps.map(p=>p.box[4]):k.type==='wpanel'?[k.c,zt]:[k.c,zt]; // размери: позиция по стената, ширина, височини от пода
