@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.12 · 21:45 · Полетата на леглата/таблата/раклата — само при тях</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.12 · 22:10 · Ал. витрина на избрана врата (гардероби и кухни)</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -754,7 +754,17 @@ function applyPOv(k,r){partKeys(r.parts);const ov=k.pOv||{},out=[];
   (k.pAdd||[]).forEach((a,i)=>a.smart==='drs'||a.smart==='dor'||out.push({name:a.name||'Нов детайл',L:r1(+a.L),Wd:r1(+a.Wd),t:+mat(a.m).t,m:a.m,e:a.e||[0,0,0,0],box:addBox(a),kind:'',key:'+#'+i,added:true}));
   const smartPass=m=>{for(let pass=0;pass<m;pass++)for(const p of out)if(p.added&&!p.grp&&p.grp!==0){const a=(k.pAdd||[])[parseInt(p.key.split('#')[1])];if(a&&a.smart&&a.smart!=='drs'&&a.smart!=='dor')(a.smart==='dv'?smartDiv:smartShelf)(k,out,a,p)}};
   smartPass(3);if((k.pAdd||[]).some(a=>a.smart==='drs'||a.smart==='dor')){(k.pAdd||[]).forEach((a,i)=>{if(a.smart==='drs')smartDrawers(k,out,a,i);else if(a.smart==='dor')smartDoorGrp(k,out,a,i)});smartPass(2)} // чекмеджетата — след рафтовете/делителите, за да хванат точната секция
-  r.parts=out.filter(q=>!q._kill);relink(k,r.parts);addMirrors(k,r.parts);return r}
+  r.parts=out.filter(q=>!q._kill);relink(k,r.parts);addVits(k,r.parts);addMirrors(k,r.parts);return r}
+const isVitDoor=(k,d)=>d.kind==='door'&&!d.hidden&&!d.pl&&!d.fp&&/^Врата/.test(d.name)&&k.wDoor!=='slide'&&!/плъзг/i.test(d.name); // само отваряемите врати
+function addVits(k,parts){ /* ал. витрина на избрана врата (гардероби и кухни) — рамка от профила под 45° + стъкло; цвят на профила и стъклото — за всяка поотделно */
+  const V=k.vit||{};if(!Object.keys(V).length)return;const S=P.settings,fu=+S.fuga||3,aF=+(S.alFuga??S.fuga)||3,aw=+(S.alW??42),gd=+(S.glassDed??7),aT=+(S.alT??25);
+  for(let i=parts.length-1;i>=0;i--){const d=parts[i];if(!isVitDoor(k,d)||!V[d.key])continue;const v=V[d.key],am=ALCOL[v.al]?'__alu'+v.al:'__alu10T',gc=GLCOL[v.gl]?v.gl:'clear',gm=mat(k.mGv||'gl4').glass?k.mGv||'gl4':'gl4';
+    const b=d.box,e=(fu-aF)/2,x=b[0]-e,dw=b[1]-b[0]+2*e,z0=b[4]-e,dh=b[5]-b[4]+2*e,y0=b[2],y1=y0+Math.max(5,aT-(+S.doorGap||0)),vT=y1-y0,fr=sd=>({x0:x,x1:x+dw,z0,z1:z0+dh,aw,sd}),key=d.key,nw=[];
+    const A=(nm,L,W,m,bx,kind,extra)=>{nw.push({name:nm,L:r1(L),Wd:r1(W),t:+mat(m).t||20,m,e:[0,0,0,0],box:bx,kind,vitOf:key,key:'Вит@'+key+'#'+nw.length,...extra})};
+    A('Витрина — ал. профил (верт.)',dh,aw,am,[x,x+aw,y0,y1,z0,z0+dh],'alu',{fr:fr('L')});A('Витрина — ал. профил (верт.)',dh,aw,am,[x+dw-aw,x+dw,y0,y1,z0,z0+dh],'alu',{fr:fr('R')});
+    A('Витрина — ал. профил (хор.)',dw,aw,am,[x,x+dw,y0,y1,z0,z0+aw],'alu',{fr:fr('B')});A('Витрина — ал. профил (хор.)',dw,aw,am,[x,x+dw,y0,y1,z0+dh-aw,z0+dh],'alu',{fr:fr('T')});
+    A('Витрина — стъкло'+(gc!=='clear'?' — '+GLCOL[gc][0]:''),dh-gd,dw-gd,gm,[x+aw,x+dw-aw,y0+vT/2-2,y0+vT/2+2,z0+aw,z0+dh-aw],'glass',{glc:gc});
+    parts.splice(i,1,...nw)}}
 function addMirrors(k,parts){ /* огледало, залепено отпред на избраната врата — отстъп от ръба (0 = колкото вратата) */
   const M=k.mir||{};if(!Object.keys(M).length)return;const t=+(mat('mir4').t)||4;
   for(const d of parts.filter(q=>q.kind==='door'&&!q.hidden&&!q.pl&&!q.fp&&M[q.key])){const q=M[d.key],g=n=>Math.max(0,+(q[n]??q.o)||0),ol=g('l'),or=g('r'),ot=g('t'),ob=g('b'),b=d.box,w=b[1]-b[0]-ol-or,h=b[5]-b[4]-ot-ob;if(w<20||h<20)continue; /* отстъп за всяка страна */
@@ -3423,7 +3433,11 @@ function renderPed0(){const k=cab(pedK),el=$('#ped');if(!k){closePed();return}pe
         <div style="grid-column:1/-1;font-size:11.5px;color:var(--muted)">По програмата: ${fmt(b.L)} × ${fmt(b.Wd)}${o.dL||o.dW||o.dx||o.dy||o.dz||o.name||o.m?' · сега е поправен':''}</div>`}
       ${a&&(a.smart==='dv'||a.smart===true&&a.hd)?`<label class="tog" style="grid-column:1/-1;color:var(--fg)"><input type="checkbox" data-pe="virt" ${a.virt?'checked':''}> Виртуален — само помощна линия (0 мм, не влиза в разкроя)</label>`:''}
       <div style="grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap">${a?'':`<button class="btn sm" data-pa="reset" ${pedSel&&(k.pOv||{})[pedSel]?'':'disabled'}>↺ Върни</button>`}${a&&(a.smart==='drs'||a.smart==='dor')?'':a&&a.smart===true?'<button class="btn sm primary" data-pa="copy" title="Нов над този — светлото се мери от него">'+(a.hd?'+ Делител над него':'+ Рафт над него')+'</button>':'<button class="btn sm" data-pa="copy">Копие (+100 нагоре)</button>'}${a||!o.hide?'<button class="btn sm sure" data-pa="del" title="Delete">Изтрий</button>':''}</div></div>`}
-  if(!pedCells.length&&p&&(p.kind==='door'||p.mir)){const dk=p.mir?p.mirOf:p.key,mo=(k.mir||{})[dk];
+  if(!pedCells.length&&p&&(p.vitOf||p.kind==='door'&&isVitDoor(k,p)&&!(k.mir||{})[p.key])){const dk=p.vitOf||p.key,vo=(k.vit||{})[dk],sel_=(n,o,v)=>`<select data-vit="${esc(dk)}" data-vk="${n}" style="background:var(--field);border:1px solid var(--line);border-radius:5px;padding:3px 4px;color:var(--fg)">${Object.entries(o).map(([c,q])=>`<option value="${c}" ${c===v?'selected':''}>${q[0]}</option>`).join('')}</select>`;
+    form=`<div style="padding:8px 12px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px">${vo
+      ?`<b>▣ Ал. витрина</b> профил ${sel_('al',ALCOL,vo.al||'10T')} стъкло ${sel_('gl',GLCOL,vo.gl||'clear')}<button class="btn sm" data-vitx="${esc(dk)}">Махни витрината</button>`
+      :`<button class="btn sm" data-viton="${esc(dk)}">▣ Ал. витрина</button>`}</div>`+(p.vitOf?'':form)}
+  if(!pedCells.length&&p&&(p.kind==='door'||p.mir)&&!(k.vit||{})[p.mir?p.mirOf:p.key]){const dk=p.mir?p.mirOf:p.key,mo=(k.mir||{})[dk];
     form=`<div style="padding:8px 12px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px">${mo
       ?`<b style="flex-basis:100%">🪞 Огледало — залепено отпред; отстъп от ръба на вратата, мм <span style="color:var(--muted);font-weight:400">(0 = до ръба)</span></b>${[['l','← отляво'],['r','→ отдясно'],['t','↑ горе'],['b','↓ долу']].map(([n,l])=>`<label style="display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--muted)">${l}<input class="f" type="number" min="0" data-mir="${esc(dk)}" data-ms="${n}" value="${+(mo[n]??mo.o)||0}" style="width:72px;font-family:var(--f-mono)"></label>`).join('')}<label style="display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--muted)">всички наведнъж<input class="f" type="number" min="0" data-mir="${esc(dk)}" data-ms="all" placeholder="—" style="width:72px;font-family:var(--f-mono)"></label><button class="btn sm" data-mirx="${esc(dk)}" style="align-self:end">Махни огледалото</button>`
       :`<button class="btn sm primary" data-miron="${esc(dk)}">🪞 + Огледало на вратата</button><span style="color:var(--muted)">залепено отпред; отстъпа го задаваш после</span>`}</div>`+(p.mir?'':form)}
@@ -3448,6 +3462,10 @@ $('#ped').addEventListener('click',e=>{if(pedPanned){pedPanned=false;return}if(e
     if((e.ctrlKey||e.metaKey)&&pedSel){if(!pedMulti.size)pedMulti.add(pedSel);if(pedMulti.has(key)&&pedMulti.size>1){pedMulti.delete(key);if(pedSel===key)pedSel=[...pedMulti][0]}else{pedMulti.add(key);pedSel=key}} // Ctrl + клик — още детайли
     else if(pedSel===key&&pedMulti.size<=1){pedSel=null;pedMulti=new Set()} /* втори клик върху маркирания — отмаркира */
     else{pedSel=key;pedMulti=new Set([key])}renderPed();rebuild3D();return}
+  {const on=e.target.closest('[data-viton]'),of=e.target.closest('[data-vitx]');if(on||of){const k=cab(pedK);if(!k)return;pushUndo();k.vit={...(k.vit||{})};
+    const keys=(pedMulti.size>1?[...pedMulti]:[on?on.dataset.viton:of.dataset.vitx]).map(x=>x.startsWith('Вит@')?x.slice(4).replace(/#\d+$/,''):x);
+    for(const dk of keys){if(on){k.vit[dk]=k.vit[dk]||{al:'10T',gl:'clear'};if(k.mir)delete k.mir[dk]}else delete k.vit[dk]}if(of&&pedSel&&pedSel.startsWith('Вит@'))pedSel=pedSel.slice(4).replace(/#\d+$/,'');if(on&&keys.length===1){pedSel='Вит@'+keys[0]+'#0';pedMulti=new Set([pedSel])}
+    P.example=false;changed(false);renderPed();rebuild3D();toast(on?'Ал. витрина'+(keys.length>1?' ('+keys.length+')':''):'Витрината е махната');return}} // ал. витрина на маркираната врата
   {const on=e.target.closest('[data-miron]'),of=e.target.closest('[data-mirx]');if(on||of){const k=cab(pedK);if(!k)return;pushUndo();k.mir={...(k.mir||{})};
     const keys=(pedMulti.size>1?[...pedMulti]:[on?on.dataset.miron:of.dataset.mirx]).map(x=>x.startsWith('Огледало@')?x.slice(9):x);
     for(const dk of keys){if(on)k.mir[dk]=k.mir[dk]||{o:0};else delete k.mir[dk]}if(of&&pedSel&&pedSel.startsWith('Огледало@'))pedSel=pedSel.slice(9);
@@ -3498,6 +3516,7 @@ function pedEdit(k,f,v){ // една промяна върху маркиран�
     for(const q in o)if(o[q]===undefined||o[q]===0)delete o[q];if(Object.keys(o).length)k.pOv[pedSel]=o;else delete k.pOv[pedSel];}
 }
 $('#ped').addEventListener('change',e=>{const k=cab(pedK),t=e.target;if(t.id==='pedDr')return;
+  if(k&&t.dataset.vit!=null){pushUndo();const keys=pedMulti.size>1?[...pedMulti].map(x=>x.startsWith('Вит@')?x.slice(4).replace(/#\d+$/,''):x):[t.dataset.vit];for(const dk of keys)if((k.vit||{})[dk])k.vit={...k.vit,[dk]:{...k.vit[dk],[t.dataset.vk]:t.value}};P.example=false;changed(false);setTimeout(()=>{renderPed();rebuild3D()},0);return}
   if(k&&t.dataset.mir!=null){pushUndo();const keys=pedMulti.size>1?[...pedMulti].map(x=>x.startsWith('Огледало@')?x.slice(9):x):[t.dataset.mir];const v=Math.max(0,+t.value||0),sd=t.dataset.ms||'all';for(const dk of keys)if((k.mir||{})[dk]){const q={...k.mir[dk]};for(const n of['l','r','t','b'])q[n]=sd==='all'||sd===n?v:+(q[n]??q.o)||0;delete q.o;k.mir={...k.mir,[dk]:q}}P.example=false;changed(false);setTimeout(()=>{renderPed();rebuild3D()},0);return}
   if(k&&t.dataset.ub){pushUndo();k[t.dataset.ub]=t.dataset.ub==='ubAng'?clamp(+t.value||45,5,85):t.value;if(t.dataset.ub==='ubEdge'&&UB_PROF[t.value])k.ubCol=UB_PROF[t.value].col0||'black';P.example=false;changed(false);renderPed();rebuild3D();return}
   if(k&&t.dataset.fov){pushUndo();k.fover=t.value===''?0:Math.max(0,+t.value);P.example=false;changed(false);renderPed();return}
