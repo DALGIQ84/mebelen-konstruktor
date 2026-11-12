@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.12 · 23:20 · Растер (пано + летви на ръб) в Свободни детайли</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.12 · 23:30 · Растер: нечетен брой летви — закръгля нагоре</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1078,9 +1078,9 @@ function buildRaw(k){
       const n=Math.max(1,Math.floor((span-2*m+g0)/(ts+g0))),g=n>1?(span-2*m-n*ts)/(n-1):0,lst=[];
       for(let i=0;i<n;i++){const a=n>1?m+i*(ts+g):(span-ts)/2;lst.push(vd?[a,a+ts,tt,tt+rw,c,c+h]:[0,W,tt,tt+rw,c+h-a-ts,c+h-a])}
       for(const b of lst)add('Растер — летва',len,rw,ms,[1,0,0,0],b,'vis'); // в 3D и на стената — всяка летва
-      const pr=Math.floor(n/2);if(pr)for(let i=0;i<pr;i++){add(`Растер — летви 2 в 1 (цепи се на две, диск ${fmt(kf)})`,len,2*rw+kf,ms,[1,0,0,0],[0,0.1,0,0.1,c,c+0.1],'');parts.at(-1).noDraw=true}
-      if(n%2){add('Растер — летва (единична)',len,rw,ms,[1,0,0,0],[0,0.1,0,0.1,c,c+0.1],'');parts.at(-1).noDraw=true}
-      warn.push(`Растер ${fmt(W)} × ${fmt(h)}: ${n} ${vd?'вертикални':'хоризонтални'} летви ${fmt(ts)} × ${fmt(rw)}, разстояние ${fmt(g)} мм${m?`, отстъп от края ${fmt(m)}`:''}; в разкроя — ${pr} бр. по 2 в 1 (${fmt(len)} × ${fmt(2*rw+kf)})${n%2?' + 1 единична':''}.`);
+      const pr=Math.ceil(n/2); /* нечетен брой — закръгля се нагоре (една летва остава резервна) */if(pr)for(let i=0;i<pr;i++){add(`Растер — летви 2 в 1 (цепи се на две, диск ${fmt(kf)})`,len,2*rw+kf,ms,[1,0,0,0],[0,0.1,0,0.1,c,c+0.1],'');parts.at(-1).noDraw=true}
+      
+      warn.push(`Растер ${fmt(W)} × ${fmt(h)}: ${n} ${vd?'вертикални':'хоризонтални'} летви ${fmt(ts)} × ${fmt(rw)}, разстояние ${fmt(g)} мм${m?`, отстъп от края ${fmt(m)}`:''}; в разкроя — ${pr} бр. по 2 в 1 (${fmt(len)} × ${fmt(2*rw+kf)})${n%2?' — закръглено нагоре, 1 летва остава резервна':''}.`);
       finishParts(k,parts);k.D=r1(tt+rw);return{parts,warn,Dk:tt+rw}}
     const ov=Math.max(0,+k.fover||0);add('Панел на стената',h,W,k.mf,[1,1,1,1],[0,W,0,tt,c,c+h],'');parts.at(-1).L=r1(h+2*ov);parts.at(-1).Wd=r1(W+2*ov);parts.at(-1).ov=ov; // надмярка на страна — за CNC
     if(ov>0)warn.push(`Панел ${Math.round(W)} × ${Math.round(h)}: в разкроя е с надмярка ${fmt(ov)} мм на страна (${fmt(W+2*ov)} × ${fmt(h+2*ov)}) — CNC го реже по контура.`);
