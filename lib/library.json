@@ -52,6 +52,18 @@
    "ar": 1,
    "rot": 90,
    "img": "lib/img/k8sxtyy.jpg"
+  },
+  {
+   "id": "cs2fceh",
+   "ts": 1794506458311,
+   "folder": "Роси",
+   "name": "Карамел",
+   "code": "9127",
+   "w": 1000,
+   "dir": "h",
+   "ar": 1,
+   "rot": 90,
+   "img": "lib/img/cs2fceh.jpg"
   }
  ]
 }
