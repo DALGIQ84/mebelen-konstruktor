@@ -88,6 +88,18 @@
    "ar": 1,
    "rot": 0,
    "img": "lib/img/10qo8ay.jpg"
+  },
+  {
+   "id": "f4gpxrs",
+   "ts": 1794520269133,
+   "folder": "Роси",
+   "name": "БЯЛО",
+   "code": "W960",
+   "w": 1000,
+   "dir": "h",
+   "ar": 1,
+   "rot": 90,
+   "img": "lib/img/f4gpxrs.jpg"
   }
  ]
 }
