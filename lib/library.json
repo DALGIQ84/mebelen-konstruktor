@@ -64,6 +64,18 @@
    "ar": 1,
    "rot": 90,
    "img": "lib/img/cs2fceh.jpg"
+  },
+  {
+   "id": "9aolojz",
+   "ts": 1794518995954,
+   "folder": "Роси",
+   "name": "Кънтри мед",
+   "code": "7749",
+   "w": 1000,
+   "dir": "h",
+   "ar": 0.7211934156378601,
+   "rot": 90,
+   "img": "lib/img/9aolojz.jpg"
   }
  ]
 }
