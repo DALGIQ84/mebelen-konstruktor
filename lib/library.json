@@ -88,6 +88,18 @@
    "ar": 1,
    "rot": 0,
    "img": "lib/img/10qo8ay.jpg"
+  },
+  {
+   "id": "q50b695",
+   "ts": 1794520325810,
+   "folder": "Егер",
+   "name": "БЯЛО",
+   "code": "W960",
+   "w": 1000,
+   "dir": "h",
+   "ar": 1,
+   "rot": 90,
+   "img": "lib/img/q50b695.jpg"
   }
  ]
 }
