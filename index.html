@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.16 · 21:35 · Стени: гърбът — HDF бял, твърд гръб в цвета на материала (за всички шкафове)</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.16 · 21:55 · Светли отвори: четливи размери (етикети, вериги отстрани)</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2546,15 +2546,28 @@ function colsFromParts(k,b){ // светлите отвори от детайл�
     const bs=H.filter(h=>h.box[0]<=xm&&h.box[1]>=xm).map(h=>[h.box[4],h.box[5],/^Дъно/.test(h.name)&&!h.added?'дъно':/^Таван/.test(h.name)&&!h.added?'таван':'рафт']).sort((a,c)=>a[0]-c[0]);
     if(bs.length<2)continue;out.push({sec:out.length+1,x0,x1,b:bs,rods:rods.filter(r=>r.x>x0&&r.x<x1).map(r=>r.z)})}
   return out.length?out:b.cols}
-function clearDims(k,cols,fs){let s='';const f=fs*0.5,st='stroke:var(--mark);stroke-width:1;vector-effect:non-scaling-stroke',tx=(x,y,t,rot)=>`<text x="${x}" y="${y}" ${rot?`transform="rotate(-90 ${x} ${y})"`:''} text-anchor="middle" dy=".35em" font-size="${f}" font-family="IBM Plex Mono,monospace" font-weight="600" style="fill:var(--mark);paint-order:stroke;stroke:var(--panel);stroke-width:${f/4}px">${t}</text>`;
-  for(const c of cols){const X0=k.off+c.x0,X1=k.off+c.x1,w=X1-X0,xm=X0+w*(c.sec==='Н'?0.12:0.5);if(w<60)continue;
-    const bs=c.b;for(let i=0;i+1<bs.length;i++){const za=bs[i][1],zb=bs[i+1][0],g=zb-za;if(g<15)continue;
-      s+=`<line x1="${xm}" y1="${-za}" x2="${xm}" y2="${-zb}" style="${st}"/><line x1="${xm-f*.6}" y1="${-za}" x2="${xm+f*.6}" y2="${-za}" style="${st}"/><line x1="${xm-f*.6}" y1="${-zb}" x2="${xm+f*.6}" y2="${-zb}" style="${st}"/>`+(g>f*2.4?tx(xm+f*.9,-(za+zb)/2,Math.round(g),1):tx(xm+f*1.6,-(za+zb)/2,Math.round(g)));
-      if(i===bs.length-2||bs[i+1][2]!=='рафт')continue}
-    const zt=bs.length>1?bs[1][0]:bs[0][1]+200,zy=bs[0][1]+Math.min(120,(zt-bs[0][1])/2);
-    s+=`<line x1="${X0}" y1="${-zy}" x2="${X1}" y2="${-zy}" style="${st};stroke-dasharray:4 3"/>`+tx(X0+w*0.28,-zy-f*.7,Math.round(w));
+function clearDims(k,cols,fs,occ){let s='';const f=fs*0.6,C='var(--mark)',st=`stroke:${C};stroke-width:1.6;vector-effect:non-scaling-stroke`;
+  const lb=(x,y,t,al)=>{const tw=String(t).length*f*0.62+f*0.7,th=f*1.35,x0=al==='r'?x-tw:al==='l'?x:x-tw/2; // етикет: бяло каре с рамка, хоризонтален текст
+    return `<rect x="${x0}" y="${y-th/2}" width="${tw}" height="${th}" rx="${f*.2}" style="fill:#fff;stroke:${C};stroke-width:1;vector-effect:non-scaling-stroke"/><text x="${x0+tw/2}" y="${y}" text-anchor="middle" dy=".36em" font-size="${f}" font-family="IBM Plex Mono,monospace" font-weight="700" style="fill:${C}">${t}</text>`};
+  const z0=+k.c,z1=+k.H,free=sd=>{const e=sd==='L'?k.off:k.off+ +k.W;return !(occ||[]).some(o=>o.front&&o.k.id!==k.id&&!['tfill','filler','plinthRun'].includes(o.k.type)&&+o.k.c<z1-1&&+o.k.H>z0+1&&(sd==='L'?o.s1>e-300&&o.s1<=e+1:o.s0<e+300&&o.s0>=e-1))};
+  const chain=(x,zs,al)=>{let q='';for(const z of zs)q+=`<line x1="${x-f*.5}" y1="${-z}" x2="${x+f*.5}" y2="${-z}" style="${st}"/>`;q+=`<line x1="${x}" y1="${-zs[0]}" x2="${x}" y2="${-zs.at(-1)}" style="${st}"/>`;return q};
+  const fL=free('L'),fR=free('R'),Tc=+mat(k.mc).t||18,isL=c=>c.x0<=Tc+3,isR=c=>c.x1>= +k.W-Tc-3,one=cols.every(c=>isL(c)&&isR(c)); // една колона (и с надстройка)
+  cols.forEach((c,ci)=>{const X0=k.off+c.x0,X1=k.off+c.x1,w=X1-X0;if(w<60)return;const bs=c.b;
+    const gaps=[];for(let i=0;i+1<bs.length;i++){const za=bs[i][1],zb=bs[i+1][0];if(zb-za>=15)gaps.push([za,zb])}
+    if(!gaps.length)return;
+    // височините на отворите — верига; крайните колони — извън шкафа (ако отстрани е свободно), иначе вътре до лявата страна
+    const outL=isL(c)&&fL,outR=!outL&&isR(c)&&fR,x=outL?k.off-f*2.2:outR?k.off+ +k.W+f*2.2:X0+f*1.1;
+    s+=chain(x,gaps.flatMap(g=>g),'');
+    for(const[za,zb]of gaps){const g=Math.round(zb-za);s+=lb(outL?x-f*.6:x+f*.6,-(za+zb)/2,g,outL?'r':'l')}
+    // ширината — веднъж, в най-големия отвор
+    const big=gaps.reduce((m,g)=>g[1]-g[0]>m[1]-m[0]?g:m),zy=(big[0]+big[1])/2+Math.min(f*2.2,(big[1]-big[0])/3);
+    s+=`<line x1="${X0}" y1="${-zy}" x2="${X1}" y2="${-zy}" style="${st};stroke-dasharray:4 3"/>`+lb((X0+X1)/2+(outL||outR?0:f*1.2),-zy,Math.round(w));
     for(const z of c.rods)s+=`<line x1="${X0+8}" y1="${-z}" x2="${X1-8}" y2="${-z}" style="stroke:#8a959b;stroke-width:3;vector-effect:non-scaling-stroke"/>`;
-    for(const q of bs)if(q[2]==='рафт')s+=`<text x="${X0+f*.3}" y="${-q[0]-f*.15}" font-size="${f*.9}" font-family="IBM Plex Mono,monospace" font-weight="600" style="fill:#fff;paint-order:stroke;stroke:#1d1d1f;stroke-width:${f/3.2}px;stroke-linejoin:round">↥${Math.round(q[0]-bs[0][1])}</text>`}
+    // височините на рафтовете от дъното — от другата страна (извън шкафа при една колона и свободно място), иначе до десния край на рафта
+    const sh=bs.filter(q=>q[2]==='рафт');if(!sh.length)return;
+    const sideR=one&&!outR&&fR,sideL=one&&outR&&fL,xh=sideR?k.off+ +k.W+f*2.2:sideL?k.off-f*2.2:null;
+    if(xh!=null){s+=chain(xh,[bs[0][1],...sh.map(q=>q[0])],'');for(const q of sh)s+=lb(sideR?xh+f*.6:xh-f*.6,-q[0],'↥'+Math.round(q[0]-bs[0][1]),sideR?'l':'r')}
+    else for(const q of sh)s+=lb(X1-f*.4,-q[0]-f*.8,'↥'+Math.round(q[0]-bs[0][1]),'r')});
   return s}
 function wallSvg(){
   const R=P.room,w=wallInfo(wv),L=w.len,H=R.h,t=R.t;fs=Math.max(L,H)/36;
@@ -2600,6 +2613,7 @@ function wallSvg(){
   for(const b of bl){const x0=Math.max(0,b.s0),x1=Math.min(L,b.s1),y1=-(b.z+b.h),cy=-(b.z+b.h/2),hor=(x1-x0)>b.h,nm=b.z>0?'трегер':'колона';
     s+=`<rect x="${x0}" y="${y1}" width="${x1-x0}" height="${b.h}" style="fill:var(--wall);opacity:.75;stroke:var(--fg);stroke-width:1;vector-effect:non-scaling-stroke"/>`+
       `<text x="${(x0+x1)/2}" y="${cy}" dy=".35em" text-anchor="middle" font-size="${Math.min(fs*0.55,(hor?b.h:(x1-x0))*0.35)}" font-family="IBM Plex Sans,sans-serif" ${hor?'':`transform="rotate(-90 ${(x0+x1)/2} ${cy})"`} style="fill:#fff">${nm} · дълб. ${Math.round(b.dep)}</text>`}
+  let cdAcc='';
   for(const o of occ){const k=o.k,on=isSel(k.id);
     if(INSTALL){const x0=Math.max(0,o.s0),x1=Math.min(L,o.s1);s+=`<rect x="${x0}" y="${-k.H}" width="${x1-x0}" height="${k.H-(o.front?k.c:0)}" style="fill:none;stroke:var(--muted);stroke-dasharray:10 8;stroke-width:1;opacity:.55;vector-effect:non-scaling-stroke"/>`;continue}
     if(o.front&&isAcc(k)){const col=(ACOL[k.acol]||ACOL.white)[1],x=k.off,W=k.W,h=k.H-k.c,yb=-k.c,st=`stroke:var(--fg);stroke-width:1;vector-effect:non-scaling-stroke`;let q='';
@@ -2624,7 +2638,7 @@ function wallSvg(){
       for(const p of b.parts.filter(p=>p.mir&&!(k.hideD&&!noHideD)&&!showClear)){const[x0,x1,,,z0,z1]=p.box,X=k.off+x0,w=x1-x0,h=z1-z0,d=Math.min(w,h)*.35; // огледало — върху вратата
         s+=`<rect x="${X}" y="${-z1}" width="${w}" height="${h}" style="fill:#e6eef2;stroke:var(--fg);stroke-width:.8;vector-effect:non-scaling-stroke"/><line x1="${X+w*.2}" y1="${-z0-h*.55}" x2="${X+w*.2+d}" y2="${-z0-h*.55-d}" style="stroke:#9fb3bd;stroke-width:1.2;vector-effect:non-scaling-stroke"/><line x1="${X+w*.3}" y1="${-z0-h*.5}" x2="${X+w*.3+d*.7}" y2="${-z0-h*.5-d*.7}" style="stroke:#9fb3bd;stroke-width:1.2;vector-effect:non-scaling-stroke"/>`}
       s+=`<rect x="${k.off}" y="${-k.H}" width="${k.W}" height="${k.H-k.c}" style="fill:none;stroke:${on?'var(--mark)':'var(--fg)'};stroke-width:${on?3:1.2};vector-effect:non-scaling-stroke"/>`;
-      if(showClear&&b.cols)s+=clearDims(k,colsFromParts(k,b),fs);
+      if(showClear&&b.cols)cdAcc+=clearDims(k,colsFromParts(k,b),fs,occ); // размерите — накрая, върху всичко
       s+=`<text x="${k.off+k.W/2}" y="${-k.H-fs*0.35}" text-anchor="middle" font-size="${fs*0.62}" font-family="IBM Plex Sans,sans-serif" font-weight="600" style="fill:${on?'var(--mark)':'var(--fg)'}">${esc(k.name)}</text></g>`}
     else s+=`<g data-id="${k.id}" style="cursor:pointer"><rect x="${Math.max(0,o.s0)}" y="${-k.H}" width="${Math.min(L,o.s1)-Math.max(0,o.s0)}" height="${k.H}" style="fill:var(--muted);fill-opacity:.18;stroke:var(--muted);stroke-dasharray:6 4;stroke-width:1;vector-effect:non-scaling-stroke"/></g>`;
   }
@@ -2653,6 +2667,7 @@ function wallSvg(){
     const fr=INSTALL?[]:occ.filter(o=>o.front);
     if(fr.length)s+=chainV([0,...fr.map(o=>o.k.c),...fr.map(o=>o.k.H),H],L+t+fs*1.4,1);
   }
+  s+=cdAcc;
   s+=`<text x="${L/2}" y="${-H-fs*3.6-xU}" text-anchor="middle" font-size="${fs*0.85}" font-family="IBM Plex Sans Condensed,sans-serif" font-weight="600" style="fill:var(--fg)">${INSTALL?'План на точките · ':''}Стена ${wv+1} — гледана отвътре${showClear&&occupancy(wv).some(o=>o.front&&o.k.type==='wardrobe')?' · светли отвори':''}</text>`;
   if(EXP){
     s+=`<text x="${-t-fs*4.5}" y="${-H-fs*6.3}" font-size="${fs*0.7}" font-family="IBM Plex Sans,sans-serif" style="fill:var(--muted)">${esc(pName())}${P.name?' · ':''}${new Date().toLocaleDateString('bg-BG')} · размерите са в мм</text>`;
