@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.16 · 21:00 · Пълнеж до тавана — без страница до стената</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.16 · 21:10 · Работен PDF: огледала при скрити врати; витрините не излизат в светлите отвори</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2614,7 +2614,7 @@ function wallSvg(){
         b.parts.filter(p=>p.name==='Страница до пода').map(p=>`<rect x="${k.off+p.box[0]}" y="${-k.c}" width="${p.box[1]-p.box[0]}" height="${k.c}" style="fill:${mat(k.mc).color};stroke:var(--fg);stroke-width:1;vector-effect:non-scaling-stroke"/>`).join('')+
         `<rect x="${k.off}" y="${-k.H}" width="${k.W}" height="${k.H-k.c}" style="fill:${mat(k.mc).color};filter:brightness(.72)"/>`; // вътрешността (сянка)
       // корпусът детайл по детайл — вижда се, където няма врати (делители, рафтове, дъно, бленди…); отзад напред
-      for(const p of b.parts.filter(p=>p.kind!=='door'&&p.kind!=='hw'&&!p.mir&&!p.noDraw&&p.name!=='Страница до пода').sort((a,c)=>a.box[3]-c.box[3])){const[x0,x1,y0,y1,z0,z1]=p.box;if(x1-x0<=0||z1-z0<=0)continue;
+      for(const p of b.parts.filter(p=>p.kind!=='door'&&p.kind!=='hw'&&!p.mir&&!p.noDraw&&p.name!=='Страница до пода'&&!(p.vitOf&&(showClear||k.hideD&&!noHideD))).sort((a,c)=>a.box[3]-c.box[3])){const[x0,x1,y0,y1,z0,z1]=p.box;if(x1-x0<=0||z1-z0<=0)continue;
         if(p.kind==='appl'){s+=`<rect x="${k.off+x0}" y="${-z1}" width="${x1-x0}" height="${z1-z0}" style="fill:#2a2e31;stroke:var(--fg);stroke-width:.8;vector-effect:non-scaling-stroke"/>`+(p.ap==='oven'?`<rect x="${k.off+x0+15}" y="${-z1+Math.min(95,(z1-z0)*.18)+15}" width="${x1-x0-30}" height="${(z1-z0)-Math.min(95,(z1-z0)*.18)-30}" style="fill:#16191b;stroke:#8a959b;stroke-width:.6;vector-effect:non-scaling-stroke"/><line x1="${k.off+x0+(x1-x0)*.12}" y1="${-z1+Math.min(95,(z1-z0)*.18)+28}" x2="${k.off+x1-(x1-x0)*.12}" y2="${-z1+Math.min(95,(z1-z0)*.18)+28}" style="stroke:#c5cacd;stroke-width:3;vector-effect:non-scaling-stroke"/>`:`<rect x="${k.off+x1-Math.min(120,(x1-x0)*.22)}" y="${-z1}" width="${Math.min(120,(x1-x0)*.22)}" height="${z1-z0}" style="fill:#c5cacd"/>`)+`<text x="${k.off+(x0+x1)/2}" y="${-(z0+z1)/2}" dy=".35em" text-anchor="middle" font-size="${fs*0.45}" font-family="IBM Plex Sans,sans-serif" style="fill:#fff">${p.ap==='oven'?'фурна':'микровълнова'}</text>`;continue}
         if(p.fp){s+=`<polygon points="${p.fp.map(([u,v])=>(k.off+u)+','+(-v)).join(' ')}" style="fill:${mat(p.m).color};stroke:var(--fg);stroke-width:.8;vector-effect:non-scaling-stroke"/>`;continue}
         if(p.fr){s+=`<polygon points="${miterPts(p.fr).map(([u,v])=>(k.off+u)+','+(-v)).join(' ')}" style="fill:${mat(p.m).color};stroke:var(--fg);stroke-width:.6;vector-effect:non-scaling-stroke"/>`;continue}
@@ -2841,8 +2841,8 @@ async function svgCanvas(s,vb,px){
   const img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(doc);await img.decode();
   const c=document.createElement('canvas');c.width=px;c.height=h;c.getContext('2d').drawImage(img,0,0,px,h);return c;
 }
-function withExport(fn){const keep={sel,selWall,showDims,tab,wv};sel=null;selWall=null;showDims=true;tab='cab';EXP=true;
-  try{return fn()}finally{EXP=false;({sel,selWall,showDims,tab,wv}=keep)}}
+function withExport(fn){const keep={sel,selWall,showDims,tab,wv,noHideD};sel=null;selWall=null;showDims=true;tab='cab';EXP=true;noHideD=true; /* в PDF-а вратите и огледалата винаги се виждат (и скритите с „Скрий вратите“) */
+  try{return fn()}finally{EXP=false;({sel,selWall,showDims,tab,wv,noHideD}=keep)}}
 const fname=x=>((pName()||'проект')+' - '+x).replace(/[\\/:*?"<>|]+/g,' ').trim()+'.png';
 async function deliver(canvas,filename){
   const blob=await new Promise(r=>canvas.toBlob(r,'image/png'));if(OFFLINE){plainDownload(filename,blob);toast('Картинката е запазена');return}
