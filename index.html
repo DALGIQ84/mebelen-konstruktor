@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.16 · 21:55 · Светли отвори: четливи размери (етикети, вериги отстрани)</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.16 · 22:05 · PDF: чертежите запълват целия лист А4 (без празни полета, портрет/пейзаж)</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2854,8 +2854,13 @@ async function svgCanvas(s,vb,px){
   const h=Math.round(px*vb[3]/vb[2]);
   const doc=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb.join(' ')}" width="${px}" height="${h}"><style>svg{${LIGHT}} .dm{stroke:var(--dimc);stroke-width:2.2;vector-effect:non-scaling-stroke;fill:none} .dt{fill:var(--dimc);font-family:'IBM Plex Mono',Consolas,monospace;font-weight:500} text{font-family:'IBM Plex Sans',Arial,sans-serif}</style><rect x="${vb[0]}" y="${vb[1]}" width="${vb[2]}" height="${vb[3]}" fill="#ffffff"/>${s}</svg>`;
   const img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(doc);await img.decode();
-  const c=document.createElement('canvas');c.width=px;c.height=h;c.getContext('2d').drawImage(img,0,0,px,h);return c;
+  const c=document.createElement('canvas');c.width=px;c.height=h;c.getContext('2d').drawImage(img,0,0,px,h);return trimCanvas(c);
 }
+function trimCanvas(c,pad=24){ // реже празните полета около чертежа — за да запълни листа
+  try{const g=c.getContext('2d'),{width:W,height:H}=c,d=g.getImageData(0,0,W,H).data,b=[d[0],d[1],d[2]];let x0=W,y0=H,x1=-1,y1=-1;
+    for(let y=0;y<H;y+=2)for(let x=0;x<W;x+=2){const i=(y*W+x)*4;if(Math.abs(d[i]-b[0])+Math.abs(d[i+1]-b[1])+Math.abs(d[i+2]-b[2])>24){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}}
+    if(x1<0)return c;x0=Math.max(0,x0-pad);y0=Math.max(0,y0-pad);x1=Math.min(W,x1+pad);y1=Math.min(H,y1+pad);
+    const o=document.createElement('canvas');o.width=x1-x0;o.height=y1-y0;const og=o.getContext('2d');og.fillStyle=`rgb(${b})`;og.fillRect(0,0,o.width,o.height);og.drawImage(c,x0,y0,o.width,o.height,0,0,o.width,o.height);return o}catch(e){return c}}
 function withExport(fn){const keep={sel,selWall,showDims,tab,wv,noHideD};sel=null;selWall=null;showDims=true;tab='cab';EXP=true;noHideD=true; /* в PDF-а вратите и огледалата винаги се виждат (и скритите с „Скрий вратите“) */
   try{return fn()}finally{EXP=false;({sel,selWall,showDims,tab,wv,noHideD}=keep)}}
 const fname=x=>((pName()||'проект')+' - '+x).replace(/[\\/:*?"<>|]+/g,' ').trim()+'.png';
@@ -3101,18 +3106,22 @@ async function saveInstallPDF(){
     for(const i of(ws.length?ws:[...Array(N()).keys()])){const q=withExport(()=>{wv=i;return wallSvg()});set.push({c:await svgCanvas(q.s,q.vb,2400),name:fname('план на точките стена '+(i+1))})}
     if(l.length)set.push({c:installTable(l),name:fname('план на точките точки')})}
   catch(e){toast('Мерителният лист не можа да се направи');return}finally{INSTALL=false}
-  const doc=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'}),PW=297,PH=210,M=8;
-  set.forEach((f,i)=>{if(i)doc.addPage('a4','landscape');const k=Math.min((PW-2*M)/f.c.width,(PH-2*M)/f.c.height),w=f.c.width*k,h=f.c.height*k;
-    doc.addImage(f.c.toDataURL('image/jpeg',0.9),'JPEG',(PW-w)/2,(PH-h)/2,w,h)});
+  const doc=new window.jspdf.jsPDF({orientation:set[0]&&set[0].c.height>set[0].c.width*1.05?'portrait':'landscape',unit:'mm',format:'a4'}),M=6;
+  set.forEach((f,i)=>{const pt=f.c.height>f.c.width*1.05,pw=pt?210:297,ph=pt?297:210; /* всеки лист — както е по-удобно: изправен чертеж → портрет; запълва целия А4 */
+    if(i)doc.addPage('a4',pt?'portrait':'landscape');
+    const k=Math.min((pw-2*M)/f.c.width,(ph-2*M)/f.c.height),w=f.c.width*k,h=f.c.height*k;
+    doc.addImage(f.c.toDataURL('image/jpeg',0.92),'JPEG',(pw-w)/2,(ph-h)/2,w,h)});
   const ok=await saveFile(`${projBase()} план на точките ${new Date().toISOString().slice(0,10)}.pdf`,doc.output('blob'));
   if(!ok)deliverMany(set);
 }
 async function savePDF(){
   if(!window.jspdf){toast('PDF не може да се направи — няма връзка с библиотеката');return}
   toast('Подготвям PDF…');let set;try{set=await exportSet()}catch(e){toast('PDF не можа да се направи');return}
-  const doc=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'}),PW=297,PH=210,M=8;
-  set.forEach((f,i)=>{if(i)doc.addPage('a4','landscape');const k=Math.min((PW-2*M)/f.c.width,(PH-2*M)/f.c.height),w=f.c.width*k,h=f.c.height*k;
-    doc.addImage(f.c.toDataURL('image/jpeg',0.9),'JPEG',(PW-w)/2,(PH-h)/2,w,h)});
+  const doc=new window.jspdf.jsPDF({orientation:set[0]&&set[0].c.height>set[0].c.width*1.05?'portrait':'landscape',unit:'mm',format:'a4'}),M=6;
+  set.forEach((f,i)=>{const pt=f.c.height>f.c.width*1.05,pw=pt?210:297,ph=pt?297:210; /* всеки лист — както е по-удобно: изправен чертеж → портрет; запълва целия А4 */
+    if(i)doc.addPage('a4',pt?'portrait':'landscape');
+    const k=Math.min((pw-2*M)/f.c.width,(ph-2*M)/f.c.height),w=f.c.width*k,h=f.c.height*k;
+    doc.addImage(f.c.toDataURL('image/jpeg',0.92),'JPEG',(pw-w)/2,(ph-h)/2,w,h)});
   const ok=await saveFile(`${projBase()} ${new Date().toISOString().slice(0,10)}.pdf`,doc.output('blob'));
   if(!ok)deliverMany(set);
 }
