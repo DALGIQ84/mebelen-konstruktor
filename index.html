@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.16 · 20:45 · Пълнеж до тавана (десен бутон)</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.16 · 20:55 · Пълнеж до тавана — страници на откритите краища</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1137,7 +1137,9 @@ function buildRaw(k){
     const hg=Math.max(0,+P.room.h-c),al=+(S.fillAllow??50),y1=+k.D,lw=+(S.tfLetva??80),tC=+mat(k.mc).t||18;
     if(hg<3){warn.push('Няма разстояние до тавана.');finishParts(k,parts);return{parts,warn,Dk:y1}}
     add('Пълнеж горе',W,hg+al,k.mf,[1,0,0,0],[0,W,y1-tF,y1,c,c+hg],'door');
-    add('Пълнеж горе — летва',W,lw,k.mc,[0,0,0,0],[0,W,y1-tF-lw,y1-tF,c,c+tC]);
+    const tS=tF,sx=[k.tsL?'L':'',k.tsR?'R':''].filter(Boolean); // открит край — странично парче до тавана, зад лицевия пълнеж
+    for(const sd of sx){const x0=sd==='L'?0:W-tS;add(sd==='L'?'Пълнеж горе — страница (лява)':'Пълнеж горе — страница (дясна)',y1-tF,hg+al,k.mf,[1,0,0,0],[x0,x0+tS,0,y1-tF,c,c+hg],'')}
+    add('Пълнеж горе — летва',W-(k.tsL?tS:0)-(k.tsR?tS:0),lw,k.mc,[0,0,0,0],[k.tsL?tS:0,W-(k.tsR?tS:0),y1-tF-lw,y1-tF,c,c+tC]);
     warn.push(`Пълнеж до тавана: ${fmt(hg)} мм (таван ${fmt(P.room.h)} − горе на шкафа ${fmt(c)}); режеш ${fmt(hg+al)} мм с припуска.`);
     finishParts(k,parts);return{parts,warn,Dk:y1};
   }
@@ -2404,7 +2406,8 @@ function addTopFiller(k){const grp=groupOf(k.id).filter(q=>q.wall===k.wall&&q.ty
   const fy=Math.max(...grp.map(q=>frontOf(q)+(+q.gap||0)-g0));
   if(+P.room.h-zt<3){toast('Няма разстояние до тавана');return}
   if(new Set(grp.map(q=>Math.round(topOf(q)))).size>1)toast('Шкафовете са с различна височина — пълнежът е от най-високия');
-  const f=cabDef({type:'tfill',name:'Пълнеж горе',W:Math.round(a1-a0),H:+P.room.h,D:Math.round(fy),c:zt,mc:k.mc,mf:k.mf,wall:k.wall,off:a0,gap:g0,plinth:false});
+  const gg=groupGaps(grp),opn=(sd)=>{if(!gg)return true;const d=sd==='L'?gg.l:gg.r,wl=sd==='L'?gg.lWall:gg.rWall;if(d<3&&wl)return false;if(d<3){const x=sd==='L'?a0:a1,nb=P.cabinets.find(q=>q.wall===k.wall&&!grp.includes(q)&&!['tfill','plinthRun','top','splash','wpanel','wshelf'].includes(q.type)&&Math.abs((sd==='L'?q.off+ +q.W:q.off)-x)<3);if(nb&&topOf(nb)>=+P.room.h-3)return false}return true}; // край до стената или до шкаф до тавана — без страница
+  const f=cabDef({type:'tfill',name:'Пълнеж горе',W:Math.round(a1-a0),H:+P.room.h,D:Math.round(fy),c:zt,mc:k.mc,mf:k.mf,wall:k.wall,off:a0,gap:g0,plinth:false,tsL:opn('L'),tsR:opn('R')});
   place(f);P.cabinets.push(f);sel=f.id;multiSel=new Set([f.id]);P.example=false;changed(true);
   toast(`Пълнеж до тавана ${Math.round(+P.room.h-zt)} мм — режеш ${Math.round(+P.room.h-zt+ +(P.settings.fillAllow??50))} мм с припуска`)}
 function groupOf(id){const g=multiSel.size>1&&multiSel.has(id)?[...multiSel].map(cab).filter(Boolean):[cab(id)];return g}
