@@ -60,7 +60,7 @@
   },
   {
    "id": "cs2fceh",
-   "ts": 1794506458311,
+   "ts": 1794948418550,
    "folder": "Роси",
    "name": "Карамел",
    "code": "9127",
@@ -68,7 +68,9 @@
    "dir": "h",
    "ar": 1,
    "rot": 90,
-   "img": "lib/img/cs2fceh.jpg"
+   "img": "lib/img/cs2fceh.jpg",
+   "sl": 2800,
+   "sw": 2070
   },
   {
    "id": "9aolojz",
