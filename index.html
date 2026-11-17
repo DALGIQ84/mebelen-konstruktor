@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.17 · 20:05 · Детайли: материалът от таблицата важи и за добавените врати/чекмеджета</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.17 · 22:45 · Вертикален делител под бленди — в цялата дълбочина</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -835,7 +835,9 @@ function smartDiv(k,ps,a,p){ // умен делител: между рафта �
     const byK=a.axk?ps2.find(q=>q.key===a.axk&&!q.hidden):null,Lq=a.anx==='l'&&byK||v.filter(q=>(q.box[0]+q.box[1])/2<xr).sort((u,w)=>w.box[1]-u.box[1])[0],Rq=a.anx==='r'&&byK||v.filter(q=>(q.box[0]+q.box[1])/2>xr).sort((u,w)=>u.box[0]-w.box[0])[0];
     if(a.anx==='l'&&Lq)cxq=Lq.box[1]+(+a.offx||0)+tt/2;else if(a.anx==='r'&&Rq)cxq=Rq.box[0]-(+a.offx||0)-tt/2}
   const t=a.virt?0:+mat(a.m).t,cx=cxq!=null?cxq:+a.cx,cz=+a.cz,h=pedHor(ps,cx,p),B=h.filter(q=>(q.box[4]+q.box[5])/2<cz).sort((u,w)=>w.box[5]-u.box[5])[0],T=h.filter(q=>(q.box[4]+q.box[5])/2>cz).sort((u,w)=>u.box[4]-w.box[4])[0];
-  const z0=B?B.box[5]:+k.c,z1=T?T.box[4]:+k.H,yb=Math.max(B?B.box[2]:0,T?T.box[2]:0),yf=Math.min(B?B.box[3]:+k.D,T?T.box[3]:+k.D);
+  const lv=(q,i)=>q?h.filter(u=>Math.abs(u.box[i]-q.box[i])<1):[], /* детайлите на същото ниво (напр. предна и задна бленда) — дълбочината е от двете заедно */
+    Bs=lv(B,5),Ts=lv(T,4),y0=a=>a.length?Math.min(...a.map(u=>u.box[2])):null,y1=a=>a.length?Math.max(...a.map(u=>u.box[3])):null;
+  const z0=B?B.box[5]:+k.c,z1=T?T.box[4]:+k.H,yb=Math.max(B?y0(Bs):0,T?y0(Ts):0),yf=Math.min(B?y1(Bs):+k.D,T?y1(Ts):+k.D);
   p.box=[cx-t/2,cx+t/2,yb,yf,z0,z1];p.L=r1(z1-z0);p.Wd=r1(yf-yb);p.smart=true;if(a.virt){p.kind='virt';p.t=0}}
 function smartShelf(k,ps,a,p){ // „умен“ рафт: даваш светлото от детайла под него (ref) и секцията — ширината и дълбочината се взимат от страниците/делителите и гърба
   {const Lk=a.lk&&ps.find(q=>q.key===a.lk&&!q.hidden),Rk=a.rk&&ps.find(q=>q.key===a.rk&&!q.hidden);if(Lk&&Rk&&Rk.box[0]>Lk.box[1])a={...a,cx:(Lk.box[1]+Rk.box[0])/2}} // остава между същите страници/делители, ако се местят
