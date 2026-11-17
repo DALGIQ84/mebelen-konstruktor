@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.17 · 19:10 · Страница до пода — по-къса при цял таван отгоре</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.17 · 19:55 · Детайли: смяната на материал в таблицата важи и след „Редактиране на детайли“</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1548,7 +1548,9 @@ function edgeEdit(e,name,ov){ // кликаеми страни на канта: 
 function matCell(r){if(r.kind==='alu'||r.kind==='glass')return `<span style="color:var(--muted)">${r.kind==='alu'?esc(mat(r.m).name)+' · '+(P.settings.alW??42)+' мм · 45°':esc(mat(r.m).name)}</span>`;const k=cab(sel),mo=(k&&k.matOv)||{},key=r.ovKey||r.name,ov=!!(mo[key]||(key!==r.name&&mo[r.name]));
   return `<span style="display:inline-flex;gap:4px;align-items:center"><select data-mov="${esc(key)}" aria-label="Материал на ${esc(r.type)}" title="Смени материала само на този детайл" style="background:${ov?'var(--field)':'transparent'};border:1px solid ${ov?'var(--mark)':'transparent'};border-radius:4px;color:var(--fg);font:inherit;font-size:13px;padding:2px 4px;cursor:pointer">${P.materials.map(m=>`<option value="${m.id}" ${m.id===r.m?'selected':''}>${esc(mLbl(m))}${String(mLbl(m)).trim().endsWith(' '+m.t)?'':' '+m.t}</option>`).join('')}</select>${ov?`<button class="btn sm" data-movx="${esc(key)}" title="Върни материала по подразбиране" aria-label="Върни материала на ${esc(r.name)}" style="padding:0 6px">↺</button>`:''}</span>`}
 $('#tbl').addEventListener('change',e=>{const t=e.target;if(!t.dataset.mov)return;const k=cab(sel);if(!k)return;const n=t.dataset.mov;k.matOv=k.matOv||{};
-  const [nm,sd]=n.split('|'),def=build({...k,matOv:{}}).parts.find(p=>p.name===nm&&(!sd||p.sd===sd));
+  const [nm,sd]=n.split('|');
+  if(k.pOv)for(const [pk,o] of Object.entries(k.pOv))if(o&&o.m!==undefined&&pk.replace(/#\d+$/,'')===nm){delete o.m;if(!Object.keys(o).length)delete k.pOv[pk]} // материал, сменен преди в „Редактиране на детайли“ — новият избор от таблицата е по-важен
+  const def=build({...k,matOv:{}}).parts.find(p=>p.name===nm&&(!sd||p.sd===sd));
   if(sd&&k.matOv[nm]){const o=k.matOv[nm];delete k.matOv[nm];k.matOv[nm+'|'+(sd==='L'?'R':'L')]=o} // старото общо → остава за другата страница
   if(def&&def.m===t.value)delete k.matOv[n];else k.matOv[n]=t.value;
   const m=mat(t.value),dt=def?+def.t:0;P.example=false;changed(false);if(dt&&+m.t!==dt)toast(`Внимание: „${m.name}“ е ${m.t} мм, а детайлът е ${dt} мм — размерите не се сменят`)});
