@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.17 · 12:35 · Библиотека: предупреждение за некачени декори и сами се качват</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.17 · 12:50 · Копирай за разкроя: с размера на плочата от библиотеката (за KRAFTCUT)</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1570,9 +1570,9 @@ function renderTable(){
   for(const r of rs){if(r.kind==='alu'||r.kind==='glass'&&!mat(r.m).glass)continue;const a=agg[r.m]||(agg[r.m]={area:0,edge:0,n:0});a.area+=r.L*r.Wd*r.n/1e6;a.edge+=((r.e[0]+r.e[1])*r.L+(r.e[2]+r.e[3])*r.Wd)*r.n/1000;a.n+=r.n}
   $('#sum').innerHTML=Object.entries(agg).map(([m,a])=>`<div><small>${esc(mLbl(mat(m)))} · ${a.n} бр.</small><b>${fmt(a.area)} м²${a.edge?` · кант ${fmt(a.edge)} м`:''}</b></div>`).join('');
 }
-function cutRows(sc){const keep=scope;scope=sc||scope;try{const list=scope==='all'?P.cabinets:P.cabinets.filter(c=>c.id===sel);
-  const S=P.settings;return rows(list).map(r=>[r.type,fmt(r.L),fmt(r.Wd),r.n,...r.e.map(v=>v?S.edgeOn:S.edgeOff),mLbl(mat(r.m))])}finally{scope=keep}}
-function exportText(sc){return cutRows(sc).map(r=>r.join('\t')).join('\n')}
+function cutRows(sc,withSz){const keep=scope;scope=sc||scope;try{const list=scope==='all'?P.cabinets:P.cabinets.filter(c=>c.id===sel);
+  const S=P.settings;return rows(list).map(r=>{const m=mat(r.m),q=[r.type,fmt(r.L),fmt(r.Wd),r.n,...r.e.map(v=>v?S.edgeOn:S.edgeOff),mLbl(m)];if(withSz&&+m.sheetL>0&&+m.sheetW>0)q.push(`${Math.round(m.sheetL)}×${Math.round(m.sheetW)}`);return q})}finally{scope=keep}} /* размерът на плочата (от библиотеката) — за KRAFTCUT */
+function exportText(sc,withSz){return cutRows(sc,withSz).map(r=>r.join('\t')).join('\n')}
 function exportCSV(sc){const q=v=>/[;"\n]/.test(String(v))?'"'+String(v).replace(/"/g,'""')+'"':String(v);
   return '\ufeff'+[['Детайл','Дължина','Ширина','Брой','Кант дълга 1','Кант дълга 2','Кант къса 1','Кант къса 2','Материал'],...cutRows(sc)].map(r=>r.map(q).join(';')).join('\r\n')}
 const OFFLINE=!window.claude; // инсталираната версия — файл на компютъра, без Claude
@@ -3356,7 +3356,7 @@ function toggleCut(open){const m=$('#cutMenu');open=open??m.hidden;m.hidden=!ope
 $('#bCut').onclick=e=>{e.stopPropagation();toggleKit(false);toggleFile(false);toggleCut()};
 document.addEventListener('click',()=>{if(!$('#cutMenu').hidden)toggleCut(false)});
 $('#cutMenu').addEventListener('click',async e=>{e.stopPropagation();const b=e.target.closest('[data-cut]');if(!b)return;toggleCut(false);const a=b.dataset.cut;
-  if(a==='copy-all'||a==='copy-cab'){const t=exportText(a==='copy-all'?'all':'cab');if(!t){toast('Няма детайли');return}copyText(t,'Копирано — постави в разкроя');return}
+  if(a==='copy-all'||a==='copy-cab'){const t=exportText(a==='copy-all'?'all':'cab',true);if(!t){toast('Няма детайли');return}copyText(t,'Копирано — постави в разкроя');return}
   if(!P.cabinets.length){toast('Няма детайли');return}
   const date=new Date().toISOString().slice(0,10);
   if(a==='dxf'){const d=panelsDXF();if(!d){toast('Няма скосени панели — правите се режат на циркуляра');return}await saveFile(`${projBase()} CNC ${date}.dxf`,new Blob([d],{type:'application/dxf'}));return}
@@ -3673,7 +3673,7 @@ function copyText(t,okMsg){
   const fallback=()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast(okMsg)}catch(e){toast('Маркирай текста и копирай ръчно')}ta.remove()};
   try{navigator.clipboard.writeText(t).then(()=>toast(okMsg),fallback)}catch(e){fallback()}
 }
-$('#bCopy').onclick=()=>{const t=exportText();if(!t){toast('Няма детайли');return}copyText(t,'Копирано — постави в разкроя')};
+$('#bCopy').onclick=()=>{const t=exportText(undefined,true);if(!t){toast('Няма детайли');return}copyText(t,'Копирано — постави в разкроя')};
 
 /* ---------- Проект ---------- */
 const open=id=>{$(id).hidden=false};
