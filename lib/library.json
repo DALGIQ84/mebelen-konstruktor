@@ -116,6 +116,20 @@
    "ar": 0.5625,
    "rot": 90,
    "img": "lib/img/bka3uy4.jpg"
+  },
+  {
+   "id": "2r6oskz",
+   "ts": 1794933752636,
+   "folder": "Роси",
+   "name": "AGT БЯЛО МАТ",
+   "code": "734A",
+   "w": 1000,
+   "sl": 2800,
+   "sw": 1220,
+   "dir": "h",
+   "ar": 1,
+   "rot": 90,
+   "img": "lib/img/2r6oskz.jpg"
   }
  ]
 }
