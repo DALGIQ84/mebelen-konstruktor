@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.17 · 18:30 · Библиотека: по-сигурно зареждане от GitHub</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.17 · 19:10 · Страница до пода — по-къса при цял таван отгоре</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1174,8 +1174,8 @@ function buildRaw(k){
   const bds=cds,bF=k.type==='oven'&&isGola(k)?+(S.golaOvB??20)||0:0;if(!hoodC)add('Дъно',bx1-bx0,Dk-bds-bF,k.mc,half==='L'?[1,0,1,0]:half==='R'?[1,0,0,1]:[1,0,0,0],[bx0,bx1,bds,Dk-bF,c,c+T]); /* фурна с Gola: дъното по-плитко отпред — хват отдолу зад челото */ // част Б: кант отпред + откъм страницата (видимия край)
   const topOut=up?false:extS?k.colTopPos==='out':k.top==='out'&&['doors','drawers'].includes(k.type||'doors'); // цял таван отгоре на страниците
   const sideH=botIn?H-c-(topOut?T:0):H-c-T-(topOut?T:0),sz0=botIn?c:c+T,sTop=topOut?H-T:H;
-  if(half!=='R'){if(fL)add('Страница до пода',H,Dk,k.mc,[1,0,1,0],[0,T,0,Dk,0,H]);else add('Страница',sideH,Dk,k.mc,[1,0,0,0],[0,T,0,Dk,sz0,sTop])}
-  if(half!=='L'){if(fR)add('Страница до пода',H,Dk,k.mc,[1,0,1,0],[W-T,W,0,Dk,0,H]);else add('Страница',sideH,Dk,k.mc,[1,0,0,0],[W-T,W,0,Dk,sz0,sTop])}
+  if(half!=='R'){if(fL)add('Страница до пода',H-(topOut?T:0),Dk,k.mc,[1,0,1,0],[0,T,0,Dk,0,sTop]);else add('Страница',sideH,Dk,k.mc,[1,0,0,0],[0,T,0,Dk,sz0,sTop])}
+  if(half!=='L'){if(fR)add('Страница до пода',H-(topOut?T:0),Dk,k.mc,[1,0,1,0],[W-T,W,0,Dk,0,sTop]);else add('Страница',sideH,Dk,k.mc,[1,0,0,0],[W-T,W,0,Dk,sz0,sTop])}
   if(k.type==='oven'){} // шкаф за фурна: без летви — фурната е директно под плота
   else if(topOut){const gb=isGola(k)?(+S.golaLw||26):0;add('Таван',W,Dk-cds-gb,k.mc,[1,0,0,0],[0,W,cds,Dk-gb,H-T,H])} /* Gola: таванът е по-плитък с L-профила */
   else if(k.top==='full'||extS||up){const gb=isGola(k)?(+S.golaLw||26):0;add('Таван',iR-iL,Dk-cds-gb,k.mc,[1,0,0,0],[iL,iR,cds,Dk-gb,H-T,H])}
