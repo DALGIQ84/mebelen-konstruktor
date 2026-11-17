@@ -15,7 +15,9 @@
    "ar": 0.5625,
    "img": "lib/img/599xixt.jpg",
    "rot": 90,
-   "ts": 1794350196873
+   "ts": 1794932216424,
+   "sl": 2800,
+   "sw": 2070
   },
   {
    "id": "asals2c",
@@ -100,6 +102,18 @@
    "ar": 1,
    "rot": 90,
    "img": "lib/img/q50b695.jpg"
+  },
+  {
+   "id": "f4gpxrs",
+   "ts": 1794520269133,
+   "folder": "Роси",
+   "name": "БЯЛО",
+   "code": "W960",
+   "w": 1000,
+   "dir": "h",
+   "ar": 1,
+   "rot": 90,
+   "img": "lib/img/f4gpxrs.jpg"
   }
  ]
 }
