@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.17 · 12:50 · Копирай за разкроя: с размера на плочата от библиотеката (за KRAFTCUT)</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.17 · 12:45 · Разкрой: материалът с кода и дебелината (напр. 7749 18)</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1571,7 +1571,7 @@ function renderTable(){
   $('#sum').innerHTML=Object.entries(agg).map(([m,a])=>`<div><small>${esc(mLbl(mat(m)))} · ${a.n} бр.</small><b>${fmt(a.area)} м²${a.edge?` · кант ${fmt(a.edge)} м`:''}</b></div>`).join('');
 }
 function cutRows(sc,withSz){const keep=scope;scope=sc||scope;try{const list=scope==='all'?P.cabinets:P.cabinets.filter(c=>c.id===sel);
-  const S=P.settings;return rows(list).map(r=>{const m=mat(r.m),q=[r.type,fmt(r.L),fmt(r.Wd),r.n,...r.e.map(v=>v?S.edgeOn:S.edgeOff),mLbl(m)];if(withSz&&+m.sheetL>0&&+m.sheetW>0)q.push(`${Math.round(m.sheetL)}×${Math.round(m.sheetW)}`);return q})}finally{scope=keep}} /* размерът на плочата (от библиотеката) — за KRAFTCUT */
+  const S=P.settings;return rows(list).map(r=>{const m=mat(r.m),lb=mLbl(m),q=[r.type,fmt(r.L),fmt(r.Wd),r.n,...r.e.map(v=>v?S.edgeOn:S.edgeOff),lb!==m.name&&+m.t>0?`${lb} ${fmt(m.t)}`:lb];if(withSz&&+m.sheetL>0&&+m.sheetW>0)q.push(`${Math.round(m.sheetL)}×${Math.round(m.sheetW)}`);return q})}finally{scope=keep}} /* размерът на плочата (от библиотеката) — за KRAFTCUT */
 function exportText(sc,withSz){return cutRows(sc,withSz).map(r=>r.join('\t')).join('\n')}
 function exportCSV(sc){const q=v=>/[;"\n]/.test(String(v))?'"'+String(v).replace(/"/g,'""')+'"':String(v);
   return '\ufeff'+[['Детайл','Дължина','Ширина','Брой','Кант дълга 1','Кант дълга 2','Кант къса 1','Кант къса 2','Материал'],...cutRows(sc)].map(r=>r.map(q).join(';')).join('\r\n')}
