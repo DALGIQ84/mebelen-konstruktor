@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.17 · 12:45 · Разкрой: материалът с кода и дебелината (напр. 7749 18)</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.17 · 12:50 · Библиотека: „дължина (по фладера)“</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -3918,7 +3918,7 @@ function renderLib(){const A=libAll(),q=($('#libQ').value||'').toLowerCase().tri
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;font-size:12px">
       <label>Име<input id="leN" value="${esc(it.name)}"></label><label>Код<input id="leC" value="${esc(it.code||'')}"></label>
       <label>Папка<select id="leF">${libAll().folders.map(f=>`<option ${f===it.folder?'selected':''}>${esc(f)}</option>`).join('')}</select></label>
-      <label>Плоча — дължина × ширина, мм<span style="display:flex;gap:4px;align-items:center"><input id="leSL" type="number" value="${it.sl||2800}" style="width:76px">×<input id="leSW" type="number" value="${it.sw||2070}" style="width:76px"></span></label>
+      <label>Плоча — дължина (по фладера) × ширина, мм<span style="display:flex;gap:4px;align-items:center"><input id="leSL" type="number" value="${it.sl||2800}" style="width:76px">×<input id="leSW" type="number" value="${it.sw||2070}" style="width:76px"></span></label>
       <label>Нова снимка (по желание)<input id="leI" type="file" accept="image/*"></label>
       <div style="display:flex;align-items:end"><button class="btn sm primary" id="leSave">Запази промените</button></div></div></details>
     <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font-size:12.5px">Фладер:</span><button class="btn sm${libLook(it)==='v'?' primary':''}" data-ldir="v">↕ вертикален</button><button class="btn sm${libLook(it)==='h'?' primary':''}" data-ldir="h">↔ хоризонтален</button>
@@ -3930,7 +3930,7 @@ function libFormHtml(){const A=libAll();return `<b style="grid-column:1/-1">Но
   <label>Папка<select id="lfF">${A.folders.map(f=>`<option ${f===libF?'selected':''}>${esc(f)}</option>`).join('')}</select></label>
   <label>Име<input id="lfN" placeholder="напр. Дъб Халифакс"></label><label>Код<input id="lfC" placeholder="напр. H1180 ST37"></label>
   <label>Снимката е широка, мм<input id="lfW" type="number" value="1000"></label>
-  <label>Плоча — дължина × ширина, мм<span style="display:flex;gap:4px;align-items:center"><input id="lfSL" type="number" value="2800" style="width:80px">×<input id="lfSW" type="number" value="2070" style="width:80px"></span></label><label>Фладер<select id="lfD"><option value="v">↕ вертикален</option><option value="h">↔ хоризонтален</option></select></label>
+  <label>Плоча — дължина (по фладера) × ширина, мм<span style="display:flex;gap:4px;align-items:center"><input id="lfSL" type="number" value="2800" style="width:80px">×<input id="lfSW" type="number" value="2070" style="width:80px"></span></label><label>Фладер<select id="lfD"><option value="v">↕ вертикален</option><option value="h">↔ хоризонтален</option></select></label>
   <label>Снимка<input id="lfI" type="file" accept="image/*"></label>
   <div style="grid-column:1/-1;display:flex;gap:6px"><button class="btn primary sm" id="lfSave">Запази</button><button class="btn sm" id="lfX">Откажи</button></div>`}
 function libAddSave(){const f=$('#lfI').files[0],name=$('#lfN').value.trim();if(!name){toast('Напиши име');return}if(!f){toast('Избери снимка');return}
