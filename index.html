@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.17 · 12:50 · Библиотека: „дължина (по фладера)“</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.17 · 18:10 · Скрин с 1 колона: секциите работят; секция „Врати — 2 бр.“</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1453,7 +1453,7 @@ function parts_hw(add,name,box){add(name,0,0,'k2',[0,0,0,0],box,'hw')}
 
 /* ---------- Списък детайли ---------- */
 
-const NS_T=[['dr','Чекмедже'],['door','Врата'],['open','Ниша'],['flap','Клапа (отпред)'],['fix','Неподвижно чело']];
+const NS_T=[['dr','Чекмедже'],['door','Врата'],['door2','Врати — 2 бр.'],['open','Ниша'],['flap','Клапа (отпред)'],['fix','Неподвижно чело']];
 const isChest=k=>!!k.chest||k.nsTop==='lid'||/ракла/i.test(k.name||''); // ракла — само клапа/ниша; останалото отпред е неподвижно чело
 const nsSecsC=(k,j)=>{const c=(k.nsCols||[])[j];return c&&Array.isArray(c.secs)&&c.secs.length?c.secs:[{t:'dr'},{t:'dr'},{t:'dr'}]}; // секциите на колона j (скрин)
 const nsSecs=k=>isChest(k)?(k.chOpen==='front'?[{t:'flap',h:+k.chFlapH>0?+k.chFlapH:0}]:[]):Array.isArray(k.nsSecs)&&k.nsSecs.length?k.nsSecs:[{t:'dr'},{t:'dr'}]; // ракла: клапа отгоре (капак) или клапа отпред (тогава отгоре е таван)
@@ -1488,11 +1488,12 @@ function buildNstand(k){const S=P.settings,parts=[],warn=[],add=(name,L,Wd,m,e,b
   for(let i=0;i+1<sc.length;i++){if(sc[i].t==='dr'&&sc[i+1].t==='dr'||sc[i].t==='fix'&&sc[i+1].t==='fix'||isChest(k)&&(sc[i].t==='fix'||sc[i+1].t==='fix'))continue;const b=bnd[i][0];add('Междинен рафт',li1-li0,Dk-bIn,k.mc,[1,0,0,0],[li0,li1,bIn,Dk,b-T/2,b+T/2])}
   sc.forEach((q,i)=>{const[zb,zt2]=bnd[i],f0=zb+fu/2,f1=zt2-fu/2,hh=f1-f0;if(hh<40&&q.t!=='open'){warn.push(`${lb}Секция ${i+1} е твърде ниска.`);return}
     if(q.t==='door'){add('Врата',hh,W-fu,k.mf,[1,1,1,1],[fu/2,W-fu/2,yF,yF+tF,f0,f1],'door');parts.at(-1).hg=k.nsHinge||'L';nDoor++}
+    else if(q.t==='door2'){const dw=Math.floor((W-2*fu)/2);add('Врата',hh,dw,k.mf,[1,1,1,1],[fu/2,fu/2+dw,yF,yF+tF,f0,f1],'door');parts.at(-1).hg='L';add('Врата',hh,dw,k.mf,[1,1,1,1],[W-fu/2-dw,W-fu/2,yF,yF+tF,f0,f1],'door');parts.at(-1).hg='R';nDoor+=2} // две врати — фуга и между тях
     else if(q.t==='fix'){const a0=i===sc.length-1?zb:f0,a1=a0+Math.floor((i===0&&lid?zt2:f1)-a0); /* без десети */add('Чело (неподвижно)',a1-a0,W,k.mf,[1,1,1,1],[0,W,yF,yF+tF,a0,a1],'door')} // ракла с капак — челото е неподвижно, на цялата ширина
     else if(q.t==='flap'){add(isChest(k)?'Клапа отпред':'Клапа',hh,W-fu,k.mf,[1,1,1,1],[fu/2,W-fu/2,yF,yF+tF,f0,f1],'door');warn.push(`${lb}Секция ${i+1}: падаща клапа — панти и механизъм (ограничител) за клапа.`)}
     else if(q.t==='dr'){const iz=inner(i),cc=sc[i+1]&&sc[i+1].t==='dr'?zb:iz.lo,kk={...k,bh:[+q.bh>0?+q.bh:null],bhAll:0};const n0=parts.length;buildDrawers(kk,{S,T,tF,W,H,c:Math.max(iz.lo,cc)-T,Dk,bIn,Wi:li1-li0,add,warn},{hs:[hh],z1:f1,zMax:sc[i-1]&&sc[i-1].t==='dr'?zt2:iz.hi});const dc=(li0+li1)/2-W/2;if(dc)for(const p of parts.slice(n0))if(p.kind==='drawer'){p.box[0]+=dc;p.box[1]+=dc}nDr++}})};
   const cols=k.skrin&&Array.isArray(k.nsCols)&&k.nsCols.length>1?k.nsCols:null;
-  if(!cols)fronts(nsSecs(k),W,T,W-T,'');
+  if(!cols)fronts(k.skrin&&Array.isArray(k.nsCols)&&k.nsCols.length===1?nsSecsC(k,0):nsSecs(k),W,T,W-T,''); // скрин с 1 колона — секциите са в колоната
   else{const n=cols.length,fixW=cols.reduce((a,q)=>a+(+q.w>0?+q.w:0),0),nA=cols.filter(q=>!(+q.w>0)).length,aw=nA?(W-fixW)/nA:0;let ws=cols.map(q=>+q.w>0?+q.w:aw);if(!nA)ws[n-1]+=W-fixW; // ширината на колоната — по осите на делителите (празно = равно)
     if(nA&&aw<150||ws.some(x=>x<150))warn.push('Колоните стават по-тесни от 150 мм — провери ширините.');
     let xa=0;const zi0=z0+T,zi1=topOver||lid?Hc-(lid?0:T):H-T;
