@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.18 · 21:45 · Врата между две страници — по-тясна от отвора като вътрешното чекмедже</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.18 · 21:50 · Врата до една страница — 5 мм от нея</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -784,7 +784,7 @@ function smartDoorGrp(k,out,a,i){ /* рафтовете зад нея не я р
   {const Lk=a.lk&&out.find(q=>q.key===a.lk&&!q.hidden),Rk=a.rk&&out.find(q=>q.key===a.rk&&!q.hidden);if(Lk&&Rk&&Rk.box[0]>Lk.box[1])a={...a,cx:(Lk.box[1]+Rk.box[0])/2}}
   const isSh=q=>q.gsh||/^Рафт/.test(q.name)&&!/над чекмеджетата/.test(q.name)||q.name==='Стъклен рафт',outS=out.filter(q=>!isSh(q)); // рафтовете са зад вратата — не я режат
   const S=P.settings,fu=+(S.drFuga??5),bq0=a.bk?out.find(q=>q.key===a.bk&&!q.hidden):null,bq=bq0&&!isSh(bq0)?bq0:null,r=pedCell(k,outS,+a.cx,bq?bq.box[5]+2:+a.cz);if(!r)return;
-  const n=Math.max(1,a.n|0),tF=+mat(a.m||k.mf).t,d0=out.find(q=>q.kind==='door'&&!q.pl),yD=d0?d0.box[2]:Math.min(r.L.box[3],r.R.box[3])+S.doorGap,J=pedJoints(r,yD),fw=+(S.wDrFw??7),gl=r.L.box[3]>=yD-0.5?fw/2:fu/2,gr=r.R.box[3]>=yD-0.5?fw/2:fu/2,dw=(J.r-J.l-gl-gr-(n-1)*fu)/n,dh=J.t-J.b-fu; // вратата между две страници (вътрешна) — по-тясна от светлия отвор както вътрешното чекмедже
+  const n=Math.max(1,a.n|0),tF=+mat(a.m||k.mf).t,d0=out.find(q=>q.kind==='door'&&!q.pl),yD=d0?d0.box[2]:Math.min(r.L.box[3],r.R.box[3])+S.doorGap,J=pedJoints(r,yD),fw=+(S.wDrFw??7),iL=r.L.box[3]>=yD-0.5,iR=r.R.box[3]>=yD-0.5,gl=iL?(iR?fw/2:fu):fu/2,gr=iR?(iL?fw/2:fu):fu/2,dw=(J.r-J.l-gl-gr-(n-1)*fu)/n,dh=J.t-J.b-fu; // вратата между две страници (вътрешна) — по-тясна от светлия отвор както вътрешното чекмедже
   splitDoors(out,i,J.l,J.r,J.b,J.t,fu);let c=0;
   for(let j=0;j<n;j++){const x=J.l+gl+j*(dw+fu);out.push({name:'Врата',L:r1(dh),Wd:r1(dw),t:tF,m:a.m||k.mf,e:[1,1,1,1],box:[x,x+dw,yD,yD+tF,J.b+fu/2,J.t-fu/2],kind:'door',smart:true,key:'+#'+i+(c?'~'+c:''),added:true,grp:i});c++}}
 function smartDrawers(k,out,a,i){ // чекмеджета в секция (външни, челото на лицето): фугата отдолу/отгоре — по средата на рафта (при дъното — долу на дъното)
