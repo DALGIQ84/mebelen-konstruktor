@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.20 · 01:10 · Тапицерията следва детайлите от „Редактиране“</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.20 · 01:20 · Изтритото/промененото в „Детайли“ остава при смяна на вида</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -764,7 +764,13 @@ function stackPair(g){if(g.length!==2)return null;const[a,b]=g;if(!a||!b||a.type
 function partKeys(parts){const cnt={};for(const p of parts){cnt[p.name]=(cnt[p.name]||0)+1;p.key=p.name+'#'+cnt[p.name]}}
 function partAxes(p){const b=p.box,s=[b[1]-b[0],b[3]-b[2],b[5]-b[4]],used=[];const near=v=>{let bi=-1,bd=1e9;s.forEach((q,i)=>{if(used.includes(i))return;const d=Math.abs(q-v);if(d<bd){bd=d;bi=i}});used.push(bi);return bi};return[near(p.L),near(p.Wd)]}
 const linkTo=(p,f,noZ0)=>{Object.defineProperty(p,'_cOf',{value:f,enumerable:false,configurable:true,writable:true});if(noZ0)p._noZ0=1}; // тапицерията следва своята основа/поле (размер, местене, скриване от „Детайли“)
-function applyPOv(k,r){partKeys(r.parts);const ov=k.pOv||{},out=[];
+const PK=new WeakMap(); // последните детайли на шкафа (ключ → кутия), за да не се губят промените от „Детайли“, когато смениш вида (напр. легло → тапицирано)
+const boxIoU=(a,b)=>{let I=1,A=1,B=1;for(let j=0;j<3;j++){const lo=Math.max(a[2*j],b[2*j]),hi=Math.min(a[2*j+1],b[2*j+1]),ea=Math.max(1,a[2*j+1]-a[2*j]),eb=Math.max(1,b[2*j+1]-b[2*j]);I*=Math.max(0,hi-lo);A*=ea;B*=eb}return I/(A+B-I||1)};
+function carryPOv(k,parts){const old=PK.get(k),ov=k.pOv;const cur=new Map();for(const p of parts)if(p.box&&p.key)cur.set(p.key,p.box.slice());PK.set(k,cur);if(!old||!ov)return;
+  const used=new Set(Object.keys(ov));for(const key of Object.keys(ov)){if(cur.has(key)||!old.has(key)||/^\+#/.test(key))continue;const ob=old.get(key);let best=null,bs=0.8;
+    for(const p of parts){if(!p.box||used.has(p.key))continue;const v=boxIoU(ob,p.box);if(v>bs){bs=v;best=p}}
+    if(best){ov[best.key]=ov[key];delete ov[key];used.add(best.key);cur.has(key)||0}}}
+function applyPOv(k,r){partKeys(r.parts);carryPOv(k,r.parts);const ov=k.pOv||{},out=[];
   for(const p of r.parts){const o=ov[p.key];if(o){p.box0=[...p.box];if(o.hide){if(!k._showHidden)continue;p.hidden=true}
       if(!p.pl&&(+o.dL||+o.dW)){const[aL,aW]=partAxes(p);if(+o.dL){p.box[2*aL+1]+=+o.dL;p.L=r1(p.L+ +o.dL)}if(+o.dW){p.box[2*aW+1]+=+o.dW;p.Wd=r1(p.Wd+ +o.dW)}}
       const dx=+o.dx||0,dy=+o.dy||0,dz=+o.dz||0;if(dx||dy||dz){p.box=[p.box[0]+dx,p.box[1]+dx,p.box[2]+dy,p.box[3]+dy,p.box[4]+dz,p.box[5]+dz];if(p.pl)p.pl=p.pl.map(([x,y])=>[x+dx,y+dy])}
