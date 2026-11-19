@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.19 · 23:30 · Библиотека: раздел „Тапицерии“ (платове за легла и табли)</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.19 · 23:45 · Настройки: Тапицирани табли — отнемане по височина и ширина</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -398,7 +398,7 @@ const SLIDES=[
   {id:'s1',name:'Телескопични',kind:'side',clear:26,lens:'250,300,350,400,450,500,550,600',lenDed:0,hOff:40,bottom:'under',bottomDed:5,groove:6},
   {id:'s2',name:'Скрити (Tandem/Movento)',kind:'under',clear:10,lens:'270,300,350,400,450,500,550,600',lenDed:10,hOff:50,bottom:'groove',botWAdd:20,botLenDed:5,fbRaise:10},
   {id:'s3',name:'Метални кутии (Tandembox)',kind:'metal',lens:'270,300,350,400,450,500,550,600',bW:75,bD:24,bkW:87,bkH:68,sideH:83}];
-const SETTINGS={slides:SLIDES,golaTop:35,golaMid:35,golaLw:26,golaLh:56,golaCw:26,golaCh:73,idrSet:2,ubRaise:20,ubPw:20,ubPh:30,golaOvB:20,golaDeadB:60,golaDeadSh:10,golaDeadF:100,fuga:3,drFuga:5,wDrSd:2,wDrIns:32,wDrFw:7,wDrGrip:35,wSlOv:30,wSlHd:40,wSlTrack:100,cdFuga:5,doorGap:2,rail:100,backIn:5,backTot:5,shelfFront:20,shelfGap:2,shelfClear:1,plinthBack:50,edgeOn:'1',edgeOff:'',cabInType:true,fillAllow:50,hfSet:40,boardDens:680,handleKg:0.3,alFuga:3,alW:42,alT:25,glassDed:7};
+const SETTINGS={hbDedH:0,hbDedW:0,slides:SLIDES,golaTop:35,golaMid:35,golaLw:26,golaLh:56,golaCw:26,golaCh:73,idrSet:2,ubRaise:20,ubPw:20,ubPh:30,golaOvB:20,golaDeadB:60,golaDeadSh:10,golaDeadF:100,fuga:3,drFuga:5,wDrSd:2,wDrIns:32,wDrFw:7,wDrGrip:35,wSlOv:30,wSlHd:40,wSlTrack:100,cdFuga:5,doorGap:2,rail:100,backIn:5,backTot:5,shelfFront:20,shelfGap:2,shelfClear:1,plinthBack:50,edgeOn:'1',edgeOff:'',cabInType:true,fillAllow:50,hfSet:40,boardDens:680,handleKg:0.3,alFuga:3,alW:42,alT:25,glassDed:7};
 const ITEM={
   window:{name:'Прозорец',color:'#5aa9d6',w:1200,h:1300,z:950},
   door:{name:'Врата',color:'#9b7b5a',w:900,h:2050,z:0,hinge:'L'},
@@ -1090,8 +1090,9 @@ function buildRaw(k){
     if(ty==='board'){add('Табла',W,H,m,[1,0,1,1],[0,W,0,tt,0,H])}
     else{const Hh=H-zU,len=vd?W:Hh,pw=Math.floor((len-(n-1)*g)/n),pl=len-(n-1)*(pw+g);for(let i=0;i<n;i++){const a=i*(pw+g),b=a+(i===n-1?pl:pw); /* без десети — остатъкът в последния */
       const bx=vd?[a,b,y0,y0+tt,zU,H]:[0,W,y0,y0+tt,H-b,H-a];
-      if(vd)add(uph?'Табла — поле за тапициране':'Табла — панел',Hh,b-a,m,uph?[0,0,0,0]:[1,1,1,0],bx);
-      else add(uph?'Табла — поле за тапициране':'Табла — панел',W,b-a,m,uph?[0,0,0,0]:[1,1,1,1],bx);
+      const dH=uph?Math.max(0,+(S.hbDedH??0)):0,dW=uph?Math.max(0,+(S.hbDedW??0)):0,fb=uph?[bx[0]+dW/2,bx[1]-dW/2,bx[2],bx[3],bx[4]+dH/2,bx[5]-dH/2]:bx; // тапицирано поле — по-малко с отнемането от Настройки (платът го увеличава)
+      if(vd)add(uph?'Табла — поле за тапициране':'Табла — панел',Hh-dH,b-a-dW,m,uph?[0,0,0,0]:[1,1,1,0],fb);
+      else add(uph?'Табла — поле за тапициране':'Табла — панел',W-dW,b-a-dH,m,uph?[0,0,0,0]:[1,1,1,1],fb);
       if(uph&&fo>0){add('Тапицерия (дунапрен '+fmt(fo)+' мм + плат)',0,0,'k2',[0,0,0,0],[bx[0],bx[1],y0,y0+tt+fo,bx[4],bx[5]],'hw');const q=parts.at(-1);q.cush=Math.min(fo*0.8,(bx[1]-bx[0])/4,(bx[5]-bx[4])/4,40);q.col=k.hbFab||'#8e8a84'}}
       warn.push(`Табла ${fmt(W)} × ${fmt(H)}: ${n} ${vd?'вертикални':'хоризонтални'} ${ty==='uph'?'полета за тапициране':'панела'} по ${fmt(pw)} мм${pl!==pw?` (последният ${fmt(pl)})`:''}${g?`, фуга ${fmt(g)} мм`:''}.`)}
     if(uph)warn.push(`Тапицирана табла: основа ${fmt(W)} × ${fmt(H)} от лицето; полетата ${zU?`от ${fmt(zU)} мм от пода`:'от пода'} — режат се тук, дунапрен ${fmt(fo)} мм и плат — при тапицера.`);
@@ -3815,12 +3816,12 @@ const SETF=[['settings.fuga','Фуга между врати, мм'],['settings.
   ['settings.cdFuga','Обща врата (2 шкафа един върху друг): по-къса с, мм'],['settings.drFuga','Чела и врати в секция (Детайли): фуга, мм'],
   ['settings.golaDeadB','Gola ъгъл с мъртво: бленда за пантите (на Г с вътрешното парче), мм'],['settings.golaDeadF','Gola ъгъл с мъртво: бленда отпред в ъгъла — видима ширина по подразбиране, мм'],['settings.golaDeadSh','Gola ъгъл с мъртво: луфт между рафта и блендата за пантите, мм'],['settings.golaOvB','Gola: шкаф за фурна — дъното по-плитко отпред (хват отдолу), мм'],['settings.ubRaise','Цяло дъно под горния ред: корпусът по-нисък с, мм'],['settings.ubPw','Цяло дъно: ал. профил дръжка — дълбочина, мм'],['settings.ubPh','Цяло дъно: ал. профил дръжка — височина, мм'],['settings.idrSet','Вътрешни чекмеджета: челото е навътре от ръба на корпуса с, мм'],['settings.golaTop','Gola: вратата/челото горе — под горния ръб на шкафа, мм'],['settings.golaMid','Gola: между челата (C-профил), мм'],['settings.golaLw','Gola L (горе): изрез в страницата — дълбочина, мм'],['settings.golaLh','Gola L (горе): изрез — височина, мм'],['settings.golaCw','Gola C (средата): изрез — дълбочина, мм'],['settings.golaCh','Gola C (средата): изрез — височина, мм'],
   ['settings.alFuga','Витрина: фуга на ал. вратите, мм'],['settings.alW','Витрина: ширина на ал. профил, мм'],['settings.alT','Витрина: корпусът е по-плитък с, мм'],['settings.glassDed','Витрина: стъклото = размерът на ал. вратата минус, мм'],
-  ['settings.edgeOn','Означение „има кант“','t'],['settings.edgeOff','Означение „няма кант“ (празно = нищо)','t']];
+  ['settings.hbDedH','Тапицирана табла: полето по-ниско с, мм (платът го увеличава)'],['settings.hbDedW','Тапицирана табла: полето по-тясно с, мм (платът го увеличава)'],['settings.edgeOn','Означение „има кант“','t'],['settings.edgeOff','Означение „няма кант“ (празно = нищо)','t']];
 const getP=p=>p.split('.').reduce((o,k)=>o[k],P);
 const setP=(p,v)=>{const a=p.split('.');a.slice(0,-1).reduce((o,k)=>o[k],P)[a.at(-1)]=v};
 const SETG=[['Врати и фуги',['fuga','doorGap','cdFuga','drFuga','wDrFw']],['Корпус, гръб, цокъл, пълнеж',['rail','backTot','plinthBack','fillAllow']],['Рафтове',['shelfFront','shelfGap','shelfClear','hfSet']],
   ['Вътрешни чекмеджета (гардероб и колона)',['wDrIns','wDrSd','wDrGrip','idrSet']],['Гардероб — плъзгащи врати',['wSlOv','wSlHd','wSlTrack']],['Gola',['golaTop','golaMid','golaLw','golaLh','golaCw','golaCh','golaOvB','golaDeadB','golaDeadF','golaDeadSh']],
-  ['Ал. витрина',['alFuga','alW','alT','glassDed']],['Цяло дъно под горния ред',['ubRaise','ubPw','ubPh']],['Тегло на вратите',['boardDens','handleKg']],['Копиране за разкроя',['edgeOn','edgeOff']]]; // групи в Настройки — затворени, отваряш нужната
+  ['Ал. витрина',['alFuga','alW','alT','glassDed']],['Цяло дъно под горния ред',['ubRaise','ubPw','ubPh']],['Тегло на вратите',['boardDens','handleKg']],['Тапицирани табли',['hbDedH','hbDedW']],['Копиране за разкроя',['edgeOn','edgeOff']]]; // групи в Настройки — затворени, отваряш нужната
 let setOpen=new Set(),setQv='';
 function setFilter(){const q=setQv.trim().toLowerCase();for(const d of document.querySelectorAll('#setForm details.setg')){let any=false;for(const l of d.querySelectorAll('label')){const ok=!q||l.textContent.toLowerCase().includes(q)||d.dataset.g.toLowerCase().includes(q);l.style.display=ok?'':'none';any=any||ok}d.style.display=any?'':'none';if(q&&any)d.open=true;else if(!q)d.open=setOpen.has(d.dataset.g)}}
 function renderSettings(){
