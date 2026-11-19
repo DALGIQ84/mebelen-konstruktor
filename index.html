@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.18 · 22:00 · Настройки: подредени в групи с търсачка</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.19 · 12:15 · Фото HD на вградена видеокарта — по-леко, без забиване</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2223,12 +2223,13 @@ new ResizeObserver(resize).observe(canvas.parentElement);
 /* ---------- Фото: натрупване на много кадри с разместена светлина = меки сенки, засенчване в ъглите, гладки ръбове ---------- */
 const halton=(i,b)=>{let f=1,r=0;while(i>0){f/=b;r+=f*(i%b);i=Math.floor(i/b)}return r};
 let ptLoad=null;const loadPT=()=>ptLoad||(ptLoad=new Promise((ok,no)=>{if(window.KPT)return ok();const sc=document.createElement('script');sc.src=(window.KP_PT||'libs/pt.js');sc.onload=()=>ok();sc.onerror=()=>{ptLoad=null;no(new Error('pt'))};document.head.appendChild(sc)}));
+let weakGpuV=null;function weakGPU(){if(weakGpuV!=null)return weakGpuV;try{const gl=renderer.getContext(),x=gl.getExtension('WEBGL_debug_renderer_info'),n=String(x?gl.getParameter(x.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER));weakGpuV=/Intel|HD Graphics|UHD|Iris|Mali|Adreno|PowerVR|SwiftShader|llvmpipe|Microsoft Basic/i.test(n)&&!/Arc/i.test(n)}catch(e){weakGpuV=false}return weakGpuV} // вградена видеокарта — фото HD по-леко
 async function photoHD(){ /* истински фото-рендер: лъчите се проследяват — отражения, отразена светлина, меки сенки */
   if(photoBusy)return;photoBusy=true;photoStop=false;const NFq=+$('#phQ').value||320,warm=$('#phL').value==='warm';
   $('#ovPhoto').hidden=false;$('#phSave').disabled=true;$('#phInfo').textContent='зареждам…';
   const keep={sel,onlySel,showDoors,ms:multiSel};let ok=false;
   try{await loadPT();
-    const r=canvas.getBoundingClientRect(),W=NFq>=1400?2400:NFq>=700?1920:NFq>=320?1600:1200,H=Math.round(W*Math.max(0.4,Math.min(1.1,r.height/Math.max(1,r.width))));
+    const wk=weakGPU(),r=canvas.getBoundingClientRect(),W=wk?(NFq>=700?1400:1100):NFq>=1400?2400:NFq>=700?1920:NFq>=320?1600:1200,H=Math.round(W*Math.max(0.4,Math.min(1.1,r.height/Math.max(1,r.width))));
     sel=null;multiSel=new Set();onlySel=false;showDoors=true;rebuild3D();
     for(const w of wallGroups)w.g.visible=showWalls&&((camera.position.x-w.cx)*w.ox+(camera.position.z-w.cz)*w.oz<0);
     world.updateMatrixWorld(true);
@@ -2240,9 +2241,9 @@ async function photoHD(){ /* истински фото-рендер: лъчит�
     const M=1/1000,rb=roomBox(),cx=(rb[0]+rb[1])/2*M,cz=(rb[2]+rb[3])/2*M,rh=P.room.h*M,rw=(rb[1]-rb[0])*M,rd=(rb[3]-rb[2])*M;
     const lights=[{p:[cx,rh-0.02,cz],t:[cx,0,cz],w:Math.max(.6,rw*.45),h:Math.max(.6,rd*.45),i:warm?4.5:5}]; // таванна светлина
     const json=grp.toJSON(),q=camera.quaternion;
-    const total=window.KP_SAMPLES||(NFq>=1400?1200:NFq>=700?600:NFq>=320?260:90),pc=$('#phC');pc.width=W;pc.height=H;const g=pc.getContext('2d');const t0=performance.now();
-    await window.KPT.render({json,W,H,cam:{p:camera.position.toArray(),q:[q.x,q.y,q.z,q.w],fov:camera.fov},warm,samples:total,lights,envI:warm?.7:.85,exp:warm?1:1.05,
-      onFrame:(cv,n,tt,end)=>{g.drawImage(cv,0,0,W,H);$('#phInfo').textContent=end?'':`${Math.round(n/tt*100)} % · ${((performance.now()-t0)/1000).toFixed(0)} сек`;if(photoStop)window.KPT.stop()}});
+    const total=window.KP_SAMPLES||Math.round((NFq>=1400?1200:NFq>=700?600:NFq>=320?260:90)*(wk?.6:1)),pc=$('#phC');pc.width=W;pc.height=H;const g=pc.getContext('2d');const t0=performance.now();
+    await window.KPT.render({json,W,H,cam:{p:camera.position.toArray(),q:[q.x,q.y,q.z,q.w],fov:camera.fov},warm,samples:total,lights,tiles:wk?4:2,pause:wk?40:0,envI:warm?.7:.85,exp:warm?1:1.05,
+      onFrame:(cv,n,tt,end)=>{g.drawImage(cv,0,0,W,H);$('#phInfo').textContent=end?'':`${Math.round(n/tt*100)} % · ${((performance.now()-t0)/1000).toFixed(0)} сек${wk?' · вградена видеокарта — по-леко, може да се ползва компютърът':''}`;if(photoStop)window.KPT.stop()}});
     const tx=(pName()?pName()+' · ':'')+'М Плюс Мебели';g.font='500 22px "IBM Plex Sans",Arial,sans-serif';const tw=g.measureText(tx).width;g.fillStyle='rgba(255,255,255,.75)';g.fillRect(W-tw-36,H-46,tw+24,32);g.fillStyle='#1a2227';g.fillText(tx,W-tw-24,H-22);
     $('#phSave').disabled=false;$('#phInfo').textContent=photoStop?'спряно':`готово · ${((performance.now()-t0)/1000).toFixed(0)} сек`;ok=true}
   catch(e){console.warn(e);toast('Реалистичното фото не тръгна — правя бързото');}
