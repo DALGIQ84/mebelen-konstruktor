@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.19 · 21:50 · Плъзгащ гардероб с надстройка — дълбочините от зоната за релсите</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.19 · 21:55 · Плъзгащ гардероб с надстройка — плъзгащите врати на цялата височина</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -719,7 +719,7 @@ function buildWardrobe(k){
   if(!(hinge&&ndr)){if(Jfull)exX.all={x0:dx0+fu/2,x1:W-(dS==='R'?dW:0)-fu/2,hs:exAll,lbl:''};else for(const e of exS)if(e.J)exX[e.i]={x0:(e.i?e.x0-T/2:0)+fu/2,x1:(e.i<n-1?e.x1+T/2:W)-fu/2,hs:e.hs,lbl:e.lbl}}
   {let cnt=0;for(const key in exX){const v=exX[key];let fz=c;v.hs.forEach(h=>{add('Чело'+v.lbl,h-fu,v.x1-v.x0,k.mf,[1,1,1,1],[v.x0,v.x1,Dk+S.doorGap,Dk+S.doorGap+tF,fz+fu/2,fz+h-fu/2],'door');fz+=h;cnt++})}
     if(cnt)warn.push(`Външни чекмеджета: ${cnt} бр., чела ${exM==='full'?exAll.join(' + ')+' мм по цялата ширина':'по секциите'}${k._exLow?'.':' — над тях рафт, вратите почват от средата му.'}`)}
-  if(slide&&ndr){const nd=Math.max(2,ndr),ov=+(S.wSlOv??30),hd=+(S.wSlHd??40),ow=W-2*T,dw=(ow+(nd-1)*ov)/nd,dh2=(top-T)-(c+T)-hd;
+  if(slide&&ndr){const nd=Math.max(2,ndr),ov=+(S.wSlOv??30),hd=+(S.wSlHd??40),ow=W-2*T,dw=(ow+(nd-1)*ov)/nd,dh2=((aH?H:top)-T)-(c+T)-hd; // с надстройка — плъзгащите врати са на цялата височина (един гардероб)
     for(let i=0;i<nd;i++){const xa=T+i*(dw-ov),y=Di+15+(i%2?0:tF+12);add('Врата плъзгаща',dh2,dw,k.mf,[1,1,1,1],[xa,xa+dw,y,y+tF,c+T+hd/2,c+T+hd/2+dh2],'door')}
     warn.push(`Плъзгащи врати: ${nd} бр., застъпване ${ov} мм, по-ниски от отвора с ${hd} мм (Настройки) — размерите на пълнежа провери по системата.`)}
   // надстройка — отделен корпус отгоре
@@ -728,10 +728,10 @@ function buildWardrobe(k){
     add('Дъно надстройка',W-tL-tR,Da,k.mc,[1,0,0,0],[tL,W-tR,0,Da,top,top+T]);add('Таван надстройка',W-tL-tR,Da,k.mc,[1,0,0,0],[tL,W-tR,0,Da,H-T,H]);
     {const cA={sec:'Н',x0:tL,x1:W-tR,b:[[top,top+T,'дъно'],[H-T,H,'таван']],rods:[]};cols.push(cA);const m=Math.max(0,k.antSh|0);if(m){const g=(aH-2*T-m*T)/(m+1);if(g<80)warn.push('Надстройка: рафтовете са нагъсто.');for(let j=1;j<=m;j++){const z=top+T+j*g+(j-1)*T;add('Рафт надстройка',W-tL-tR-2*cl,Da-S.shelfFront-yB,k.mc,[1,0,0,0],[tL+cl,W-tR-cl,0,Da-S.shelfFront-yB,z,z+T]);cA.b.push([z,z+T,'рафт'])}}}
     if(yB)add('Гръб надстройка',aH-2*T,W-tL-tR,mbY,bInW?[0,0,0,0]:[1,0,0,0],[tL,W-tR,0,yB,top+T,H-T],'back');else if(k.mb!=='none')add('Гръб надстройка',aH-bt,W-bt,k.mb,[0,0,0,0],[bt/2,W-bt/2,-(+mat(k.mb).t||3),0,top+bt/2,H-bt/2],'back');
-    const na2=k.wDoor==='none'||!ndr||cdw?0:slide?Math.max(2,Math.round(W/500)):ndr,dw=na2?(W-na2*fu)/na2:0;
+    const na2=k.wDoor==='none'||!ndr||cdw||slide?0:ndr,dw=na2?(W-na2*fu)/na2:0;
     if(na2&&dS&&!k._deadOpen){const dxA=dS==='L'?0:W-dW;add('Мъртво лице надстройка',aH-fu,dW,k.mf,[1,1,1,1],[dxA,dxA+dW,Da+S.doorGap,Da+S.doorGap+tF,top+fu/2,H-fu/2],'door')}
     const dw2=na2?(W-dW-na2*fu)/na2:0;for(let i=0;i<na2;i++){const xa=dx0+fu/2+i*(dw2+fu),dw=dw2;add('Врата надстройка',aH-fu,dw,k.mf,[1,1,1,1],[xa,xa+dw,Da+S.doorGap,Da+S.doorGap+tF,top+fu/2,H-fu/2],'door')}
-    warn.push(`Надстройка ${r(aH)} мм — отделен корпус отгоре (страници, дъно, таван, гръб)${na2?', '+na2+' врати на панти':cdw?', вратите са общи с долната част':', без врати'}.`)}
+    warn.push(`Надстройка ${r(aH)} мм — отделен корпус отгоре (страници, дъно, таван, гръб)${na2?', '+na2+' врати на панти':cdw?', вратите са общи с долната част':slide?', плъзгащите врати минават и пред нея':', без врати'}.`)}
   if(rods.length)warn.push(`Лостове: ${rods.map(v=>v+' мм').join(', ')} (на 60 мм под рафта или тавана).`);
   if(yB){const keep=/^(Страница надстройка|Дъно надстройка|Таван надстройка|Гръб|Мъртво|Врата|Цокъл)/;for(let i=mk;i<parts.length;i++){const p=parts[i];if(p.kind==='door'||p.kind==='back'||keep.test(p.name))continue;p.box[2]+=yB;p.box[3]+=yB}}
   for(const c2 of cols)c2.b.sort((a,b)=>a[0]-b[0]);
