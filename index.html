@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.19 · 23:45 · Настройки: Тапицирани табли — отнемане по височина и ширина</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.19 · 23:50 · Библиотека: Декори / Тапицерии като табове горе</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -327,7 +327,8 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 
 <div id="ovLib" class="ov" hidden>
   <div class="dlg" style="width:min(1150px,100%)">
-    <h3><span style="display:flex;gap:6px;align-items:center">Библиотека <button class="btn sm" id="libMD">Декори</button><button class="btn sm" id="libMF">Тапицерии</button></span> <span style="display:flex;gap:6px"><button class="btn sm" id="libSync">⚙ Синхронизация</button><button class="btn sm" data-close>Затвори</button></span></h3>
+    <h3>Библиотека <span style="display:flex;gap:6px"><button class="btn sm" id="libSync">⚙ Синхронизация</button><button class="btn sm" data-close>Затвори</button></span></h3>
+    <div class="tabs" style="margin:0 16px 0;max-width:420px"><button id="libMD" class="on">Декори</button><button id="libMF">Тапицерии</button></div>
     <div class="body" style="display:grid;grid-template-columns:200px 1fr;gap:12px;min-height:60vh">
       <div style="display:flex;flex-direction:column;gap:6px"><div id="libFolders" style="display:flex;flex-direction:column;gap:4px"></div><button class="btn sm" id="libAddF">+ Папка</button></div>
       <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
@@ -3990,11 +3991,11 @@ const FABP='Тапицерии/',isFabF=f=>String(f||'').startsWith(FABP),fName=
 let libMode='dec';
 function libView(){const A0=libAll(),fab=libMode==='fab',ok=f=>fab===isFabF(f);return {folders:A0.folders.filter(ok),items:A0.items.filter(i=>ok(i.folder))}}
 function renderLib(){const A=libView(),q=($('#libQ').value||'').toLowerCase().trim(),fab=libMode==='fab';
-  $('#libMD').classList.toggle('primary',!fab);$('#libMF').classList.toggle('primary',fab);$('#libAdd').textContent=fab?'+ Плат':'+ Декор';if(libF&&fab!==isFabF(libF))libF='';
+  $('#libMD').classList.toggle('on',!fab);$('#libMF').classList.toggle('on',fab);$('#libAdd').textContent=fab?'+ Плат':'+ Декор';if(libF&&fab!==isFabF(libF))libF='';
   $('#libFolders').innerHTML=[['','Всички',A.items.length],...A.folders.map(f=>[f,fName(f),A.items.filter(i=>i.folder===f).length])].map(([v,n,c])=>`<button class="btn sm${libF===v?' primary':''}" data-lf="${esc(v)}" style="justify-content:space-between;display:flex">${esc(n)} <span style="opacity:.7">${c}</span></button>`).join('');
   const L=A.items.filter(i=>(!libF||i.folder===libF)&&(!q||(i.name+' '+(i.code||'')).toLowerCase().includes(q)));
   $('#libGrid').innerHTML=L.length?L.map(i=>`<button data-li="${esc(i.id)}" style="display:flex;flex-direction:column;gap:4px;padding:6px;border:1px solid ${libOpenId===i.id?'var(--accent)':'var(--line)'};border-radius:8px;background:var(--panel);text-align:left;cursor:pointer">
-    <img src="${esc(libImg(i))}" alt="" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:5px;background:var(--field);${libRotCss(i)}"><b style="font-size:12.5px">${esc(i.name)}</b><span style="font-size:11.5px;color:var(--muted)">${esc(i.code||'')}${i.pend?' · само тук':''}</span></button>`).join(''):`<p class="note">${A.items.length?'Няма декори по това търсене.':'Още няма декори — натисни „+ Декор“.'}</p>`;
+    <img src="${esc(libImg(i))}" alt="" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:5px;background:var(--field);${libRotCss(i)}"><b style="font-size:12.5px">${esc(i.name)}</b><span style="font-size:11.5px;color:var(--muted)">${esc(i.code||'')}${i.pend?' · само тук':''}</span></button>`).join(''):`<p class="note">${A.items.length?'Няма декори по това търсене.':(libMode==='fab'?'Още няма платове — направи папка и натисни „+ Плат“.':'Още няма декори — натисни „+ Декор“.')}</p>`;
   const it=A.items.find(i=>i.id===libOpenId),D=$('#libDet');if(!it){D.hidden=true;return}D.hidden=false;
   if(fab){const U=P.cabinets.filter(c=>c.type==='bed'&&c.bClad==='uph'||c.type==='hboard'&&c.hbType==='uph');
     D.innerHTML=`<div style="display:flex;gap:12px;flex-wrap:wrap"><img src="${esc(libImg(it))}" alt="" style="width:180px;height:180px;object-fit:cover;border-radius:6px"><div style="display:flex;flex-direction:column;gap:6px;min-width:220px;flex:1">
