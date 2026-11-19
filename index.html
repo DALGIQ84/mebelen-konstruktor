@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.19 · 22:20 · Настройките се пазят след рестарт (общи за програмата)</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.19 · 22:25 · Настройки: записаният проект си пази своите, новите — последните</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -446,8 +446,9 @@ const SHAPES={
   rect:(W,L)=>[[0,0],[W,0],[W,L],[0,L]],
   L:(W,L,a,b)=>[[0,0],[W,0],[W,L-b],[W-a,L-b],[W-a,L],[0,L]],
   U:(W,L,a,b)=>[[0,0],[W,0],[W,L],[W-a,L],[W-a,L-b],[a,L-b],[a,L],[0,L]]};
+const USK='mebel-konstruktor.settings';function userSet(){try{const u=JSON.parse(localStorage.getItem(USK)||'null')||{};delete u.slides;return u}catch(e){return {}}} // последните ми настройки — за новите проекти
 function sample(){
-  const P={example:true,room:{h:2600,t:120,pts:SHAPES.rect(3600,3000),shape:{kind:'rect',W:3600,L:3000,a:1200,b:1000},items:[]},settings:{...SETTINGS},materials:MATS.map(m=>({...m})),cabinets:[
+  const P={example:true,room:{h:2600,t:120,pts:SHAPES.rect(3600,3000),shape:{kind:'rect',W:3600,L:3000,a:1200,b:1000},items:[]},settings:{...SETTINGS,...userSet()},materials:MATS.map(m=>({...m})),cabinets:[
     cabDef({name:'Д1 мивка',wall:0,off:0,W:800,doors:2,sh:0}),
     cabDef({name:'Д2',wall:0,off:800,W:600,sh:1}),
     cabDef({name:'Д3',wall:0,off:1400,W:450,sh:2}),
@@ -504,8 +505,7 @@ function mergeCorners(){ // старите „ъгъл А“ + „ъгъл Б“
     Object.assign(A,{type:'cornerL',armB:Math.round(+B.W+Dk),deadOpen:false,deadSide:'none',half:null,name:String(A.name).replace(/ ъгъл А$/,' ъглов')});
     P.cabinets=P.cabinets.filter(q=>q!==B);n++}
   if(n)setTimeout(()=>toast(n>1?`${n} ъглови шкафа са събрани в един`:'Ъгловият шкаф е събран в един'),300);return n}
-const USK='mebel-konstruktor.settings',userSet=()=>{try{return JSON.parse(localStorage.getItem(USK)||'null')||{}}catch(e){return {}}}; // настройките са общи за програмата — пазят се отделно от проекта
-function migrate(){{const u=userSet();if(P&&P.settings)for(const kk in u)if(kk!=='slides')P.settings[kk]=u[kk]}mergeCorners();for(const g of MATS.filter(m=>m.glass))if(!P.materials.some(m=>m.id===g.id))P.materials.push({...g});for(const q of P.cabinets)if(q.type==='wardrobe'&&q.wPl==null)q.wPl=true;for(const q of P.cabinets)if(q.type==='endShelf'&&q.eFloor==null)q.eFloor=true;for(const q of P.cabinets)if(q.upper&&q.hood&&!q.hsV2){if(q.hoodStrip!=null&&+q.c===1490)q.c=1450;q.hsV2=true}for(const[kk,vv]of[['wDrSd',2],['wDrGrip',35],['wDrFw',7],['wDrIns',32],['wSlOv',30],['wSlHd',40],['wSlTrack',100],['backTot',5],['cdFuga',5],['drFuga',5],['hfSet',40],['boardDens',680],['handleKg',0.3],['alFuga',3],['alW',42],['alT',25],['glassDed',7]])if(P.settings[kk]==null)P.settings[kk]=vv;if(+P.settings.glassDed===70)P.settings.glassDed=7;if(+P.settings.alT===20)P.settings.alT=25; // стъклото = вратата − 7 мм
+function migrate(){mergeCorners();for(const g of MATS.filter(m=>m.glass))if(!P.materials.some(m=>m.id===g.id))P.materials.push({...g});for(const q of P.cabinets)if(q.type==='wardrobe'&&q.wPl==null)q.wPl=true;for(const q of P.cabinets)if(q.type==='endShelf'&&q.eFloor==null)q.eFloor=true;for(const q of P.cabinets)if(q.upper&&q.hood&&!q.hsV2){if(q.hoodStrip!=null&&+q.c===1490)q.c=1450;q.hsV2=true}for(const[kk,vv]of[['wDrSd',2],['wDrGrip',35],['wDrFw',7],['wDrIns',32],['wSlOv',30],['wSlHd',40],['wSlTrack',100],['backTot',5],['cdFuga',5],['drFuga',5],['hfSet',40],['boardDens',680],['handleKg',0.3],['alFuga',3],['alW',42],['alT',25],['glassDed',7]])if(P.settings[kk]==null)P.settings[kk]=vv;if(+P.settings.glassDed===70)P.settings.glassDed=7;if(+P.settings.alT===20)P.settings.alT=25; // стъклото = вратата − 7 мм
   for(const m of MATS.filter(m=>m.id.startsWith('pl')))if(!P.materials.some(q=>q.id===m.id))P.materials.push({...m});
   if(!P.materials.some(m=>m.id==='p8'||m.name==='ПДЧ 8'))P.materials.push({id:'p8',name:'ПДЧ 8',t:8,color:'#cfc8bb'});
   P.settings={...SETTINGS,...P.settings};if(!P.settings.faFix){if(+P.settings.fillAllow===20)P.settings.fillAllow=50;P.settings.faFix=true}if(!P.settings.eoFix){if(P.settings.edgeOff==='0')P.settings.edgeOff='';P.settings.eoFix=true} // без кант = празно поле (OptiCut)if(P.settings.slides===SLIDES)P.settings.slides=SLIDES.map(x=>({...x}));
@@ -3376,7 +3376,7 @@ $('#cutMenu').addEventListener('click',async e=>{e.stopPropagation();const b=e.t
   if(a==='dxf'){const d=panelsDXF();if(!d){toast('Няма скосени панели — правите се режат на циркуляра');return}await saveFile(`${projBase()} CNC ${date}.dxf`,new Blob([d],{type:'application/dxf'}));return}
   const ok=a==='csv'?await saveFile(`${projBase()} разкрой ${date}.csv`,exportCSV('all')):await saveFile(`${projBase()} разкрой ${date}.txt`,exportText('all'));
   if(!ok){copyText(exportText('all'),'Запазването на файл не е позволено тук — детайлите са копирани')}});
-function newProject(){projFH=null;curSet(null);$('#bSaveSm').textContent='като файл на компютъра';P={room:{h:P.room.h,t:P.room.t,pts:SHAPES.rect(3600,3000),shape:{kind:'rect',W:3600,L:3000,a:1200,b:1000},items:[]},settings:{...P.settings},materials:MATS.map(m=>({...m})),cabinets:[]};afterLoad()} /* нов проект — цветовете на корпус/лице са тези по подразбиране; промените остават само в своя проект */
+function newProject(){projFH=null;curSet(null);$('#bSaveSm').textContent='като файл на компютъра';P={room:{h:P.room.h,t:P.room.t,pts:SHAPES.rect(3600,3000),shape:{kind:'rect',W:3600,L:3000,a:1200,b:1000},items:[]},settings:{...SETTINGS,...userSet()},materials:MATS.map(m=>({...m})),cabinets:[]};afterLoad()} /* нов проект — цветовете на корпус/лице са тези по подразбиране; промените остават само в своя проект */
 $('#fNew').onclick=e=>sureItem(e.currentTarget,newProject);
 $('#fSample').onclick=e=>sureItem(e.currentTarget,()=>{P=sample();afterLoad()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#kitMenu').hidden)toggleKit(false)});
@@ -3761,7 +3761,7 @@ $('#bSave').onclick=async()=>{toggleFile(false);if(OFFLINE){await saveProj(false
 $('#pjFile').onchange=e=>{const f=e.target.files[0];if(!f)return;projFH=null;curSet(null);const r=new FileReader();r.onload=()=>loadProject(r.result);r.readAsText(f);e.target.value=''};
 $('#pjSample').onclick=()=>{P=sample();afterLoad();$('#ovProj').hidden=true};
 $('#pjNew').onclick=e=>{const b=e.target;if(!b.classList.contains('sure')){b.classList.add('sure');b.textContent='Сигурен ли си? Натисни пак';return}
-  P={room:{h:P.room.h,t:P.room.t,pts:SHAPES.rect(3600,3000),shape:{kind:'rect',W:3600,L:3000,a:1200,b:1000},items:[]},settings:{...P.settings},materials:P.materials,cabinets:[]};afterLoad();$('#ovProj').hidden=true};
+  P={room:{h:P.room.h,t:P.room.t,pts:SHAPES.rect(3600,3000),shape:{kind:'rect',W:3600,L:3000,a:1200,b:1000},items:[]},settings:{...SETTINGS,...userSet()},materials:P.materials,cabinets:[]};afterLoad(); /* нов проект — с моите настройки; записаният проект си пази своите */$('#ovProj').hidden=true};
 
 /* ---------- Настройки ---------- */
 const SETF=[['settings.fuga','Фуга между врати, мм'],['settings.doorGap','Луфт врата–корпус, мм'],['settings.rail','Ширина бленда, мм'],['settings.backTot','Гръб (закован) — по-малък от корпуса с, мм (общо, по половината от всеки край)'],
