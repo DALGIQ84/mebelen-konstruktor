@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.20 · 00:05 · Тапицирани легла и табли: облечените детайли не се виждат в 3D</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.20 · 00:15 · Легло/табла: избор на плат направо от параметрите</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1750,6 +1750,8 @@ function renderEditor(){
     if(f==='divShort'&&k.type==='fridge')l='Дъно и таван по-плитки отзад с, мм';
     return `<label class="${x==='full'?'full':''}">${l}<input id="${id}" data-f="${f}" type="${t==='text'?'text':'number'}" ${t==='int'?'min="0" step="1"':'step="1"'} value="${esc(v??'')}"${f==='wBoxH'?' placeholder="авто — напр. 120 или 100, 150, 200"':''}></label>`;
   }).join('')+(k.type==='top'||k.type==='splash'?topTexHtml(k):'')+`${k.mb!=='none'&&k.backPos!=='in'&&+mat(k.mb).t>=10?'<p class="note" style="color:var(--mark)">Гърбът е отвън, затова рафтовете не се скъсяват. Избери „Вътре в корпуса“, ако гърбът влиза между страниците.</p>':''}<p class="note">${onWall?'В плана шкафът се плъзга по стената. Издърпай го далече от стената, за да го откачиш.':'Пусни шкафа близо до стена в плана и той ще се залепи към нея.'}</p><p class="warn" id="warns"></p><div class="acts"><button class="btn sm primary" id="bPed" title="Промени всеки детайл поотделно">Детайли ✎${Object.keys(k.pOv||{}).length+(k.pAdd||[]).length?' ('+(Object.keys(k.pOv||{}).length+(k.pAdd||[]).length)+')':''}</button>${k.type==='doors'&&cdPartner(k)?'<button class="btn sm" id="bCdOff" title="Двата шкафа пак са всеки със своя врата">Всеки със своя врата</button>':''}${onWall?'<button class="btn sm" id="bAlign" title="Отстъпва от стената, така че лицето да е на линия с другите шкафове на стената">Подравни отпред</button>':''}<button class="btn sm" id="bDel">Изтрий шкафа</button></div>`;
+  if(k.type==='bed'&&k.bClad==='uph'||k.type==='hboard'&&k.hbType==='uph'){const d=document.createElement('div');d.className='full';d.style.cssText='grid-column:1/-1;display:flex;flex-direction:column;gap:5px'; // платовете — избор от библиотеката направо от параметрите
+    d.innerHTML='<div class="sub" style="margin:4px 0 0">Платове (тапицерия)</div>'+[1,2,3].map(i=>{const q=fabSlot(k,i);return `<div style="display:flex;gap:6px;align-items:center;font-size:12.5px"><b style="width:52px">Плат ${i}</b><span style="flex:1;color:${q.n?'var(--fg)':'var(--muted)'}">${q.n?esc(q.n):'не е избран'}${q.col?` <span style="display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:middle;background:${q.col}"></span>`:''}</span><button class="btn sm" data-fpick="${i}">Избери от библиотеката</button></div>`}).join('')+'<span class="note" style="margin:0">По подразбиране всичко е с Плат 1; друг плат на част — „Редактиране на детайли“ → Плат'+(k.type==='hboard'?', или „Платове по полетата“':'')+'.</span>';ed.appendChild(d)}
   applyCollapse();
   renderWarn();
 }
@@ -1757,7 +1759,8 @@ let EDCL=(()=>{try{return JSON.parse(localStorage.getItem('mebel-konstruktor.cl'
 function applyCollapse(){let hide=false;const ch=[...$('#ed').children];ch.forEach((el,i)=>{if(el.classList.contains('sub')){const t=el.textContent.trim();el.classList.add('cl');hide=EDCL.includes(t);el.classList.toggle('off',hide);
   let j=i+1,any=false;while(j<ch.length&&!ch[j].classList.contains('sub')){if(ch[j].matches('input,select,textarea,button')||ch[j].querySelector('input,select,textarea,button'))any=true;j++}el.hidden=!any;return} /* празен раздел — без заглавие */
   el.hidden=hide})}
-$('#ed').addEventListener('click',e=>{const h=e.target.closest('.sub.cl');if(!h)return;const t=h.textContent.trim();EDCL=EDCL.includes(t)?EDCL.filter(x=>x!==t):[...EDCL,t];try{localStorage.setItem('mebel-konstruktor.cl',JSON.stringify(EDCL))}catch(err){}applyCollapse()});
+$('#ed').addEventListener('click',e=>{const fp=e.target.closest('[data-fpick]');if(fp){libPick={id:sel,slot:+fp.dataset.fpick};libMode='fab';libOpenId=null;$('#bLib').click();return}
+  const h=e.target.closest('.sub.cl');if(!h)return;const t=h.textContent.trim();EDCL=EDCL.includes(t)?EDCL.filter(x=>x!==t):[...EDCL,t];try{localStorage.setItem('mebel-konstruktor.cl',JSON.stringify(EDCL))}catch(err){}applyCollapse()});
 const NOTE_CHIPS=['Push панти','Push водачи','Без дръжка','Дръжка профил','Плавно затваряне','LED осветление','Стъклена врата'];
 const noteInfo=k=>(String(k.note||'').trim()?'✎ '+String(k.note).trim()+' · ':'')+cabInfo(k); // забележката — първа, за да не се отреже
 function renderWarn(){const k=cab(sel);if(!k)return;const w=build(k).warn;const el=$('#warns');if(el){el.textContent=w.join(' ');el.hidden=!w.length}}
@@ -3992,9 +3995,9 @@ function fabMat(id,col,wmm){const it=libAll().items.find(q=>q.id===id);if(!it)re
     const tx=new THREE.CanvasTexture(c);tx.wrapS=tx.wrapT=THREE.RepeatWrapping;const w=(wmm||300)/1000;tx.repeat.set(1/w,1/(w*c.height/c.width));if(THREE.SRGBColorSpace)tx.colorSpace=THREE.SRGBColorSpace;
     FABTX[key]=new THREE.MeshStandardMaterial({map:tx,roughness:.95,metalness:0});rebuild3D()};img.onerror=()=>{FABTX[key]=null};img.src=libImg(it);return null}
 const FABP='Тапицерии/',isFabF=f=>String(f||'').startsWith(FABP),fName=f=>isFabF(f)?f.slice(FABP.length):f; // папките с платове — с представка, за да не се смесват с декорите
-let libMode='dec';
+let libMode='dec',libPick=null; // libPick — избор на плат от параметрите (кой шкаф, кой слот)
 function libView(){const A0=libAll(),fab=libMode==='fab',ok=f=>fab===isFabF(f);return {folders:A0.folders.filter(ok),items:A0.items.filter(i=>ok(i.folder))}}
-function renderLib(){const A=libView(),q=($('#libQ').value||'').toLowerCase().trim(),fab=libMode==='fab';
+function renderLib(){const A=libView(),q=($('#libQ').value||'').toLowerCase().trim(),fab=libMode==='fab';if(!fab)libPick=null;if(libPick){const kk=cab(libPick.id),sl=libPick.slot;setTimeout(()=>libMsg('👉 Цъкни плат — става Плат '+sl+' на „'+(kk?kk.name:'')+'“.'),0)}
   $('#libMD').classList.toggle('on',!fab);$('#libMF').classList.toggle('on',fab);$('#libAdd').textContent=fab?'+ Плат':'+ Декор';if(libF&&fab!==isFabF(libF))libF='';
   $('#libFolders').innerHTML=[['','Всички',A.items.length],...A.folders.map(f=>[f,fName(f),A.items.filter(i=>i.folder===f).length])].map(([v,n,c])=>`<button class="btn sm${libF===v?' primary':''}" data-lf="${esc(v)}" style="justify-content:space-between;display:flex">${esc(n)} <span style="opacity:.7">${c}</span></button>`).join('');
   const L=A.items.filter(i=>(!libF||i.folder===libF)&&(!q||(i.name+' '+(i.code||'')).toLowerCase().includes(q)));
@@ -4053,11 +4056,11 @@ async function libApply(it,mid,quiet){const m=P.materials.find(q=>q.id===mid);if
 $('#bLib').onclick=()=>{open('#ovLib');libMsg(libTok()?'':'Декорите се пазят на това устройство; за да отиват и на другите — „⚙ Синхронизация“ (веднъж).');renderLib();libLoad().then(()=>{renderLib();libMsg(libTok()?'':'Декорите се пазят на това устройство; за да отиват и на другите — „⚙ Синхронизация“ (веднъж).');if(libTok()&&(libLocal().items||[]).some(q=>q.pend))libPush()})}; /* чакащите се качват сами при отваряне */
 $('#libQ').oninput=renderLib;
 $('#libAddF').onclick=()=>{const n=(prompt('Име на новата папка (напр. Невилс):')||'').trim();if(!n)return;const fn=(libMode==='fab'?FABP:'')+n;const L=libLocal();L.folders=[...new Set([...(L.folders||[]),fn])];libLocalSet(L);libF=fn;renderLib();libPush()};
-$('#libMD').onclick=()=>{libMode='dec';libOpenId=null;$('#libForm').hidden=true;renderLib()};$('#libMF').onclick=()=>{libMode='fab';libOpenId=null;$('#libForm').hidden=true;renderLib()};
+$('#libMD').onclick=()=>{libPick=null;libMode='dec';libOpenId=null;$('#libForm').hidden=true;renderLib()};$('#libMF').onclick=()=>{libMode='fab';libOpenId=null;$('#libForm').hidden=true;renderLib()};
 $('#libAdd').onclick=()=>{if(!libView().folders.length){toast('Първо направи папка (+ Папка)');return}const F=$('#libForm');F.innerHTML=libFormHtml();F.hidden=false;$('#libDet').hidden=true;$('#lfN').focus()};
 $('#libForm').addEventListener('click',e=>{if(e.target.id==='lfSave')libAddSave();if(e.target.id==='lfX')$('#libForm').hidden=true});
 $('#ovLib').addEventListener('click',e=>{const f=e.target.closest('[data-lf]');if(f){libF=f.dataset.lf;renderLib();return}
-  const i=e.target.closest('[data-li]');if(i){libOpenId=libOpenId===i.dataset.li?null:i.dataset.li;renderLib();return}
+  const i=e.target.closest('[data-li]');if(i){if(libPick&&libMode==='fab'){const it=libAll().items.find(q=>q.id===i.dataset.li),k=cab(libPick.id);if(it&&k){fabApply(it,k,false,libPick.slot);libPick=null;$('#ovLib').hidden=true;renderLib()}return}libOpenId=libOpenId===i.dataset.li?null:i.dataset.li;renderLib();return}
   const fa=e.target.closest('[data-fapply]');if(fa){const it=libAll().items.find(q=>q.id===libOpenId),k=cab(fa.dataset.fapply);if(it&&k)fabApply(it,k,false,fa.dataset.fslot);return}
   const a=e.target.closest('[data-lapply]');if(a){const it=libAll().items.find(q=>q.id===libOpenId);if(it)libApply(it,a.dataset.lapply);return}
   const d=e.target.closest('[data-ldel]');if(d){if(!confirm('Да изтрия ли декора от библиотеката? (В проектите остава.)'))return;const L=libLocal();L.del=[...new Set([...(L.del||[]),d.dataset.ldel])];L.items=L.items.filter(q=>q.id!==d.dataset.ldel||!q.pend);libLocalSet(L);libOpenId=null;renderLib();libPush();return}
