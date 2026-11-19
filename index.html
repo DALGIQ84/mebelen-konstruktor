@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.19 · 12:15 · Фото HD на вградена видеокарта — по-леко, без забиване</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.19 · 12:25 · Детайли: смяна на материала сменя и дебелината (стъклен рафт 6 мм)</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -750,7 +750,10 @@ function applyPOv(k,r){partKeys(r.parts);const ov=k.pOv||{},out=[];
   for(const p of r.parts){const o=ov[p.key];if(o){p.box0=[...p.box];if(o.hide){if(!k._showHidden)continue;p.hidden=true}
       if(!p.pl&&(+o.dL||+o.dW)){const[aL,aW]=partAxes(p);if(+o.dL){p.box[2*aL+1]+=+o.dL;p.L=r1(p.L+ +o.dL)}if(+o.dW){p.box[2*aW+1]+=+o.dW;p.Wd=r1(p.Wd+ +o.dW)}}
       const dx=+o.dx||0,dy=+o.dy||0,dz=+o.dz||0;if(dx||dy||dz){p.box=[p.box[0]+dx,p.box[1]+dx,p.box[2]+dy,p.box[3]+dy,p.box[4]+dz,p.box[5]+dz];if(p.pl)p.pl=p.pl.map(([x,y])=>[x+dx,y+dy])}
-      if(o.name)p.name=o.name;if(o.m){p.m=o.m;p.t=+mat(o.m).t}p.ov=true}
+      if(o.name)p.name=o.name;if(o.m){const nm=mat(o.m),t0=+p.t||0,t1=+nm.t||t0;p.m=o.m;p.t=t1;
+        if(p.box&&t1>0&&Math.abs(t1-t0)>0.1){const b=p.box,ex=[b[1]-b[0],b[3]-b[2],b[5]-b[4]],ax=ex.indexOf(Math.min(...ex)),c=(b[2*ax]+b[2*ax+1])/2;p.box=b.slice();p.box[2*ax]=c-t1/2;p.box[2*ax+1]=c+t1/2} // друга дебелина (напр. стъкло 6 вместо ПДЧ 18) — и в чертежа
+        if(nm.glass){if(p.kind!=='glass'){p.kind='glass';p.e=[0,0,0,0];if(/^Рафт/.test(p.name))p.gsh=true;p.glc=p.glc||'clear'}}else if(p.kind==='glass'&&!p.vitOf)p.kind=''}
+      p.ov=true}
     out.push(p)}
   (k.pAdd||[]).forEach((a,i)=>a.smart==='drs'||a.smart==='dor'||out.push({name:a.name||'Нов детайл',L:r1(+a.L),Wd:r1(+a.Wd),t:+mat(a.m).t,m:a.m,e:a.e||[0,0,0,0],box:addBox(a),kind:'',key:'+#'+i,added:true}));
   const smartPass=m=>{for(let pass=0;pass<m;pass++)for(const p of out)if(p.added&&!p.grp&&p.grp!==0){const a=(k.pAdd||[])[parseInt(p.key.split('#')[1])];if(a&&a.smart&&a.smart!=='drs'&&a.smart!=='dor')(a.smart==='dv'?smartDiv:smartShelf)(k,out,a,p)}};
