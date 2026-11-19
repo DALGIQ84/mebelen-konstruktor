@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.19 · 23:59 · Тапицерия: Плат 1/2/3 и шарки по полетата на таблата</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.20 · 00:05 · Тапицирани легла и табли: облечените детайли не се виждат в 3D</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1063,7 +1063,8 @@ function buildRaw(k){
       add('Облицовка страна — основа за тапициране (45° към краката)',D,H-fl,k.mf,[0,0,0,0],[0,tf,0,D,fl,H]);parts.at(-1).pl=[[0,0],[tf,0],[tf,D-tf],[0,D]];
       add('Облицовка страна — основа за тапициране (45° към краката)',D,H-fl,k.mf,[0,0,0,0],[W-tf,W,0,D,fl,H]);parts.at(-1).pl=[[W-tf,0],[W,0],[W,D],[W-tf,D-tf]];
       add('Облицовка чело — основа за тапициране (45° на двата края)',W,H-fl,k.mf,[0,0,0,0],[0,W,D-tf,D,fl,H]);parts.at(-1).pl=[[tf,D-tf],[W-tf,D-tf],[W,D],[0,D]];
-      if(fo>0){for(const[x0,x1]of[[-fo,tf],[W-tf,W+fo]]){add('Тапицерия',0,0,'k2',[0,0,0,0],[x0,x1,0,D+fo,fl,H],'hw');Object.assign(parts.at(-1),{cush:cr,cushAx:'x',col:fc})}
+      if(fo>0){for(const q of parts)if(/^Облицовка (страна|чело) — основа за тапициране/.test(q.name))q.hid3d=true; // облечени в плат — в 3D не се виждат
+        for(const[x0,x1]of[[-fo,tf],[W-tf,W+fo]]){add('Тапицерия',0,0,'k2',[0,0,0,0],[x0,x1,0,D+fo,fl,H],'hw');Object.assign(parts.at(-1),{cush:cr,cushAx:'x',col:fc})}
         add('Тапицерия',0,0,'k2',[0,0,0,0],[-fo,W+fo,D-tf,D+fo,fl,H],'hw');Object.assign(parts.at(-1),{cush:cr,col:fc})}
       warn.push(`Тапицирана облицовка: основите се събират под 45° на ъглите при краката; дунапрен ${fmt(fo)} мм и плат — при тапицера (леглото става ${fmt(W+2*fo)} × ${fmt(D+fo)}).`)}
     else{add('Облицовка страна',D-tf,H-fl,k.mf,[1,0,0,0],[0,tf,0,D-tf,fl,H]);add('Облицовка страна',D-tf,H-fl,k.mf,[1,0,0,0],[W-tf,W,0,D-tf,fl,H]); // челото е на цялата ширина, страните опират в него
@@ -1094,6 +1095,7 @@ function buildRaw(k){
       const dH=uph?Math.max(0,+(S.hbDedH??0)):0,dW=uph?Math.max(0,+(S.hbDedW??0)):0,fb=uph?[bx[0]+dW/2,bx[1]-dW/2,bx[2],bx[3],bx[4]+dH/2,bx[5]-dH/2]:bx; // тапицирано поле — по-малко с отнемането от Настройки (платът го увеличава)
       if(vd)add(uph?'Табла — поле за тапициране':'Табла — панел',Hh-dH,b-a-dW,m,uph?[0,0,0,0]:[1,1,1,0],fb);
       else add(uph?'Табла — поле за тапициране':'Табла — панел',W-dW,b-a-dH,m,uph?[0,0,0,0]:[1,1,1,1],fb);
+      if(uph&&fo>0)parts.at(-1).hid3d=true; // полето е облечено в плат — в 3D се вижда само тапицерията
       if(uph&&fo>0){add('Тапицерия (дунапрен '+fmt(fo)+' мм + плат)',0,0,'k2',[0,0,0,0],[bx[0],bx[1],y0,y0+tt+fo,bx[4],bx[5]],'hw');const q=parts.at(-1);q.cush=Math.min(fo*0.8,(bx[1]-bx[0])/4,(bx[5]-bx[4])/4,40);q.col=k.hbFab||'#8e8a84';const pt=k.hbPat||'';q.fs=pt==='alt'?(i%2?2:1):pt==='alt3'?(i%3)+1:pt==='mid'?((n%2?i===(n-1)/2:(i===n/2-1||i===n/2))?2:1):pt==='ends'?((i===0||i===n-1)?2:1):1}}
       warn.push(`Табла ${fmt(W)} × ${fmt(H)}: ${n} ${vd?'вертикални':'хоризонтални'} ${ty==='uph'?'полета за тапициране':'панела'} по ${fmt(pw)} мм${pl!==pw?` (последният ${fmt(pl)})`:''}${g?`, фуга ${fmt(g)} мм`:''}.`)}
     if(uph)warn.push(`Тапицирана табла: основа ${fmt(W)} × ${fmt(H)} от лицето; полетата ${zU?`от ${fmt(zU)} мм от пода`:'от пода'} — режат се тук, дунапрен ${fmt(fo)} мм и плат — при тапицера.`);
@@ -2127,7 +2129,7 @@ function rebuild3D(){
     if(isoCab?k.id!==isoCab:onlySel&&k.id!==sel)continue;
     const g=new THREE.Group();g.position.set(k.x*M,0,k.y*M);g.rotation.y=-k.rot*Math.PI/180;
     if(isAcc(k)){accModel(g,k,M,isSel(k.id)?selCol:null);world.add(g);continue}
-    for(const p of build(k).parts){
+    for(const p of build(k).parts){if(p.hid3d)continue;
       if(p.kind==='appl'){applFront(g,p,M,k.id);continue}
       if((!showDoors||(k.hideD&&!noHideD))&&(p.kind==='door'||p.kind==='alu'||p.kind==='glass')&&!p.gsh)continue; // скрити врати — само за картинката
       const [x0,x1,y0,y1,z0,z1]=p.box;
