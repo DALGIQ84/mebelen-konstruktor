@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.20 · 00:55 · Табла: табличката за полетата на цял ред</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.20 · 01:00 · Табла: ред за всяко поле веднага</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -460,7 +460,8 @@ const SHAPES={
   rect:(W,L)=>[[0,0],[W,0],[W,L],[0,L]],
   L:(W,L,a,b)=>[[0,0],[W,0],[W,L-b],[W-a,L-b],[W-a,L],[0,L]],
   U:(W,L,a,b)=>[[0,0],[W,0],[W,L],[W-a,L],[W-a,L-b],[a,L-b],[a,L],[0,L]]};
-const USK='mebel-konstruktor.settings';function userSet(){try{const u=JSON.parse(localStorage.getItem(USK)||'null')||{};delete u.slides;return u}catch(e){return {}}} // последните ми настройки — за новите проекти
+const USK='mebel-konstruktor.settings';function hbSzHtml(k,l='Размер на полетата'){if(k.type!=='hboard'||k.hbType!=='uph'||(k.hbDir||'v')!=='v')return '';const n=Math.max(1,Math.min(20,+k.hbN|0||3)),sz=k.hbSz||[],ip='style="width:100%;box-sizing:border-box"';return `<div id="hbSzBox" class="full" style="grid-column:1/-1"><div class="sub" style="margin-top:4px">${l} <span class="note" style="font-weight:400">— празно = автоматично</span></div><table style="width:100%;border-collapse:collapse;font-size:12px"><tr><th style="text-align:left">Поле</th><th>Широчина, мм</th><th>Височина, мм</th></tr>${Array.from({length:n},(_,i)=>`<tr><td>${i+1}</td><td><input id="f_hbw${i}" data-hbw="${i}" type="number" step="1" placeholder="авто" value="${+sz[i]?.w>0?+sz[i].w:''}" ${ip}></td><td><input id="f_hbh${i}" data-hbh="${i}" type="number" step="1" placeholder="авто" value="${+sz[i]?.h>0?+sz[i].h:''}" ${ip}></td></tr>`).join('')}</table></div>`}
+function userSet(){try{const u=JSON.parse(localStorage.getItem(USK)||'null')||{};delete u.slides;return u}catch(e){return {}}} // последните ми настройки — за новите проекти
 function sample(){
   const P={example:true,room:{h:2600,t:120,pts:SHAPES.rect(3600,3000),shape:{kind:'rect',W:3600,L:3000,a:1200,b:1000},items:[]},settings:{...SETTINGS,...userSet()},materials:MATS.map(m=>({...m})),cabinets:[
     cabDef({name:'Д1 мивка',wall:0,off:0,W:800,doors:2,sh:0}),
@@ -1667,7 +1668,7 @@ function renderEditor(){
       `<div class="acts full"><button class="btn sm" id="bDel">Изтрий</button></div>`;
     ed.innerHTML=h;return}
   ed.innerHTML=FIELDS.map(([f,l,t,x])=>{
-    if(t==='hbsz'){if(k.type!=='hboard'||k.hbType!=='uph'||(k.hbDir||'v')!=='v')return '';const n=Math.max(1,Math.min(20,+k.hbN|0||3)),sz=k.hbSz||[],ip='style="width:100%;box-sizing:border-box"';return `<div class="full" style="grid-column:1/-1"><div class="sub" style="margin-top:4px">${l} <span class="note" style="font-weight:400">— празно = автоматично</span></div><table style="width:100%;border-collapse:collapse;font-size:12px"><tr><th style="text-align:left">Поле</th><th>Широчина, мм</th><th>Височина, мм</th></tr>${Array.from({length:n},(_,i)=>`<tr><td>${i+1}</td><td><input id="f_hbw${i}" data-hbw="${i}" type="number" step="1" placeholder="авто" value="${+sz[i]?.w>0?+sz[i].w:''}" ${ip}></td><td><input id="f_hbh${i}" data-hbh="${i}" type="number" step="1" placeholder="авто" value="${+sz[i]?.h>0?+sz[i].h:''}" ${ip}></td></tr>`).join('')}</table></div>`}
+    if(t==='hbsz')return hbSzHtml(k,l);
     if(t==='note')return `<label class="full">${l}<textarea id="f_note" data-f="note" rows="2" placeholder="напр. Push панти, без дръжка…" style="font:inherit;resize:vertical;height:54px;min-height:34px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--fg)">${esc(k.note||'')}</textarea><span style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${NOTE_CHIPS.map(c=>`<button type="button" class="btn sm" data-nchip="${esc(c)}" style="padding:2px 8px;font-size:11px">+ ${esc(c)}</button>`).join('')}</span></label>`;
     if(k.type==='filler'&&!FILL_OK.includes(f))return '';
     if(k.type==='tfill'){if(!['_','name','note','W','mf','mc','wall','off'].includes(f))return '';if(f==='W')l='Дължина, мм';if(f==='mf')l='Лице';if(f==='mc')l='Летва'}
@@ -1819,6 +1820,7 @@ $('#ed').addEventListener('input',e=>{
   if(f==='frDoors')k.frDoors=+v;
   const full=['gola','plinth','nsPl','rDir','idrOn','chOpen','hbType','hbPat','bClad','bMat','bRail','bHead','nsMount','nsTop','nsBot','bHB','wExSep','wExM','wLsh','wCorner','wDoor','antr','eShape','eFloor','diag','hoodStrip','hoodH','liftMech','upper','lift','hood','vitrine','vdoors','split','sh','open','half','deadOpen','div','divRef','mb','backPos','type','dr','slide','deadSide','lowType','frDoors','mwOn','toFloor'].includes(f);
   const typing=e.target.tagName==='INPUT'&&e.target.type!=='checkbox'&&e.target.type!=='radio'; // докато пишеш в полето — не прерисувай редактора (губи се фокусът); прерисува се при излизане/Enter
+  if(f==='hbN'&&k.type==='hboard'){const b=$('#hbSzBox');if(b)b.outerHTML=hbSzHtml(k)} // редовете за всяко поле — веднага, докато пишеш броя
   if(full&&typing){edPending=true;changed(false)}else changed(full);
 });
 let edPending=false;
