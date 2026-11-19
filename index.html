@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.19 · 22:30 · Матрак — заоблени всички ръбове, по-малък радиус</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.19 · 23:00 · Аксесоари: декорация (кафе машина, кана, ваза, растение…)</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -418,7 +418,20 @@ const ACC={ // уреди и аксесоари: free = стои на пода; 
   washer:{name:'Пералня',W:600,D:600,h:850,free:true},
   dwFS:{name:'Съдомиялна (свободностояща)',W:600,D:600,h:850,free:true},
   dryer:{name:'Сушилня',W:600,D:600,h:850,free:true},
-  hoodW:{name:'Аспиратор (стенен, с комин)',W:900,D:500,h:950,free:true,up:true}};
+  hoodW:{name:'Аспиратор (стенен, с комин)',W:900,D:500,h:950,free:true,up:true},
+  // декорация — само за картинката (3D/фото), не заемат място и нямат детайли
+  coffee:{name:'Кафе машина',W:240,D:400,h:360,free:true,deco:true},
+  kettle:{name:'Кана за вода',W:220,D:170,h:250,free:true,deco:true},
+  toaster:{name:'Тостер',W:290,D:170,h:190,free:true,deco:true},
+  microT:{name:'Микровълнова (на плота)',W:480,D:380,h:280,free:true,deco:true},
+  fruit:{name:'Купа с плодове',W:300,D:300,h:140,free:true,deco:true},
+  vase:{name:'Ваза с цвете',W:140,D:140,h:450,free:true,deco:true},
+  plant:{name:'Саксия с растение',W:420,D:420,h:1000,free:true,deco:true,floor:true},
+  books:{name:'Книги',W:260,D:200,h:230,free:true,deco:true},
+  lamp:{name:'Настолна лампа',W:240,D:240,h:460,free:true,deco:true},
+  board:{name:'Дъски за рязане',W:380,D:60,h:320,free:true,deco:true},
+  bottles:{name:'Бутилки (олио, оцет)',W:180,D:90,h:280,free:true,deco:true},
+  bread:{name:'Кутия за хляб',W:380,D:220,h:180,free:true,deco:true}};
 const ACOL={white:['Бял','#f3f4f4'],inox:['Инокс','#c4c9cc'],black:['Черен','#2b2e30']};
 const accOf=k=>ACC[k.acc]||ACC.sink;
 const isAcc=k=>k&&k.type==='acc';
@@ -1635,7 +1648,7 @@ function renderEditor(){
     let h=`<label class="full">Име<input id="f_name" data-f="name" value="${v(k.name)}"></label>`+
       `<label>Вид<select id="f_acc" data-f="acc">${Object.entries(ACC).map(([id,o])=>`<option value="${id}" ${id===k.acc?'selected':''}>${o.name}</option>`).join('')}</select></label>`+
       `<label>Цвят<select id="f_acol" data-f="acol">${Object.entries(ACOL).map(([id,o])=>`<option value="${id}" ${id===k.acol?'selected':''}>${o[0]}</option>`).join('')}</select></label>`+
-      num('W','Ширина, мм',k.W)+num('D','Дълбочина, мм',k.D)+(a.up?num('c','Долен ръб от пода, мм',Math.round(k.c))+num('H','Височина на аспиратора (с комина), мм',Math.round(k.H-k.c)):inb?'':num('H','Височина, мм',Math.round(k.H-k.c)));
+      num('W','Ширина, мм',k.W)+num('D','Дълбочина, мм',k.D)+(a.deco?num('c','Стои на височина от пода, мм',Math.round(k.c))+num('H','Височина, мм',Math.round(k.H-k.c)):a.up?num('c','Долен ръб от пода, мм',Math.round(k.c))+num('H','Височина на аспиратора (с комина), мм',Math.round(k.H-k.c)):inb?'':num('H','Височина, мм',Math.round(k.H-k.c)));
     if(k.acc==='sink')h+=`<label>Корита<select id="f_bowls" data-f="bowls"><option value="1" ${+k.bowls!==2&&+k.bowls!==3?'selected':''}>1 коритo</option><option value="3" ${+k.bowls===3?'selected':''}>1 корито + отцедник</option><option value="2" ${+k.bowls===2?'selected':''}>2 корита</option></select></label>`;
     if(k.acc==='hob')h+=`<label>Зони<select id="f_zones" data-f="zones"><option value="4" ${+k.zones!==5&&+k.zones!==2?'selected':''}>4</option><option value="5" ${+k.zones===5?'selected':''}>5</option><option value="2" ${+k.zones===2?'selected':''}>2 (домино)</option><option value="22" ${+k.zones===22?'selected':''}>двоен — 2 домино един до друг</option></select></label>`;
     if(inb&&(k.onTop||+k.accZ>0))h+=`<label>Височина от пода, мм<input id="f_accZ" data-f="accZ" type="number" step="1" placeholder="авто" value="${+k.accZ>0?+k.accZ:''}"></label><p class="note full" style="margin-top:0">${+k.accZ>0?`Зададена на ръка — празно = пак върху плота${k._autoZ?` (${Math.round(k._autoZ)} мм)`:''}.`:`Стои върху плота — височината се взима сама (${Math.round(k.c)} мм от пода). Напиши друга, ако трябва.`}</p>`;
@@ -1779,7 +1792,7 @@ $('#ed').addEventListener('input',e=>{
   if(f==='vitrine'&&v&&!(+k.vdoors>0))k.vdoors=+k.W>650?2:1;
   if(f==='type'&&v==='cornerL'&&k.type!=='cornerL'){k.armB=k.armB||900;k.W=Math.max(+k.W,900)}
   if(f==='px')k.x=v;else if(f==='py')k.y=v;
-  else if(f==='c'&&isAcc(k)&&accOf(k).up){const h=k.H-k.c;k.c=v;k.H=v+h}
+  else if(f==='c'&&isAcc(k)&&(accOf(k).up||accOf(k).deco)){const h=k.H-k.c;k.c=v;k.H=v+h}
   else if(f==='H')k.H=(k.type==='endShelf'&&!k.upper)||k.type==='wardrobe'||k.type==='nstand'?v:v+ +k.c; // показва се без цокъла, пази се общата височина (висок завършващ рафт — от пода)
   else if(f==='c'){if((k.type==='endShelf'&&!k.upper)||k.type==='wardrobe')k.c=v;else{const body=k.H-k.c;k.c=v;k.H=body+v}}
   else if(f==='mf'&&k.type==='top'){ // друга дебелина на плота — гърбът над него слиза/качва се и пак опира в плота
@@ -2175,6 +2188,28 @@ function liftCalc(k){if(!(+k.lift>0))return null;const S=P.settings,ds=+(S.board
   const kg=doors[0].kg+2*hw;r.msg.push(`височина на корпуса ${hc} мм · тегло на вратата ~${fmt(kg)} кг (с дръжка ×2) — избери механизма по таблицата на Blum за ${M.name.replace('Blum Aventos ','')}`);r.short=`${M.name} · корпус ${hc} мм · врата ~${fmt(kg)} кг`;return r}
 const accMats={};
 function accMat(col,rough=.5,metal=0){const key=col+rough+metal;return accMats[key]||(accMats[key]=new THREE.MeshStandardMaterial({color:col,roughness:rough,metalness:metal}))}
+function decoModel(g,k,W,D,z0,H,B,cyl,body,dark,glass,ring,mid){ // декоративни предмети — прости, но разпознаваеми; x 0..W, y от z0 нагоре, z от стената към лицето 0..D
+  const t=k.acc,cx=W/2,cz=D/2,col=c=>accMat(c,.6,0),sph=(r,x,y,z,m,sx=1,sy=1,sz=1)=>{const s=new THREE.Mesh(new THREE.SphereGeometry(r,24,16),m);s.scale.set(sx,sy,sz);s.position.set(x,y,z);g.add(s);return s},
+    cone=(r0,r1,h,x,y,z,m,seg=32)=>{const c=new THREE.Mesh(new THREE.CylinderGeometry(r1,r0,h,seg),m);c.position.set(x,y+h/2,z);g.add(c);return c};
+  if(t==='coffee'){B(W,H*0.12,D,cx,z0+H*0.06,cz,body);B(W,H*0.2,D,cx,z0+H*0.9,cz,body);B(W,H*0.9,D*0.55,cx,z0+H*0.45,D*0.27,body); // основа, глава, тяло отзад
+    B(W*0.86,0.006,D*0.35,cx,z0+H*0.125,D*0.75,dark);B(W*0.5,H*0.08,0.004,cx,z0+H*0.86,D+0.002,glass);cone(0.03,0.028,0.06,cx,z0+H*0.13,D*0.72,col('#f4f1ea'));cyl(0.012,0.04,cx,z0+H*0.76,D*0.72,ring)}
+  else if(t==='kettle'){const r=Math.min(W*0.38,D/2);cyl(r*1.05,0.02,cx*0.9,z0+0.01,cz,dark);cone(r,r*0.75,H*0.8,cx*0.9,z0+0.02,cz,body,40);cone(r*0.75,r*0.5,H*0.12,cx*0.9,z0+0.02+H*0.8,cz,body,40);
+    B(0.025,H*0.6,0.03,cx*0.9+r+0.02,z0+H*0.5,cz,dark);B(0.05,0.03,0.025,cx*0.9-r-0.01,z0+H*0.72,cz,body)}
+  else if(t==='toaster'){B(W,H*0.9,D,cx,z0+H*0.45,cz,body);B(W*0.8,0.004,D*0.18,cx,z0+H*0.9+0.002,D*0.33,dark);B(W*0.8,0.004,D*0.18,cx,z0+H*0.9+0.002,D*0.67,dark);B(0.02,0.02,0.03,W*0.12,z0+H*0.7,D+0.01,dark)}
+  else if(t==='microT'){B(W,H,D,cx,z0+H/2,cz,body);B(W*0.7,H*0.75,0.004,W*0.38,z0+H/2,D+0.002,glass);B(W*0.18,H*0.75,0.004,W*0.86,z0+H/2,D+0.002,dark)}
+  else if(t==='fruit'){const r=Math.min(W,D)/2;const bw=new THREE.Mesh(new THREE.SphereGeometry(r,32,16,0,Math.PI*2,Math.PI/2,Math.PI/2),accMat('#e8e2d6',.4,0));bw.scale.set(1,0.45,1);bw.position.set(cx,z0+r*0.45,cz);bw.material.side=THREE.DoubleSide;g.add(bw);
+    const F=[['#e2a02a',.05],['#c6352c',.045],['#7fae3a',.045],['#e2c52a',.04],['#d2652a',.045]];F.forEach(([c,rr],i)=>{const a=i/F.length*Math.PI*2;sph(rr,cx+Math.cos(a)*r*0.42,z0+r*0.42+rr*0.6,cz+Math.sin(a)*r*0.42,col(c))});sph(0.05,cx,z0+r*0.5+0.05,cz,col('#9b2c2c'))}
+  else if(t==='vase'){const r=Math.min(W,D)/2;cone(r*0.7,r,H*0.45,cx,z0,cz,accMat('#d7d2c8',.3,0),40);cone(r,r*0.55,H*0.1,cx,z0+H*0.45,cz,accMat('#d7d2c8',.3,0),40);
+    for(let i=0;i<3;i++){const a=i*2.1;cyl(0.003,H*0.45,cx+Math.cos(a)*0.01,z0+H*0.72,cz+Math.sin(a)*0.01,col('#4d7a3a'));sph(0.035,cx+Math.cos(a)*0.03,z0+H*0.95,cz+Math.sin(a)*0.03,col(['#e9e4ef','#f0c6d4','#f4e2b0'][i]))}}
+  else if(t==='plant'){const r=Math.min(W,D)/2;cone(r*0.75,r,H*0.32,cx,z0,cz,accMat('#b8a68c',.7,0),36);
+    for(let i=0;i<14;i++){const a=i*2.4,rr=0.06+((i*37)%5)*0.012;sph(rr*1.6,cx+Math.cos(a)*r*0.45*((i%3)/3+0.4),z0+H*0.4+((i*53)%9)/9*H*0.55,cz+Math.sin(a)*r*0.45*((i%3)/3+0.4),col(i%2?'#4f7d3c':'#3f6a33'),1,0.8,1)}}
+  else if(t==='books'){const C=['#7b2e2e','#2e4a6b','#d8cdb4','#3d5a3a','#8a6a3a','#222'];let x=0.01;let i=0;while(x<W-0.02){const w=0.025+((i*7)%3)*0.01,h=H*(0.75+((i*13)%4)*0.07);B(w,h,D*0.9,x+w/2,z0+h/2,cz,col(C[i%C.length]));x+=w+0.002;i++}}
+  else if(t==='lamp'){const r=Math.min(W,D)/2;cyl(r*0.55,0.02,cx,z0+0.01,cz,dark);cyl(0.008,H*0.6,cx,z0+0.02+H*0.3,cz,ring);const sh=cone(r,r*0.6,H*0.35,cx,z0+H*0.62,cz,accMat('#f1ead8',.8,0),40);sh.material.side=THREE.DoubleSide}
+  else if(t==='board'){B(W*0.9,H,0.018,cx,z0+H/2,0.012,col('#b88a56'));B(W*0.65,H*0.8,0.015,cx*0.8,z0+H*0.4,0.03,col('#8a6238'));cyl(0.015,0.02,cx,z0+H*0.9,0.025,dark,'z')}
+  else if(t==='bottles'){for(const[x,c]of[[W*0.28,'#c9a227'],[W*0.72,'#3b2a20']]){const r=Math.min(W*0.22,D/2);cyl(r,H*0.65,x,z0+H*0.325,cz,accMat(c,.15,0));cone(r,r*0.35,H*0.12,x,z0+H*0.65,cz,accMat(c,.15,0));cyl(r*0.35,H*0.15,x,z0+H*0.845,cz,accMat(c,.15,0));cyl(r*0.4,H*0.05,x,z0+H*0.95,cz,dark)}}
+  else if(t==='bread'){B(W,H*0.55,D,cx,z0+H*0.275,cz,col('#b88a56'));const c=new THREE.Mesh(new THREE.CylinderGeometry(D/2,D/2,W,24,1,false,0,Math.PI),col('#a07445'));c.rotation.z=Math.PI/2;c.position.set(cx,z0+H*0.55,cz);g.add(c)}
+  else B(W,H,D,cx,z0+H/2,cz,body);
+}
 function accModel(g,k,M,hl){ // проста, но разпознаваема форма на уреда; локално: x = ширина, y = височина, z = от стената към лицето
   const W=+k.W*M,D=+k.D*M,z0=+k.c*M,Hh=(+k.H-k.c)*M,col=(ACOL[k.acol]||ACOL.white)[1],inox=k.acol==='inox',blk=k.acol==='black';
   const body=accMat(col,inox?.35:.45,inox?.35:0),dark=accMat('#1d2124',.25,0),mid=accMat('#7d868b',.4,.3),glass=accMat('#14181b',.12,0),ring=accMat('#9aa3a8',.3,.5);
@@ -2204,6 +2239,7 @@ function accModel(g,k,M,hl){ // проста, но разпознаваема ф
      const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.computeVertexNormals();const m=new THREE.Mesh(geo,body);m.material.side=THREE.DoubleSide;g.add(m)}
     const top=z0+ch+py;if(Hh>ch+py+0.02)B(cw,Hh-ch-py,cd,W/2,top+(Hh-ch-py)/2,cd/2,body);
     B(W*0.25,0.012,0.004,W/2,z0+ch/2,D+0.002,dark)}
+  else if(accOf(k).deco)decoModel(g,k,W,D,z0,Hh,B,cyl,body,dark,glass,ring,mid);
   else{ // свободностоящи
     const fz=D,inset=0.004;B(W,Hh,D,W/2,z0+Hh/2,D/2,body);
     if(t==='fridgeFS'){const sp=Hh*0.36;B(W-inset*2,0.006,0.004,W/2,z0+sp,fz+0.001,dark); // фуга между вратите
@@ -2217,6 +2253,7 @@ function accModel(g,k,M,hl){ // проста, но разпознаваема ф
       for(const[a,b,r]of[[.27,.3,.08],[.27,.7,.1],[.73,.3,.1],[.73,.7,.08]]){const m=new THREE.Mesh(new THREE.RingGeometry(r*0.9,r,40),accMat('#6f777b',.4,0));m.rotation.x=-Math.PI/2;m.position.set(W*a,z0+Hh+0.007,D*b);g.add(m)}
       B(W-0.06,Hh*0.45,0.006,W/2,z0+Hh*0.42,fz+0.002,glass);B(W*0.7,0.02,0.03,W/2,z0+Hh*0.7,fz+0.02,ring);
       for(let i=0;i<5;i++)cyl(0.018,0.025,W*(0.15+i*0.175),z0+Hh-0.06,fz+0.012,mid,'z')}}
+  if(hl&&accOf(k).deco){const e=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(W,Hh,D)),new THREE.LineBasicMaterial({color:hl}));e.position.set(W/2,z0+Hh/2,D/2);g.add(e)}
   if(hl)g.traverse(o=>{if(o.isMesh&&o.geometry.type==='BoxGeometry'&&o.geometry.parameters.width>=W*0.99){const e=new THREE.LineSegments(new THREE.EdgesGeometry(o.geometry),new THREE.LineBasicMaterial({color:hl}));e.position.copy(o.position);g.add(e)}});
   g.traverse(o=>{if(o.isMesh)o.userData.cab=k.id});
 }
@@ -2541,7 +2578,7 @@ function blockOcc(i){ // свободни колони, долепени до с
 function occupancy(i){ // шкафове на стената (лице) и шкафове от съседни стени (профил)
   const w=wallInfo(i),out=[];
   for(const k of P.cabinets){
-    if(k.type==='plinthRun'||k.type==='top'||k.type==='splash'||k.type==='wpanel'||k.type==='wshelf'||k.type==='ubottom'||accIn(k)||(isAcc(k)&&accOf(k).up))continue; // цокълът, плотът, мивката и котлонът не заемат място по стената
+    if(k.type==='plinthRun'||k.type==='top'||k.type==='splash'||k.type==='wpanel'||k.type==='wshelf'||k.type==='ubottom'||accIn(k)||(isAcc(k)&&(accOf(k).up||accOf(k).deco)))continue; // цокълът, плотът, мивката, котлонът и декорацията не заемат място по стената
     if(k.wall===i){out.push({k,s0:k.off,s1:k.off+k.W,front:true});continue}
     const c=corners(k),ss=c.map(p=>(p[0]-w.A[0])*w.u[0]+(p[1]-w.A[1])*w.u[1]),dd=c.map(p=>(p[0]-w.A[0])*w.n[0]+(p[1]-w.A[1])*w.n[1]);
     if(Math.min(...dd)<60&&Math.max(...dd)>0&&Math.max(...ss)>1&&Math.min(...ss)<w.len-1)out.push({k,s0:Math.min(...ss),s1:Math.max(...ss),front:false});
@@ -3240,8 +3277,12 @@ function setTab(t){if(t!=='room'&&drawRoom){if(drawRoom.pts.length>=2)drawFinish
   if((t==='acc'||t==='cab')&&was!==t){const k=cab(sel);if(!k||isAcc(k)!==(t==='acc')){const f=P.cabinets.find(q=>isAcc(q)===(t==='acc'));sel=f?f.id:null;multiSel=new Set(sel?[sel]:[])}renderList();renderEditor();renderTable();rebuild3D()}
   if(t==='room'){renderRoom();setView(view==='wall'?'wall':'plan')}else{selWall=null;setView(view)}renderPlan()}
 $('#tCab').onclick=()=>setTab('cab');$('#tRoom').onclick=()=>setTab('room');$('#tAcc').onclick=()=>setTab('acc');
-$('#accAdd').innerHTML=Object.entries(ACC).map(([id,a])=>`<button class="btn sm" data-addacc="${id}">+ ${a.name.replace(' (свободностоящ)','').replace(' (свободностояща)',' своб.')}</button>`).join('');
+$('#accAdd').innerHTML=Object.entries(ACC).filter(([,a])=>!a.deco).map(([id,a])=>`<button class="btn sm" data-addacc="${id}">+ ${a.name.replace(' (свободностоящ)','').replace(' (свободностояща)',' своб.')}</button>`).join('')+`<div style="flex-basis:100%;font-size:12px;font-weight:600;color:var(--muted);margin-top:6px">Декорация (само за картинката)</div>`+Object.entries(ACC).filter(([,a])=>a.deco).map(([id,a])=>`<button class="btn sm" data-addacc="${id}">+ ${a.name}</button>`).join('');
 $('#accAdd').addEventListener('click',e=>{const id=e.target.dataset.addacc;if(!id)return;const a=ACC[id];
+  if(a.deco){const tp=!a.floor&&P.cabinets.find(t=>t.type==='top'&&t.wall!==null),n=P.cabinets.filter(q=>isAcc(q)&&accOf(q).deco).length; // декорация — на плота (или на пода до стената)
+    const k=cabDef({type:'acc',acc:id,acol:'white',name:a.name.replace(/ \(.*\)/,''),W:a.W,D:a.D,c:tp?Math.round(+tp.H):0,H:(tp?Math.round(+tp.H):0)+a.h,gap:0,plinth:false});
+    if(tp){k.wall=tp.wall;k.off=Math.round(tp.off+Math.min(Math.max(80,(+tp.W-a.W)*((n*0.37)%1)),Math.max(0,+tp.W-a.W-20)));k.gap=Math.max(0,(+tp.gap||0)+40)}else{const ws=[...Array(N()).keys()].sort((x,y)=>wallInfo(y).len-wallInfo(x).len);k.wall=ws[0];k.off=100;k.gap=80;for(const i of ws){let o0=0;for(const o of occupancy(i))o0=Math.max(o0,o.s1);if(o0+a.W+100<=wallInfo(i).len){k.wall=i;k.off=Math.round(o0+(o0?80:100));break}}} /* на пода — до стената, след последния шкаф */
+    place(k);P.cabinets.push(k);sel=k.id;multiSel=new Set([k.id]);P.example=false;changed(true);toast(a.name+' — премести го с мишката; „Стои на височина“ е в параметрите');return}
   const hb=a.up?P.cabinets.find(q=>isAcc(q)&&(q.acc==='hob'||q.acc==='stove')&&q.wall!==null):null,c0=a.up?(hb?Math.round(+hb.H+650):1550):a.free?0:900;
   const k=cabDef({type:'acc',acc:id,acol:id==='hob'?'black':id==='sink'||id==='hoodW'?'inox':'white',name:a.name.replace(/ \(.*\)/,''),W:a.W,D:a.D,c:c0,H:a.up?Math.max(c0+300,+P.room.h||2500):c0+a.h,gap:a.gap||0,plinth:false,bowls:1,zones:4});
   // вграденото — върху първия плот; свободното — на най-дългата стена след последния шкаф
