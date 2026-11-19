@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.20 · 01:20 · Изтритото/промененото в „Детайли“ остава при смяна на вида</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.20 · 01:30 · Скосените детайли също се намаляват от „Детайли“</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -772,7 +772,8 @@ function carryPOv(k,parts){const old=PK.get(k),ov=k.pOv;const cur=new Map();for(
     if(best){ov[best.key]=ov[key];delete ov[key];used.add(best.key);cur.has(key)||0}}}
 function applyPOv(k,r){partKeys(r.parts);carryPOv(k,r.parts);const ov=k.pOv||{},out=[];
   for(const p of r.parts){const o=ov[p.key];if(o){p.box0=[...p.box];if(o.hide){if(!k._showHidden)continue;p.hidden=true}
-      if(!p.pl&&(+o.dL||+o.dW)){const[aL,aW]=partAxes(p);if(+o.dL){p.box[2*aL+1]+=+o.dL;p.L=r1(p.L+ +o.dL)}if(+o.dW){p.box[2*aW+1]+=+o.dW;p.Wd=r1(p.Wd+ +o.dW)}}
+      if(+o.dL||+o.dW){const[aL,aW]=partAxes(p),grow=(ax,d)=>{const c=(p.box[2*ax]+p.box[2*ax+1])/2;p.box[2*ax+1]+=d;if(p.pl&&ax<2)p.pl=p.pl.map(v=>{const w=[...v];if(w[ax]>c)w[ax]+=d;return w})}; /* и детайлите с форма (скосени под 45°) — крайните точки отзад се местят */
+        if(+o.dL){grow(aL,+o.dL);p.L=r1(p.L+ +o.dL)}if(+o.dW){grow(aW,+o.dW);p.Wd=r1(p.Wd+ +o.dW)}}
       const dx=+o.dx||0,dy=+o.dy||0,dz=+o.dz||0;if(dx||dy||dz){p.box=[p.box[0]+dx,p.box[1]+dx,p.box[2]+dy,p.box[3]+dy,p.box[4]+dz,p.box[5]+dz];if(p.pl)p.pl=p.pl.map(([x,y])=>[x+dx,y+dy])}
       if(o.fs)p.fs=+o.fs;if(o.name)p.name=o.name;if(o.m){const nm=mat(o.m),t0=+p.t||0,t1=+nm.t||t0;p.m=o.m;p.t=t1;
         if(p.box&&t1>0&&Math.abs(t1-t0)>0.1){const b=p.box,ex=[b[1]-b[0],b[3]-b[2],b[5]-b[4]],ax=ex.indexOf(Math.min(...ex)),c=(b[2*ax]+b[2*ax+1])/2;p.box=b.slice();p.box[2*ax]=c-t1/2;p.box[2*ax+1]=c+t1/2} // друга дебелина (напр. стъкло 6 вместо ПДЧ 18) — и в чертежа
