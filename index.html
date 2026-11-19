@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.19 · 12:25 · Детайли: смяна на материала сменя и дебелината (стъклен рафт 6 мм)</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.19 · 12:45 · Детайли: изтритата врата под/над чекмедже изчезва и в 3D</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -758,6 +758,8 @@ function applyPOv(k,r){partKeys(r.parts);const ov=k.pOv||{},out=[];
   (k.pAdd||[]).forEach((a,i)=>a.smart==='drs'||a.smart==='dor'||out.push({name:a.name||'Нов детайл',L:r1(+a.L),Wd:r1(+a.Wd),t:+mat(a.m).t,m:a.m,e:a.e||[0,0,0,0],box:addBox(a),kind:'',key:'+#'+i,added:true}));
   const smartPass=m=>{for(let pass=0;pass<m;pass++)for(const p of out)if(p.added&&!p.grp&&p.grp!==0){const a=(k.pAdd||[])[parseInt(p.key.split('#')[1])];if(a&&a.smart&&a.smart!=='drs'&&a.smart!=='dor')(a.smart==='dv'?smartDiv:smartShelf)(k,out,a,p)}};
   smartPass(3);if((k.pAdd||[]).some(a=>a.smart==='drs'||a.smart==='dor')){(k.pAdd||[]).forEach((a,i)=>{if(a.smart==='drs')smartDrawers(k,out,a,i);else if(a.smart==='dor')smartDoorGrp(k,out,a,i)});smartPass(2)} // чекмеджетата — след рафтовете/делителите, за да хванат точната секция
+  for(const p of out){if(!p.key||!/[↓↑]/.test(p.key))continue;const o=ov[p.key];if(!o)continue; // частите на разделена врата (над/под чекмеджета) — също се трият и сменят от „Детайли“
+    if(o.hide){if(k._showHidden)p.hidden=true;else p._kill=true}if(o.m){p.m=o.m;p.t=+mat(o.m).t}if(o.e)p.e=[...o.e];if(o.name)p.name=o.name;p.ov=true}
   {const mo=k.matOv||{};for(const p of out)if((p.added||p.grp!=null)&&p.m0===undefined){const id=(p.sd&&mo[p.name+'|'+p.sd])||mo[p.name];if(id&&id!==p.m&&P.materials.some(m=>m.id===id)){p.m0=p.m;p.m=id;p.t=+mat(id).t}}} // добавени в „Детайли“ (и групите врати/чекмеджета) — и те слушат материала от таблицата
   r.parts=out.filter(q=>!q._kill);relink(k,r.parts);addVits(k,r.parts);addMirrors(k,r.parts);return r}
 const isVitDoor=(k,d)=>d.kind==='door'&&!d.hidden&&!d.pl&&!d.fp&&/^Врата/.test(d.name)&&k.wDoor!=='slide'&&!/плъзг/i.test(d.name); // само отваряемите врати
