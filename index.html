@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.20 · 01:30 · Скосените детайли също се намаляват от „Детайли“</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.20 · 01:40 · Легло: махнеш ли страница — челото не стърчи</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -782,6 +782,10 @@ function applyPOv(k,r){partKeys(r.parts);carryPOv(k,r.parts);const ov=k.pOv||{},
     out.push(p)}
   for(let i=out.length-1;i>=0;i--){const p=out[i],f=p._cOf;if(!f)continue;if(!out.includes(f)){out.splice(i,1);continue}if(f.hidden)p.hidden=true;
     if(f.box0){const b=p.box.slice();for(let j=0;j<6;j++){if(j===4&&p._noZ0)continue;b[j]+=f.box[j]-f.box0[j]}p.box=b;p.ov=true}}
+  if(k.type==='bed'){const fr=out.find(q=>q.bFront&&!q.hidden),all=r.parts;if(fr){const tf=fr.bTf||18; // махнеш ли страница — челото не стърчи от тази страна (и е право там)
+    for(const sd of['L','R']){const s0=all.find(q=>q.bSide===sd);if(!s0||(out.includes(s0)&&!s0.hidden))continue;const b=fr.box.slice();
+      if(sd==='L'){b[0]+=tf;if(fr.pl)fr.pl=fr.pl.map(([x,y])=>[Math.max(x,b[0]),y])}else{b[1]-=tf;if(fr.pl)fr.pl=fr.pl.map(([x,y])=>[Math.min(x,b[1]),y])}
+      fr.box=b;fr.L=r1(fr.L-tf);const cu=out.find(q=>q.bCushF);if(cu){const c=cu.box.slice();if(sd==='L')c[0]=b[0];else c[1]=b[1];cu.box=c}}}}
   (k.pAdd||[]).forEach((a,i)=>a.smart==='drs'||a.smart==='dor'||out.push({name:a.name||'Нов детайл',L:r1(+a.L),Wd:r1(+a.Wd),t:+mat(a.m).t,m:a.m,e:a.e||[0,0,0,0],box:addBox(a),kind:'',key:'+#'+i,added:true}));
   const smartPass=m=>{for(let pass=0;pass<m;pass++)for(const p of out)if(p.added&&!p.grp&&p.grp!==0){const a=(k.pAdd||[])[parseInt(p.key.split('#')[1])];if(a&&a.smart&&a.smart!=='drs'&&a.smart!=='dor')(a.smart==='dv'?smartDiv:smartShelf)(k,out,a,p)}};
   smartPass(3);if((k.pAdd||[]).some(a=>a.smart==='drs'||a.smart==='dor')){(k.pAdd||[]).forEach((a,i)=>{if(a.smart==='drs')smartDrawers(k,out,a,i);else if(a.smart==='dor')smartDoorGrp(k,out,a,i)});smartPass(2)} // чекмеджетата — след рафтовете/делителите, за да хванат точната секция
@@ -1071,16 +1075,16 @@ function buildRaw(k){
       add('Кош 1 — за механизма',mL,mH,k.mc,[1,0,1,0],[X0+t,X0+2*t,t,t+mL,Hb-mH,Hb]);add('Кош 1 — за механизма',mL,mH,k.mc,[1,0,1,0],[X1-2*t,X1-t,t,t+mL,Hb-mH,Hb])}
     if(k.bClad==='uph'){ // тапицирана облицовка — основи, събрани под 45° на ъглите при краката; дунапренът и платът — при тапицера
       const fo=Math.max(0,+(k.bFoam??30)),fc=k.bFab||'#8e8a84',cr=Math.min(fo*0.8,30);
-      add('Облицовка страна — основа за тапициране (45° към краката)',D,H-fl,k.mf,[0,0,0,0],[0,tf,0,D,fl,H]);parts.at(-1).pl=[[0,0],[tf,0],[tf,D-tf],[0,D]];
-      add('Облицовка страна — основа за тапициране (45° към краката)',D,H-fl,k.mf,[0,0,0,0],[W-tf,W,0,D,fl,H]);parts.at(-1).pl=[[W-tf,0],[W,0],[W,D],[W-tf,D-tf]];
-      add('Облицовка чело — основа за тапициране (45° на двата края)',W,H-fl,k.mf,[0,0,0,0],[0,W,D-tf,D,fl,H]);parts.at(-1).pl=[[tf,D-tf],[W-tf,D-tf],[W,D],[0,D]];
+      add('Облицовка страна — основа за тапициране (45° към краката)',D,H-fl,k.mf,[0,0,0,0],[0,tf,0,D,fl,H]);parts.at(-1).pl=[[0,0],[tf,0],[tf,D-tf],[0,D]];parts.at(-1).bSide='L';
+      add('Облицовка страна — основа за тапициране (45° към краката)',D,H-fl,k.mf,[0,0,0,0],[W-tf,W,0,D,fl,H]);parts.at(-1).pl=[[W-tf,0],[W,0],[W,D],[W-tf,D-tf]];parts.at(-1).bSide='R';
+      add('Облицовка чело — основа за тапициране (45° на двата края)',W,H-fl,k.mf,[0,0,0,0],[0,W,D-tf,D,fl,H]);parts.at(-1).pl=[[tf,D-tf],[W-tf,D-tf],[W,D],[0,D]];Object.assign(parts.at(-1),{bFront:1,bTf:tf});
       if(fo>0){for(const q of parts)if(/^Облицовка (страна|чело) — основа за тапициране/.test(q.name))q.hid3d=true; // облечени в плат — в 3D не се виждат
         const bs=parts.filter(q=>/^Облицовка (страна|чело) — основа за тапициране/.test(q.name));
         for(const[x0,x1,bi]of[[-fo,tf,0],[W-tf,W+fo,1]]){add('Тапицерия',0,0,'k2',[0,0,0,0],[x0,x1,0,D+fo,fl,H],'hw');Object.assign(parts.at(-1),{cush:cr,cushAx:'x',col:fc});if(bs[bi])linkTo(parts.at(-1),bs[bi])}
-        add('Тапицерия',0,0,'k2',[0,0,0,0],[-fo,W+fo,D-tf,D+fo,fl,H],'hw');Object.assign(parts.at(-1),{cush:cr,col:fc});if(bs[2])linkTo(parts.at(-1),bs[2])}
+        add('Тапицерия',0,0,'k2',[0,0,0,0],[-fo,W+fo,D-tf,D+fo,fl,H],'hw');Object.assign(parts.at(-1),{cush:cr,col:fc,bCushF:1});if(bs[2])linkTo(parts.at(-1),bs[2])}
       warn.push(`Тапицирана облицовка: основите се събират под 45° на ъглите при краката; дунапрен ${fmt(fo)} мм и плат — при тапицера (леглото става ${fmt(W+2*fo)} × ${fmt(D+fo)}).`)}
-    else{add('Облицовка страна',D-tf,H-fl,k.mf,[1,0,0,0],[0,tf,0,D-tf,fl,H]);add('Облицовка страна',D-tf,H-fl,k.mf,[1,0,0,0],[W-tf,W,0,D-tf,fl,H]); // челото е на цялата ширина, страните опират в него
-    add('Облицовка чело (крака)',W,H-fl,k.mf,[1,0,1,1],[0,W,D-tf,D,fl,H])}
+    else{add('Облицовка страна',D-tf,H-fl,k.mf,[1,0,0,0],[0,tf,0,D-tf,fl,H]);parts.at(-1).bSide='L';add('Облицовка страна',D-tf,H-fl,k.mf,[1,0,0,0],[W-tf,W,0,D-tf,fl,H]);parts.at(-1).bSide='R'; // челото е на цялата ширина, страните опират в него
+    add('Облицовка чело (крака)',W,H-fl,k.mf,[1,0,1,1],[0,W,D-tf,D,fl,H]);Object.assign(parts.at(-1),{bFront:1,bTf:tf})}
     if(k.bRail==='L'||k.bRail==='R'){ // предпазна бленда (детско легло) — отвътре на облицовката, от главата, стърчи над облицовката
       const rh=Math.max(50,+(k.bRailH??200)),rl=clamp(+k.bRailL>0?+k.bRailL:Math.round(D*0.6),200,D-tf),xr=k.bRail==='L'?tf:W-2*tf,z0r=Hb;
       add('Предпазна бленда',rl,H+rh-z0r,k.mf,[1,1,1,1],[xr,xr+tf,0,rl,z0r,H+rh]);warn.push(`Предпазна бленда ${fmt(rl)} × ${fmt(H+rh-z0r)} — ${k.bRail==='L'?'отляво':'отдясно'}, ${fmt(rh)} мм над облицовката; отворът за влизане е към краката (${fmt(D-rl)} мм).`)}
@@ -3594,7 +3598,7 @@ function renderPed0(){const k=cab(pedK),el=$('#ped');if(!k){closePed();return}pe
   else if(p){const a=p.added?(k.pAdd||[])[parseInt(p.key.split('#')[1])]:null,b=a?null:pedBase(k,p.key)||p;
     form=`<div style="padding:10px 12px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
       <label style="grid-column:1/-1;display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--muted)">Име<input class="f" type="text" data-pe="name" value="${esc(p.name)}"></label>
-      ${f('Дължина, мм','L',p.L,p.pl||p.smart?'disabled':'')}${f('Ширина, мм','Wd',p.Wd,p.pl||p.smart?'disabled':'')}
+      ${f('Дължина, мм','L',p.L,p.smart?'disabled':'')}${f('Ширина, мм','Wd',p.Wd,p.smart?'disabled':'')}
       ${k.type==='ubottom'&&/^Цяло дъно/.test(p.name)?`<label style="grid-column:1/-1;display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--muted)">Преден ръб (хват отдолу)<select class="f" data-ub="ubEdge">${[['none','прав, с кант'],...Object.entries(UB_PROF).map(([v,q])=>[v,q.name+' '+q.code]),['bev','скосен под ъгъл']].map(([v,n])=>`<option value="${v}" ${(k.ubEdge||'none')===v?'selected':''}>${n}</option>`).join('')}</select></label>${k.ubEdge==='bev'?`<label style="display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--muted)">Ъгъл, °<input class="f" type="number" data-ub="ubAng" value="${+k.ubAng||45}"></label>`:''}${k.ubEdge==='L'||UB_PROF[k.ubEdge]?`<label style="grid-column:span 2;display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--muted)">Цвят на профила<select class="f" data-ub="ubCol">${Object.entries(GOLA_COL).map(([v,[n]])=>`<option value="${v}" ${(k.ubCol||'alu')===v?'selected':''}>${n}</option>`).join('')}</select></label>`:''}`:''}
       ${p.cush&&!p.mattr?`<label style="display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--muted)">Плат<select class="f" data-pe="fs">${[1,2,3].map(i=>{const q=fabSlot(k,i);return `<option value="${i===1?'':i}" ${(+(p.fs||1))===i?'selected':''}>Плат ${i}${q.n?' — '+esc(q.n):''}</option>`}).join('')}</select></label>`:''}
       <label style="display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--muted)">Материал<select class="f" data-pe="m">${P.materials.map(m=>`<option value="${m.id}" ${m.id===p.m?'selected':''}>${esc(mLbl(m))}</option>`).join('')}</select></label>
