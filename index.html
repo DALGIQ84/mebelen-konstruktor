@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.20 · 01:40 · Легло: махнеш ли страница — челото не стърчи</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.20 · 16:30 · Рафтовете в светлите отвори — от долния край на страницата</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2633,7 +2633,7 @@ function colsFromParts(k,b){ // светлите отвори от детайл�
     const bs=H.filter(h=>h.box[0]<=xm&&h.box[1]>=xm).map(h=>[h.box[4],h.box[5],/^Дъно/.test(h.name)&&!h.added?'дъно':/^Таван/.test(h.name)&&!h.added?'таван':'рафт']).sort((a,c)=>a[0]-c[0]);
     if(bs.length<2)continue;out.push({sec:out.length+1,x0,x1,b:bs,rods:rods.filter(r=>r.x>x0&&r.x<x1).map(r=>r.z)})}
   return out.length?out:b.cols}
-function clearDims(k,cols,fs,occ){let s='';const f=fs*0.6,C='var(--mark)',st=`stroke:${C};stroke-width:1.6;vector-effect:non-scaling-stroke`;
+function clearDims(k,cols,fs,occ,bb){let s='';const VP=(bb?.parts||[]).filter(p=>!p.hidden&&!p.pl&&p.box&&p.box[1]-p.box[0]<=40&&p.box[5]-p.box[4]>=150&&!['door','drawer','back','hw','appl','virt','alu','vis','glass'].includes(p.kind));const f=fs*0.6,C='var(--mark)',st=`stroke:${C};stroke-width:1.6;vector-effect:non-scaling-stroke`;
   const lb=(x,y,t,al)=>{const tw=String(t).length*f*0.62+f*0.7,th=f*1.35,x0=al==='r'?x-tw:al==='l'?x:x-tw/2; // етикет: бяло каре с рамка, хоризонтален текст
     return `<rect x="${x0}" y="${y-th/2}" width="${tw}" height="${th}" rx="${f*.2}" style="fill:#fff;stroke:${C};stroke-width:1;vector-effect:non-scaling-stroke"/><text x="${x0+tw/2}" y="${y}" text-anchor="middle" dy=".36em" font-size="${f}" font-family="IBM Plex Mono,monospace" font-weight="700" style="fill:${C}">${t}</text>`};
   const z0=+k.c,z1=+k.H,free=sd=>{const e=sd==='L'?k.off:k.off+ +k.W;return !(occ||[]).some(o=>o.front&&o.k.id!==k.id&&!['tfill','filler','plinthRun'].includes(o.k.type)&&+o.k.c<z1-1&&+o.k.H>z0+1&&(sd==='L'?o.s1>e-300&&o.s1<=e+1:o.s0<e+300&&o.s0>=e-1))};
@@ -2652,9 +2652,10 @@ function clearDims(k,cols,fs,occ){let s='';const f=fs*0.6,C='var(--mark)',st=`st
     for(const z of c.rods)s+=`<line x1="${X0+8}" y1="${-z}" x2="${X1-8}" y2="${-z}" style="stroke:#8a959b;stroke-width:3;vector-effect:non-scaling-stroke"/>`;
     // височините на рафтовете от дъното — от другата страна (извън шкафа при една колона и свободно място), иначе до десния край на рафта
     const sh=bs.filter(q=>q[2]==='рафт');if(!sh.length)return;
+    const base=q=>{const sd=VP.filter(v=>(Math.abs(v.box[1]-c.x0)<3||Math.abs(v.box[0]-c.x1)<3)&&v.box[4]<=q[0]+1&&v.box[5]>=q[1]-1).sort((a,b)=>Math.abs(a.box[1]-c.x0)-Math.abs(b.box[1]-c.x0))[0];return sd?sd.box[4]:bs[0][1]}; // от долния край на страницата, на която се пробива (при надстройка — нейната)
     const sideR=one&&!outR&&fR,sideL=one&&outR&&fL,xh=sideR?k.off+ +k.W+f*2.2:sideL?k.off-f*2.2:null;
-    if(xh!=null){s+=chain(xh,[bs[0][1],...sh.map(q=>q[0])],'');for(const q of sh)s+=lb(sideR?xh+f*.6:xh-f*.6,-q[0],'↥'+Math.round(q[0]-bs[0][1]),sideR?'l':'r')}
-    else for(const q of sh)s+=lb(X1-f*.4,-q[0]-f*.8,'↥'+Math.round(q[0]-bs[0][1]),'r')});
+    if(xh!=null){s+=chain(xh,[bs[0][1],...sh.map(q=>q[0])],'');for(const q of sh)s+=lb(sideR?xh+f*.6:xh-f*.6,-q[0],'↥'+Math.round(q[0]-base(q)),sideR?'l':'r')}
+    else for(const q of sh)s+=lb(X1-f*.4,-q[0]-f*.8,'↥'+Math.round(q[0]-base(q)),'r')});
   return s}
 function wallSvg(){
   const R=P.room,w=wallInfo(wv),L=w.len,H=R.h,t=R.t;fs=Math.max(L,H)/36;
@@ -2725,7 +2726,7 @@ function wallSvg(){
       for(const p of b.parts.filter(p=>p.mir&&!(k.hideD&&!noHideD)&&!showClear)){const[x0,x1,,,z0,z1]=p.box,X=k.off+x0,w=x1-x0,h=z1-z0,d=Math.min(w,h)*.35; // огледало — върху вратата
         s+=`<rect x="${X}" y="${-z1}" width="${w}" height="${h}" style="fill:#e6eef2;stroke:var(--fg);stroke-width:.8;vector-effect:non-scaling-stroke"/><line x1="${X+w*.2}" y1="${-z0-h*.55}" x2="${X+w*.2+d}" y2="${-z0-h*.55-d}" style="stroke:#9fb3bd;stroke-width:1.2;vector-effect:non-scaling-stroke"/><line x1="${X+w*.3}" y1="${-z0-h*.5}" x2="${X+w*.3+d*.7}" y2="${-z0-h*.5-d*.7}" style="stroke:#9fb3bd;stroke-width:1.2;vector-effect:non-scaling-stroke"/>`}
       s+=`<rect x="${k.off}" y="${-k.H}" width="${k.W}" height="${k.H-k.c}" style="fill:none;stroke:${on?'var(--mark)':'var(--fg)'};stroke-width:${on?3:1.2};vector-effect:non-scaling-stroke"/>`;
-      if(showClear&&b.cols)cdAcc+=clearDims(k,colsFromParts(k,b),fs,occ); // размерите — накрая, върху всичко
+      if(showClear&&b.cols)cdAcc+=clearDims(k,colsFromParts(k,b),fs,occ,b); // размерите — накрая, върху всичко
       s+=`<text x="${k.off+k.W/2}" y="${-k.H-fs*0.35}" text-anchor="middle" font-size="${fs*0.62}" font-family="IBM Plex Sans,sans-serif" font-weight="600" style="fill:${on?'var(--mark)':'var(--fg)'}">${esc(k.name)}</text></g>`}
     else s+=`<g data-id="${k.id}" style="cursor:pointer"><rect x="${Math.max(0,o.s0)}" y="${-k.H}" width="${Math.min(L,o.s1)-Math.max(0,o.s0)}" height="${k.H}" style="fill:var(--muted);fill-opacity:.18;stroke:var(--muted);stroke-dasharray:6 4;stroke-width:1;vector-effect:non-scaling-stroke"/></g>`;
   }
