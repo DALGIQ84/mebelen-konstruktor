@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 10:45 · Плотът взима дълбочината на шкафовете</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 12:00 · План: размери и за панелите на стената</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2919,7 +2919,7 @@ function planSvg(){
         else s+=`<line x1="${it.off}" y1="0" x2="${it.off+it.w}" y2="${dd}" style="stroke:#4b5960;stroke-width:1;vector-effect:non-scaling-stroke"/>`}
       else{const cx=it.off+it.w/2,r=it.type==='duct'?Math.max(fs*0.55,it.w/2):fs*0.55;s+=`<circle cx="${cx}" cy="${r+12}" r="${r}" style="fill:${d.color}"/><text x="${cx}" y="${r+12}" dy="0.35em" text-anchor="middle" font-size="${fs*0.65}" font-weight="600" font-family="IBM Plex Sans,sans-serif" transform="rotate(${-deg} ${cx} ${r+12})" style="fill:#fff">${d.mark}</text>`}
     }
-    const ocA=occupancy(i),ocU=ocA.filter(o=>o.k.upper),flip=deg>90||deg<=-90,ty=-R.t-fs*(showDims?(ocU.length?4.4:2.9):0.55);
+    const ocA=occupancy(i),ocU=[...ocA.filter(o=>o.k.upper),...P.cabinets.filter(q=>['wpanel','wshelf','ubottom'].includes(q.type)&&q.wall===i&&!ocA.some(o=>o.k===q)).map(k=>({k,s0:+k.off,s1:+k.off+ +k.W}))],flip=deg>90||deg<=-90,ty=-R.t-fs*(showDims?(ocU.length?4.4:2.9):0.55);
     if(showDims){const its=exItems(R.items).filter(q=>q.wall===i);
       if(its.length)s+=chain([0,w.len,...its.flatMap(q=>isPt(q.type)?[q.off+q.w/2]:[q.off,q.off+q.w])],-R.t-fs*1.1,-1,flip,0,w.len);
       if(ocU.length)s+=chain([0,w.len,...ocU.flatMap(o=>[o.s0,o.s1])],-R.t-fs*(its.length?2.6:1.1),-1,flip,0,w.len); // горните — извън стаята
