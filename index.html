@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 18:15 · Съдомиялна с Gola — 6 бленди горе</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 18:25 · Плот в ъгъла опира в вече сложения</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2520,6 +2520,9 @@ function addTops(grp){ // по един плот за всяка стена; в 
     if(a0<60){if(a0<1||fil(0,a0))a0=0}else if(cornerL&&a0<TD+150)a0=TD;
     if(a1>wi.len-60){if(a1>wi.len-1||fil(a1,wi.len))a1=wi.len}else if(cornerR&&a1>wi.len-TD-150)a1=wi.len-TD;
     if(g.some(q=>q.cb==='end'))a1=Math.min(a1,wi.len-TD);if(g.some(q=>q.cb==='start'))a0=Math.max(a0,TD); // рамо Б опира в плота на рамо А
+    {const n=N(),pw=(+w-1+n)%n,nw=(+w+1)%n,ex=P.cabinets.filter(q=>q.type==='top'&&q.wall!=null&&!made.includes(q)); /* в ъгъла вече има плот по съседната стена — новият опира в него, не се застъпват */
+      if(a0<TD+5)for(const t of ex.filter(t=>t.wall===pw&&+t.off+ +t.W>wallInfo(pw).len-(TD+5)))a0=Math.max(a0,(+t.gap||0)+ +t.D);
+      if(a1>wi.len-TD-5)for(const t of ex.filter(t=>t.wall===nw&&+t.off<TD+5))a1=Math.min(a1,wi.len-(+t.gap||0)-+t.D)}
     const p=cabDef({type:'top',name:'Плот',W:Math.round(a1-a0),D:TD,c:top,H:top+38,mf:'pl38',wall:+w,off:a0,gap:0,plinth:false});place(p);P.cabinets.push(p);made.push(p)}
   sel=made[0].id;multiSel=new Set(made.map(p=>p.id));P.example=false;changed(true);
   toast(made.length>1?`${made.length} плота — по един за всяка стена`:`Плот ${made[0].W} × ${TD} мм`)}
