@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 09:50 · Всяка стая — със свои цветове</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 09:55 · Библиотека: показва за коя стая слагаш декора</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -4080,7 +4080,7 @@ function renderLib(){const A=libView(),q=($('#libQ').value||'').toLowerCase().tr
     <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font-size:12.5px">Фладер:</span><button class="btn sm${libLook(it)==='v'?' primary':''}" data-ldir="v">↕ вертикален</button><button class="btn sm${libLook(it)==='h'?' primary':''}" data-ldir="h">↔ хоризонтален</button>
       <label style="font-size:12.5px;display:flex;gap:4px;align-items:center;margin-left:6px">снимката е широка<input id="libW" type="number" value="${it.w||1000}" style="width:70px">мм</label></div>
     <span class="note" style="margin:0">Снимката се завърта сама — няма значение как е качена. В 3D фладерът върви по дължината на детайла (първия размер); за отделен детайл — бутона ⇄ в „Детайли“.</span>
-    <span style="font-size:12.5px">Сложи на материала:</span><div style="display:flex;gap:6px;flex-wrap:wrap">${mats.map(m=>`<button class="btn sm" data-lapply="${esc(m.id)}">${esc(m.name)}${m.dec===it.id?' ✓':''}</button>`).join('')}</div>
+    <span style="font-size:12.5px">Сложи на материала${nRooms()>1?` в стая <b>„${esc(P.rooms[P.ri|0].name)}“</b>`:''}:</span><div style="display:flex;gap:6px;flex-wrap:wrap">${mats.map(m=>`<button class="btn sm" data-lapply="${esc(m.id)}">${esc(m.name)}${m.dec===it.id?' ✓':''}</button>`).join('')}</div>
     <div style="display:flex;gap:6px;margin-top:6px"><button class="btn sm" data-ldel="${esc(it.id)}">Изтрий от библиотеката</button>${it.pend?`<button class="btn sm" id="libRetry">Качи пак</button>`:''}</div></div></div>`}
 function libFormHtml(){const A=libView();if(libMode==='fab')return `<b style="grid-column:1/-1">Нов плат</b>
   <label>Папка<select id="lfF">${A.folders.map(f=>`<option value="${esc(f)}" ${f===libF?'selected':''}>${esc(fName(f))}</option>`).join('')}</select></label>
