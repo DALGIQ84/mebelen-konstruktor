@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 13:25 · Висящо нощно шкафче: „Горният ръб — от пода“</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 13:30 · Висящо нощно шкафче: височина на шкафчето + долен ръб</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1540,6 +1540,7 @@ const nsSecs=k=>isChest(k)?(k.chOpen==='front'?[{t:'flap',h:+k.chFlapH>0?+k.chFl
 function nsGeom(k){ // нощно шкафче: къде е корпусът
   const T=+mat(k.mc).t||18,H=+k.H,mt=k.nsMount||'legs',z0=Math.max(0,+(k.nsLeg??(mt==='wall'?400:mt==='plinth'?80:100)));
   k.c=z0;return{T,H,mt,z0}}
+const nsZ0=k=>{const mt=k.nsMount||'legs';return Math.max(0,+(k.nsLeg??(mt==='wall'?400:mt==='plinth'?80:100)))};
 function buildNstand(k){const S=P.settings,parts=[],warn=[],add=(name,L,Wd,m,e,box,kind='')=>parts.push({name,L:r1(L),Wd:r1(Wd),t:+mat(m).t,m,e,box,kind});
   const{T,H,mt,z0}=nsGeom(k),W=+k.W,D=+k.D,tF=+mat(k.mf).t||18,noB=k.mb==='none',B=noB?0:+mat(k.mb).t||3,hdf=!noB&&B<8,fu=S.fuga;
   const lid=isChest(k)?k.chOpen!=='front':k.nsTop==='lid',Hc=lid?H-tF:H; // ракла с капак отгоре: корпусът е под капака, без таван
@@ -1727,7 +1728,7 @@ function renderEditor(){
       if(ONLY[f]&&ONLY[f]!==k.type)return ''}
     if(k.type==='nstand'){if(f==='nsCols'&&!k.skrin)return '';if(f==='nsSecs'&&k.skrin)return '';if(isChest(k)&&['nsTop','nsSecs','nsHinge','slide','nl','mx','mxb'].includes(f))return '';if(f==='chFlapH'&&!(isChest(k)&&k.chOpen==='front'))return '';if((f==='chOpen'||f==='chDiv'||f==='chSh')&&!isChest(k))return '';if(!['_','name','note','W','H','D','nsMount','nsLeg','plinth','nsPl','nsPlB','chOpen','chFlapH','chDiv','chSh','nsCols','nsTop','nsBot','nsSecs','nsHinge','slide','nl','mc','mf','mb','mx','mxb','wall','off','gap','px','py','rot'].includes(f))return '';const sc=nsSecs(k),mt=k.nsMount||'legs';
       if(f==='plinth'&&(mt==='wall'||mt==='plinth'))return '';if(f==='nsPl'&&mt!=='plinth')return '';if(f==='nsPlB'&&!(mt==='plinth'&&k.nsPl!==false||mt!=='wall'&&mt!=='plinth'&&k.plinth))return '';if(f==='nsBot'&&mt==='sides')return '';if(f==='nsHinge'&&!sc.some(q=>q.t==='door'))return '';if(['slide','nl','mx','mxb'].includes(f)&&!sc.some(q=>q.t==='dr'))return '';
-      if(f==='H')l=mt==='wall'?'Горният ръб — от пода, мм':'Височина от пода, мм';if(f==='D')l='Дълбочина с лицето, мм';if(f==='nsLeg')l=mt==='legs'?'Крачета, мм':mt==='plinth'?'Цокъл, мм':mt==='wall'?'Долният ръб — от пода, мм':'Дъното — от пода, мм';if(f==='mf')l='Лице';if(f==='mb')l='Гръб (HDF или плоскост)'}
+      if(f==='H')l=mt==='wall'?'Височина на шкафчето, мм':'Височина от пода, мм';if(f==='D')l='Дълбочина с лицето, мм';if(f==='nsLeg')l=mt==='legs'?'Крачета, мм':mt==='plinth'?'Цокъл, мм':mt==='wall'?'Долният ръб — от пода, мм':'Дъното — от пода, мм';if(f==='mf')l='Лице';if(f==='mb')l='Гръб (HDF или плоскост)'}
     else if(k.type==='bed'){if(!['_','name','note','W','D','H','bUp','bFl','bSpl','bMech','bMechL','bMechH','bClad','bFoam','bFab','bMat','bMatH','bHead','bHeadH','bRail','bRailH','bRailL','mc','mf','mb','wall','off','gap','px','py','rot'].includes(f))return '';if((f==='bMechL'||f==='bMechH')&&(k.bMech===false||k.bMech==='off'))return '';if((f==='bFoam'||f==='bFab')&&k.bClad!=='uph')return '';if(f==='bMatH'&&!k.bMat)return '';if(f==='bHeadH'&&!k.bHead)return '';if((f==='bRailH'||f==='bRailL')&&!(k.bRail==='L'||k.bRail==='R'))return '';
       if(f==='W')l='Ширина (външна), мм';if(f==='D')l='Дължина (външна), мм';if(f==='H')l='Височина (външна), мм';if(f==='bSpl')l='Кош — частта към главата, мм (празно = наполовина)';if(f==='mc')l='Кош';if(f==='mf')l='Облицовка';if(f==='mb')l='Дъно на коша'}
     else if(k.type==='hboard'){if(f==='hbSz'&&!(k.hbType==='uph'&&(k.hbDir||'v')==='v'))return '';if(!['_','name','note','W','H','hbType','hbDir','hbN','hbGap','hbSz','hbFoam','hbUphZ','hbPat','hbFab','mf','mc','wall','off','gap','px','py','rot'].includes(f))return '';if(['hbDir','hbN','hbGap'].includes(f)&&(k.hbType||'board')==='board')return '';if(['hbFoam','hbUphZ','hbFab','hbPat'].includes(f)&&!(k.hbType==='uph'||k.hbType==='uphP'))return '';if(f==='mf'&&k.hbType==='uphP')return '';if(f==='mc'&&!(k.hbType==='uph'||k.hbType==='uphP'))return '';if(f==='W')l='Ширина, мм';if(f==='H')l='Височина от пода, мм';if(f==='mf')l=(k.hbType==='uph'||k.hbType==='uphP')?'Основа (стъпва на пода)':'Материал';if(f==='mc')l='Полета за тапициране'}
@@ -1800,7 +1801,7 @@ function renderEditor(){
     if(t==='wall') return `<label>${l}<select id="${id}" data-f="wall"><option value="">Свободно</option>${P.room.pts.map((_,i)=>`<option value="${i}" ${k.wall===i?'selected':''}>Стена ${i+1} · ${Math.round(wallInfo(i).len)}</option>`).join('')}</select></label>`;
     if((f==='off'||f==='gap')&&!onWall)return '';
     if((f==='px'||f==='py'||f==='rot')&&onWall)return '';
-    const v=f==='px'?Math.round(k.x):f==='py'?Math.round(k.y):f==='rot'?Math.round(k.rot*10)/10:f==='H'?r1((k.type==='endShelf'&&!k.upper)||k.type==='wardrobe'||k.type==='nstand'?k.H:k.H-k.c):k[f];
+    const v=f==='px'?Math.round(k.x):f==='py'?Math.round(k.y):f==='rot'?Math.round(k.rot*10)/10:f==='H'?r1(k.type==='nstand'&&k.nsMount==='wall'?k.H-nsZ0(k):(k.type==='endShelf'&&!k.upper)||k.type==='wardrobe'||k.type==='nstand'?k.H:k.H-k.c):k[f];
     if(f==='c'&&k.type==='col')l='Стъпва на височина (от пода), мм';
     if(f==='divShort'&&k.type==='fridge')l='Дъно и таван по-плитки отзад с, мм';
     return `<label class="${x==='full'?'full':''}">${l}<input id="${id}" data-f="${f}" type="${t==='text'?'text':'number'}" ${t==='int'?'min="0" step="1"':'step="1"'} value="${esc(v??'')}"${f==='wBoxH'?' placeholder="авто — напр. 120 или 100, 150, 200"':''}></label>`;
@@ -1850,12 +1851,13 @@ $('#ed').addEventListener('input',e=>{
   if(['rW','rGap','rM','rKerf','bHeadH','bRailH','bRailL','bMatH','bFoam','hbN','hbGap','hbFoam','hbUphZ','chDiv','chSh','chFlapH','nsLeg','nsPlB','bMW','bML','bGap','bH','bSpl','bUp','bFl','bHBh','bHBw','lift','hoodD','hoodH','hoodStrip','vdoors','split','armB','W','H','D','c','div','sh','doors','dr','nl','bRails','deadW','ovenH','lowH','mwH','over','pc','topSh','fridgeH','frDoors','frLow','divShort','grooveD','grooveY','px','py','rot','off','gap'].includes(f)){v=+v;if(!isFinite(v))return;if(v<0&&!['px','py','rot','off'].includes(f))return}
   if(f==='upper'){const h=k.H-k.c;if(v){k.c=1450;k.H=1450+Math.min(h,900);if(+k.D>400)k.D=320;k.plinth=false;k.floor='none'}else{k.c=100;k.H=100+h;if(+k.D<500)k.D=580}}
   if(f==='nsMount'){const body=+k.H-(+k.nsLeg||0);k.nsLeg={legs:100,plinth:80,wall:400,sides:100}[v]??100;k.H=k.nsLeg+body} /* смяна как стои — корпусът запазва височината си */
-  if(f==='nsLeg'&&k.type==='nstand'){const body=+k.H-(+k.c||0);k.H=v+body} /* по-високи крачета — шкафчето се вдига, не се смалява */
+  if(f==='nsLeg'&&k.type==='nstand'){const body=+k.H-nsZ0(k);k.H=v+body} /* по-високи крачета — шкафчето се вдига, не се смалява */
   if(f==='liftMech'&&v==='hf')k.lift=2;if(f==='liftMech'&&(v==='hl'||v==='hs'))k.lift=1;
   if(f==='vitrine'&&v&&!(+k.vdoors>0))k.vdoors=+k.W>650?2:1;
   if(f==='type'&&v==='cornerL'&&k.type!=='cornerL'){k.armB=k.armB||900;k.W=Math.max(+k.W,900)}
   if(f==='px')k.x=v;else if(f==='py')k.y=v;
   else if(f==='c'&&isAcc(k)&&(accOf(k).up||accOf(k).deco)){const h=k.H-k.c;k.c=v;k.H=v+h}
+  else if(f==='H'&&k.type==='nstand'&&k.nsMount==='wall')k.H=v+nsZ0(k); /* висящо — пишеш височината на шкафчето, долният ръб си стои */
   else if(f==='H')k.H=(k.type==='endShelf'&&!k.upper)||k.type==='wardrobe'||k.type==='nstand'?v:v+ +k.c; // показва се без цокъла, пази се общата височина (висок завършващ рафт — от пода)
   else if(f==='c'){if((k.type==='endShelf'&&!k.upper)||k.type==='wardrobe')k.c=v;else{const body=k.H-k.c;k.c=v;k.H=body+v}}
   else if(f==='mf'&&k.type==='top'){ // друга дебелина на плота — гърбът над него слиза/качва се и пак опира в плота
