@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 14:30 · Вътрешни чекмеджета с дръжки</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 14:45 · Общ цокъл и през колона/ниша (успоредни стени)</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2509,6 +2509,12 @@ function addTops(grp){ // по един плот за всяка стена; в 
   toast(made.length>1?`${made.length} плота — по един за всяка стена`:`Плот ${made[0].W} × ${TD} мм`)}
 function addPlinths(grp){ // по един общ цокъл за всяка стена: от първия до последния избран шкаф (пълнежите също влизат)
   const ok=grp.filter(q=>q.wall!==null&&!['col','plinthRun','cornerL'].includes(q.type)),byW={};for(const q of ok)(byW[q.wall]=byW[q.wall]||[]).push(q);
+  { /* шкафове на успоредни стени (колона/ниша) с лицето на една линия — един общ цокъл, не два */
+    const fr=q=>(+q.gap||0)+ +q.D,ws=Object.keys(byW).map(Number).sort((a,b)=>byW[b].length-byW[a].length);
+    for(const b of ws){if(!byW[b])continue;const wb=wallInfo(b),fb=Math.max(...byW[b].map(fr));
+      for(const j of ws){if(j===b||!byW[j])continue;const wj=wallInfo(j);if(wb.n[0]*wj.n[0]+wb.n[1]*wj.n[1]<0.99)continue;const d=(wj.A[0]-wb.A[0])*wb.n[0]+(wj.A[1]-wb.A[1])*wb.n[1];
+        if(byW[j].some(q=>Math.abs(d+fr(q)-fb)>3))continue;
+        for(const q of byW[j]){const px=wj.A[0]+wj.u[0]*q.off,py=wj.A[1]+wj.u[1]*q.off,po=(px-wb.A[0])*wb.u[0]+(py-wb.A[1])*wb.u[1];byW[b].push({...q,_o:q,wall:b,off:po,gap:(+q.gap||0)+d})}delete byW[j]}}}
   const made=[];pushUndo();
   for(const q of grp.filter(q=>q.type==='cornerL'&&q.wall!==null&&+q.c>0)){ // ъглов: цокъл по рамо А (покрива ъгъла) + по рамо Б (опира в него)
     q.plinth=false;const S=P.settings,T=+mat(q.mc).t,Dk=+q.D-S.doorGap-+mat(q.mf).t,e=Dk-S.plinthBack,aB=+q.armB||900;
@@ -2518,7 +2524,7 @@ function addPlinths(grp){ // по един общ цокъл за всяка с�
     /* крайните страници до пода (външни) — цокълът е между тях, не под тях */
     const lq=g.find(q=>q.off===a0r),rq=g.find(q=>q.off+q.W===a1r),flr=(q,s)=>(q.type==='endPanel'&&q.toFloor!==false)||q.floor===s||q.floor==='both';
     const a0=a0r+(lq&&flr(lq,'L')?(lq.type==='endPanel'?+lq.W:+mat(lq.mc).t):0),a1=a1r-(rq&&flr(rq,'R')?(rq.type==='endPanel'?+rq.W:+mat(rq.mc).t):0);
-    if(c<=0)continue;for(const q of g)q.plinth=false;
+    if(c<=0)continue;for(const q of g)(q._o||q).plinth=false;
     const p=cabDef({type:'plinthRun',name:'Цокъл',W:Math.round(a1-a0),H:c,c,D,mf:ref.mf,mc:ref.mc,wall:+w,off:a0,gap:+ref.gap||0});place(p);P.cabinets.push(p);made.push(p)}
   if(!made.length){toast('Няма шкафове на стена с цокъл');return}
   sel=made[0].id;multiSel=new Set(made.map(p=>p.id));P.example=false;changed(true);
