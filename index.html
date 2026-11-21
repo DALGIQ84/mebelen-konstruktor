@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 12:20 · Гардероб: дълбочина на надстройката</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 12:30 · Гардероб: общата врата — с фугата на вратите</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -743,7 +743,7 @@ function buildWardrobe(k){
   if(Jfull)exBox(tL,W-tR,exAll,'',exBl(k.wExB));else for(const e of exS)if(e.J)exBox(e.x0,e.x1,e.hs,e.lbl,e.bx);
   // врати
   const ndr=Math.max(0,k.doors|0); // 0 врати — без врати, вижда се вътрешността
-  const cdw=hinge&&ndr&&aH&&!!k.wCD,dz1=cdw?H:top,cdf=cdw?+(S.cdFuga??5):fu; // обща врата за долната част и надстройката
+  const cdw=hinge&&ndr&&aH&&!!k.wCD,dz1=cdw?H:top,cdf=fu; // общата врата на гардероба — с фугата на вратите, като всички // обща врата за долната част и надстройката
   const dS=hinge&&ndr&&(k.deadSide==='L'||k.deadSide==='R')?k.deadSide:null,dW=dS?clamp(+k.deadW||0,k._deadOpen?0:50,W-200):0,dx0=dS==='L'?dW:0; // ъглов: мъртво лице (неподвижно), вътре — отворено към секцията
   if(dS&&!k._deadOpen){const dxA=dS==='L'?0:W-dW;add('Мъртво лице',dz1-c-cdf,dW,k.mf,[1,1,1,1],[dxA,dxA+dW,Dk+S.doorGap,Dk+S.doorGap+tF,c+cdf/2,dz1-cdf/2],'door');warn.push(`Ъглов: мъртво лице ${r(dW)} мм ${dS==='L'?'отляво':'отдясно'} — съседният гардероб опира в него.`)}
   const exOfX=x=>exS.find(e=>x>=e.x0-T&&x<=e.x1+T),exX={};
