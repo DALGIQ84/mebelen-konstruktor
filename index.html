@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 17:50 · Съдомиялна с Gola — цветът на профила като на съседа</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 17:58 · Съдомиялна с Gola — хватът като при другите шкафове</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1243,7 +1243,7 @@ function buildRaw(k){
     const gn=golaNb(k),dh=gn?H-c-golaTopGap(gn):H-c-S.fuga,z0=gn?c:c+S.fuga/2; /* до шкаф с Gola — като вратите му */
     add('Врата',dh,W-S.fuga,k.mf,[1,1,1,1],[S.fuga/2,W-S.fuga/2,Dk+S.doorGap,Dk+S.doorGap+tF,z0,z0+dh],'door');golaRun(add,gn,W,Dk,H,S,parts);if(gn&&k.gola&&k.golaCol){const pp=parts.findLast(q=>q.name==='Gola L профил');if(pp)pp.col=(GOLA_COL[k.golaCol]||GOLA_COL.alu)[1]}if(gn)warn.push('Gola: вратата на съдомиялната е като на съседите (горе − '+fmt(golaTopGap(gn))+' мм, долу наравно).');
     for(const y of[Dk-S.rail-(gn&&golaL(gn)?+S.golaLw||26:0),0])for(const z of[H-T,H-2*T])add('Бленда',W,S.rail,k.mc,[1,0,0,0],[0,W,y,y+S.rail,z,z+T]); // 4 бленди горе: по 2 една под друга отпред и отзад
-    add('Съдомиялна',0,0,'k2',[0,0,0,0],[3,W-3,20,Dk,Math.max(0,c-20),H-T-5],'hw');
+    add('Съдомиялна',0,0,'k2',[0,0,0,0],[3,W-3,20,gn&&golaL(gn)?Dk-(+S.golaLw||26)-2:Dk,Math.max(0,c-20),gn&&golaL(gn)?H-(+S.golaLh||56)-3:H-T-5],'hw'); /* с Gola — машината е под и зад профила (не се вижда в хвата) */
     if(k.plinth&&c>0){const y=Dk-S.plinthBack;add('Цокъл',W,c,k.mf,[1,0,0,0],[0,W,y-T,y,0,c],'plinth')}
     finishParts(k,parts);return{parts,warn,Dk};
   }
