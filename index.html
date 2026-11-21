@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 16:15 · Плот и върху скрин / нощно шкафче</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 17:05 · Подравни отпред — горен шкаф над колона</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1909,7 +1909,8 @@ function frontOf(k){ // докъде стига шкафът отпред — п
 function frontRefs(k){const row=q=>!!q.upper===!!k.upper,ok=q=>q!==k&&q.wall===k.wall&&!isAcc(q)&&!['top','plinthRun','splash','wpanel','wshelf','ubottom'].includes(q.type)&&row(q);
   const all=P.cabinets.filter(ok),near=all.filter(q=>q.off<=k.off+k.W+5&&q.off+q.W>=k.off-5); // първо — съседите до него
   return(near.length?near:all).map(q=>(+q.gap||0)+frontOf(q))}
-function alignFront(k){if(!k||k.wall===null)return;let r=frontRefs(k);if(!r.length){ /* няма съседи на стената — търси шкафове на успоредна стена (напр. колона/ниша), лицето им на същата линия */
+function alignFront(k){if(!k||k.wall===null)return;let r=frontRefs(k);if(!r.length){const st=P.cabinets.filter(q=>q!==k&&q.wall===k.wall&&!isAcc(q)&&!!q.upper!==!!k.upper&&!['top','plinthRun','splash','wpanel','wshelf','ubottom','filler','tfill'].includes(q.type)&&q.off<k.off+ +k.W-5&&q.off+ +q.W>k.off+5);if(st.length)r=st.map(q=>(+q.gap||0)+frontOf(q))} /* горен над колона/хладилник — на линия с шкафа под него */
+  if(!r.length){ /* няма съседи на стената — търси шкафове на успоредна стена (напр. колона/ниша), лицето им на същата линия */
     const wk=wallInfo(k.wall),cw=w=>{const W=wallInfo(w.wall);return[W.A[0]+W.u[0]*(+w.off+ +w.W/2),W.A[1]+W.u[1]*(+w.off+ +w.W/2)]},ck=cw(k),cand=[];
     for(const q of P.cabinets){if(q===k||q.wall===null||q.wall===k.wall||isAcc(q)||!!q.upper!==!!k.upper||['top','plinthRun','splash','wpanel','wshelf','ubottom','filler','tfill'].includes(q.type))continue;const wq=wallInfo(q.wall);
       if(wk.n[0]*wq.n[0]+wk.n[1]*wq.n[1]<0.99)continue;const d=(wk.A[0]-wq.A[0])*wq.n[0]+(wk.A[1]-wq.A[1])*wq.n[1],c=cw(q);cand.push({v:(+q.gap||0)+frontOf(q)-d,dist:Math.hypot(c[0]-ck[0],c[1]-ck[1])})}
