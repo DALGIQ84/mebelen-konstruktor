@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 18:35 · Плот: размерът от „Детайли“ и в параметрите</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 18:40 · Детайли ↔ параметри: и панел, рафт, завършваща страница</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -3794,7 +3794,7 @@ $('#ped').addEventListener('change',e=>{const k=cab(pedK),t=e.target;if(t.id==='
     if(c==='a'){const a=+v;if(v!==''&&a>0&&a<90){if(!(+q.x>0))q.x=100;q.y=Math.round(+q.x*Math.tan(a*Math.PI/180)*10)/10}else if(v===''||a<=0){q.x=0;q.y=0}}else q[c]=v===''?0:Math.max(0,+v);
     P.example=false;changed(false);renderPed();rebuild3D();return}if(!k||!t.dataset.pe||!pedSel)return;const f=t.dataset.pe,v=t.type==='checkbox'?t.checked:t.value;pushUndo();
   const keys=pedMulti.size>1?[...pedMulti]:[pedSel],cur=pedSel;for(const key of keys){pedSel=key;pedEdit(k,f,v)}pedSel=cur; // маркирани няколко — промяната важи за всички
-  {const MP={top:{L:'W',Wd:'D'},splash:{L:'W'},plinthRun:{L:'W'},ubottom:{L:'W'}}[k.type];if(MP&&k.pOv){const mk=Object.keys(k.pOv).find(x=>/#1$/.test(x)&&(+k.pOv[x].dL||+k.pOv[x].dW)); /* плот, гръб, цокъл: размерът от „Детайли“ отива в параметрите (едно и също число навсякъде) */
+  {const MP=k.type==='wpanel'&&k.raster?null:{top:{L:'W',Wd:'D'},splash:{L:'W'},plinthRun:{L:'W'},ubottom:{L:'W'},wpanel:{L:'fpH',Wd:'W'},endPanel:{Wd:'D'},wshelf:{L:'W',Wd:'D'}}[k.type];if(MP&&k.pOv){const mk=Object.keys(k.pOv).find(x=>/#1$/.test(x)&&(+k.pOv[x].dL||+k.pOv[x].dW)); /* плот, гръб, цокъл: размерът от „Детайли“ отива в параметрите (едно и също число навсякъде) */
     if(mk){const o2=k.pOv[mk];if(MP.L&&+o2.dL){k[MP.L]=Math.round((+k[MP.L]+ +o2.dL)*10)/10;delete o2.dL}if(MP.Wd&&+o2.dW){k[MP.Wd]=Math.round((+k[MP.Wd]+ +o2.dW)*10)/10;delete o2.dW}if(!Object.keys(o2).length)delete k.pOv[mk]}}}
   P.example=false;changed(false);renderPed();renderEditor()});
 { // зум с колелцето (към курсора), местене с влачене (ляв/десен/среден бутон), двоен клик — целия чертеж
