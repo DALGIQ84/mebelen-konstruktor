@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.20 · 16:30 · Рафтовете в светлите отвори — от долния край на страницата</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 09:40 · Няколко стаи в един проект</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -177,7 +177,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
     </div></div>
   <div class="dd"><button class="btn" id="bCut" aria-haspopup="true" aria-expanded="false">Разкрой ▾</button>
     <div class="ddm" id="cutMenu" hidden >
-      <button class="item" data-cut="copy-all"><span>Копирай целия проект</span><small>за поставяне в OptiCut или в разкроя</small></button>
+      <button class="item" data-cut="copy-all"><span>Копирай целия проект</span><small>всички стаи · за поставяне в OptiCut или в разкроя</small></button><button class="item" data-cut="copy-room" id="cutRoomIt" hidden><span>Копирай тази стая</span><small>само шкафовете в отворената стая</small></button>
       <button class="item" data-cut="copy-cab"><span>Копирай избрания шкаф</span><small>само детайлите на избрания</small></button>
       <div style="border-top:1px solid var(--line);margin:4px 0"></div>
       <button class="item" data-cut="csv"><span>Запази като CSV</span><small>отваря се в Excel и се импортира в OptiCut</small></button>
@@ -228,7 +228,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
       <div class="stagebar">
         <div class="seg"><button id="v3" class="on">3D</button><button id="vp">План</button><button id="vw">Стени</button></div>
         <span id="wallNav" hidden><button class="btn sm" id="wPrev" aria-label="Предишна стена">‹</button><select id="wallSel" aria-label="Стена"></select><button class="btn sm" id="wNext" aria-label="Следваща стена">›</button></span>
-        <button class="btn sm" id="bMeasure" title="Рулетка: клик в първата точка, клик във втората. Shift — само хоризонтално/вертикално. Esc — изход" aria-pressed="false">📏 Рулетка</button><button class="btn sm" id="bImg">Запази картинка</button><button class="btn sm" id="bPhoto" title="Реалистична снимка от този изглед — със сенки и светлина">Фото</button><button class="btn sm" id="bImgAll" hidden>Всички стени</button>
+        <button class="btn sm" id="bMeasure" title="Рулетка: клик в първата точка, клик във втората. Shift — само хоризонтално/вертикално. Esc — изход" aria-pressed="false">📏 Рулетка</button><button class="btn sm" id="bImg">Запази картинка</button><button class="btn sm" id="bPhoto" title="Реалистична снимка от този изглед — със сенки и светлина">Фото</button><button class="btn sm" id="bImgAll" hidden>Всички стени</button><span id="roomTabs" style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-left:8px;padding-left:8px;border-left:1px solid var(--line)"></span>
         <div class="dd" style="margin-left:auto"><button class="btn sm" id="bView" aria-haspopup="true" aria-expanded="false">Изглед ▾</button>
           <div class="ddm vmenu" id="viewMenu" hidden style="left:auto;right:0;width:250px">
             <label class="tog"><input type="checkbox" id="tLeft" checked> Лява колона <small>(стая, шкафове, параметри)</small></label>
@@ -490,8 +490,9 @@ function applySnap(str){const tex={};for(const m of P.materials)if(m.tex)tex[m.i
   for(const m of o.materials){const t=tex[m.id];if(t){m.tex=t.tex;m.texAR=t.texAR;m.texAvg=t.texAvg}}
   if(o.room&&o.room.ftex&&o.room.ftex.ar&&!o.room.ftex.tex&&P.room.ftex&&P.room.ftex.tex)o.room.ftex.tex=P.room.ftex.tex;
   const ow=P.room.wtex||{};if(o.room&&o.room.wtex)for(const i in o.room.wtex){const e=o.room.wtex[i];if(e.ar&&!e.tex&&ow[i]&&ow[i].tex)e.tex=ow[i].tex}
+  if(o.rooms&&P.rooms)o.rooms.forEach((r,i)=>{const src=i===(P.ri|0)?P.room:P.rooms[i]?.room;const dst=i===(o.ri|0)?o.room:r.room;if(!src||!dst||dst===o.room&&i===(o.ri|0)&&i===(P.ri|0))return;if(dst.ftex&&!dst.ftex.tex&&src.ftex?.tex)dst.ftex.tex=src.ftex.tex;const w0=src.wtex||{};if(dst.wtex)for(const j in dst.wtex){const e=dst.wtex[j];if(e&&!e.tex&&w0[j]?.tex)e.tex=w0[j].tex}}); // текстурите и на другите стаи
   P=o;histLock=true;try{P.mcDone=true;migrate();if(!cab(sel))sel=P.cabinets[0]?.id||null;save()}finally{histLock=false}lastSnap=snapP();
-  renderList();renderEditor();renderTable();if(tab==='room')renderRoom();rebuild3D();renderPlan()}
+  renderList();renderEditor();renderTable();if(tab==='room')renderRoom();rebuild3D();renderPlan();renderRoomTabs()}
 function pedAfterUndo(){if(!pedK)return;const k=cab(pedK);if(!k){closePed();return}const ps=pedParts(k);if(pedSel&&!ps.some(q=>q.key===pedSel))pedSel=null;pedCells=[];renderPed();rebuild3D()} // „Детайли“ се опреснява веднага след Ctrl+Z / Ctrl+Y
 function undoAll(){if(!hist.length){toast('Няма какво да се върне');return}redoH.push(snapP());applySnap(hist.pop());toast('Върнато назад');pedAfterUndo()}
 function redoAll(){if(!redoH.length){toast('Няма какво да се повтори');return}hist.push(snapP());applySnap(redoH.pop());toast('Повторено');pedAfterUndo()}
@@ -520,7 +521,28 @@ function mergeCorners(){ // старите „ъгъл А“ + „ъгъл Б“
     Object.assign(A,{type:'cornerL',armB:Math.round(+B.W+Dk),deadOpen:false,deadSide:'none',half:null,name:String(A.name).replace(/ ъгъл А$/,' ъглов')});
     P.cabinets=P.cabinets.filter(q=>q!==B);n++}
   if(n)setTimeout(()=>toast(n>1?`${n} ъглови шкафа са събрани в един`:'Ъгловият шкаф е събран в един'),300);return n}
-function migrate(){mergeCorners();for(const g of MATS.filter(m=>m.glass))if(!P.materials.some(m=>m.id===g.id))P.materials.push({...g});for(const q of P.cabinets)if(q.type==='wardrobe'&&q.wPl==null)q.wPl=true;for(const q of P.cabinets)if(q.type==='endShelf'&&q.eFloor==null)q.eFloor=true;for(const q of P.cabinets)if(q.upper&&q.hood&&!q.hsV2){if(q.hoodStrip!=null&&+q.c===1490)q.c=1450;q.hsV2=true}for(const[kk,vv]of[['wDrSd',2],['wDrGrip',35],['wDrFw',7],['wDrIns',32],['wSlOv',30],['wSlHd',40],['wSlTrack',100],['backTot',5],['cdFuga',5],['drFuga',5],['hfSet',40],['boardDens',680],['handleKg',0.3],['alFuga',3],['alW',42],['alT',25],['glassDed',7]])if(P.settings[kk]==null)P.settings[kk]=vv;if(+P.settings.glassDed===70)P.settings.glassDed=7;if(+P.settings.alT===20)P.settings.alT=25; // стъклото = вратата − 7 мм
+/* ---------- Стаи в един проект: текущата е в P.room / P.cabinets, другите — в P.rooms[i] ---------- */
+const nRooms=()=>(P.rooms||[]).length||1;
+function roomOf(i){return i===(P.ri|0)?{room:P.room,cabinets:P.cabinets}:{room:P.rooms[i].room,cabinets:P.rooms[i].cabinets}}
+function withRoom(i,fn){if(i===(P.ri|0))return fn();const keep={room:P.room,cabinets:P.cabinets},t=P.rooms[i];P.room=t.room;P.cabinets=t.cabinets;try{return fn()}finally{P.room=keep.room;P.cabinets=keep.cabinets}}
+function roomRefresh(){sel=P.cabinets[0]?.id||null;multiSel=new Set(sel?[sel]:[]);selWall=null;wv=0;undoStack.length=0;updUndo();save();renderList();renderEditor();renderTable();if(tab==='room')renderRoom();rebuild3D();renderPlan();if(view==='wall')renderWall();fit();renderRoomTabs()}
+function switchRoom(i){if(i===(P.ri|0)||!P.rooms[i])return;const e=P.rooms[P.ri|0];e.room=P.room;e.cabinets=P.cabinets;const t=P.rooms[i];P.room=t.room;P.cabinets=t.cabinets;delete t.room;delete t.cabinets;P.ri=i;roomRefresh()}
+function newRoomObj(){return{h:P.room.h,t:P.room.t,pts:SHAPES.rect(3600,3000),shape:{kind:'rect',W:3600,L:3000,a:1200,b:1000},items:[]}}
+function addRoom(copyOf){const n=P.rooms.length+1;let o;if(copyOf!=null){const src=roomOf(copyOf),c=JSON.parse(JSON.stringify(src)),ids={};for(const k of c.cabinets){const ni=uid();ids[k.id]=ni;k.id=ni}for(const k of c.cabinets)for(const f of['cdW','grpOf'])if(k[f]&&ids[k[f]])k[f]=ids[k[f]];
+    const tx=src.room;if(tx.ftex&&tx.ftex.tex&&c.room.ftex)c.room.ftex.tex=tx.ftex.tex;o={name:P.rooms[copyOf].name+' (копие)',room:c.room,cabinets:c.cabinets}}
+  else o={name:'Стая '+n,room:newRoomObj(),cabinets:[]};P.rooms.push(o);switchRoom(P.rooms.length-1);P.example=false;save();toast(`„${P.rooms[P.ri].name}“ — ${copyOf!=null?'копие':'нова празна стая; начертай стените от „Стая“'}`)}
+function delRoom(i){if(P.rooms.length<2)return;const nm=P.rooms[i].name;if(!confirm(`Да изтрия ли „${nm}“ с всичките ѝ шкафове?`))return;if(i===(P.ri|0)){const j=i?i-1:1;switchRoom(j)}P.rooms.splice(i,1);if(P.ri>i)P.ri--;save();renderRoomTabs();renderTable();toast(`„${nm}“ е изтрита`)}
+function renameRoom(i){const n=(prompt('Име на стаята:',P.rooms[i].name)||'').trim();if(!n)return;P.rooms[i].name=n;save();renderRoomTabs();if(typeof renderTable==='function')renderTable()}
+function renderRoomTabs(){const el=$('#roomTabs');if(!el||!P.rooms)return;el.innerHTML=P.rooms.map((r,i)=>`<button class="btn sm${i===(P.ri|0)?' primary':''}" data-room="${i}" title="Десен бутон — преименувай, копирай, изтрий">${esc(r.name)}</button>`).join('')+`<button class="btn sm" id="bRoomAdd" title="Нова стая в същия проект">+ Стая</button>`;
+  const sa=$('#sAll');if(sa)sa.textContent=P.rooms.length>1?'Цялата стая':'Целия проект';const cr=$('#cutRoomIt');if(cr)cr.hidden=P.rooms.length<2}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#roomTabs [data-room],#bRoomAdd');if(!b)return;if(b.id==='bRoomAdd'){addRoom();return}switchRoom(+b.dataset.room)});
+document.addEventListener('contextmenu',e=>{const b=e.target.closest&&e.target.closest('#roomTabs [data-room]');if(!b)return;e.preventDefault();const i=+b.dataset.room,it=(a,t,sm)=>`<button class="item" data-rctx="${a}"><span>${t}</span>${sm?`<small>${sm}</small>`:''}</button>`;
+  ctx.innerHTML=`<div class="gh" style="padding:6px 8px;font-weight:600">${esc(P.rooms[i].name)}</div>`+it('ren','Преименувай')+it('copy','Копирай стаята','със стените и шкафовете')+(P.rooms.length>1?'<div style="border-top:1px solid var(--line);margin:4px 0"></div>'+it('del','Изтрий стаята','с шкафовете в нея'):'');
+  ctx.hidden=false;const w=ctx.offsetWidth,h=ctx.offsetHeight;ctx.style.left=Math.min(e.clientX,innerWidth-w-8)+'px';ctx.style.top=Math.max(8,Math.min(e.clientY,innerHeight-h-8))+'px';ctx.dataset.id='';ctx.dataset.door='';ctx.dataset.room=i});
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#ctxMenu [data-rctx]');if(!b)return;e.stopPropagation();const i=+ctx.dataset.room,a=b.dataset.rctx;ctx.hidden=true;if(a==='ren')renameRoom(i);else if(a==='copy')addRoom(i);else if(a==='del')delRoom(i)},true);
+function moveToRoom(grp,i){if(!P.rooms[i]||i===(P.ri|0))return;const t=P.rooms[i],nw=(t.room.pts||[]).length-(t.room.open?1:0),ids=new Set(grp.map(q=>q.id));
+  for(const k of grp){if(k.wall!=null&&k.wall>=nw){k.wall=null;k.x=600;k.y=600;k.rot=0}t.cabinets.push(k)}P.cabinets=P.cabinets.filter(c=>!ids.has(c.id));sel=P.cabinets[0]?.id||null;multiSel=new Set(sel?[sel]:[]);undoStack.length=0;updUndo();changed(true);toast(`${grp.length>1?grp.length+' шкафа са преместени':'Преместен'} в „${t.name}“`)}
+function migrate(){if(!Array.isArray(P.rooms)||!P.rooms.length){P.rooms=[{name:'Стая 1'}];P.ri=0}P.ri=Math.max(0,Math.min(P.rooms.length-1,P.ri|0));delete P.rooms[P.ri].room;delete P.rooms[P.ri].cabinets;mergeCorners();for(const g of MATS.filter(m=>m.glass))if(!P.materials.some(m=>m.id===g.id))P.materials.push({...g});for(const q of P.cabinets)if(q.type==='wardrobe'&&q.wPl==null)q.wPl=true;for(const q of P.cabinets)if(q.type==='endShelf'&&q.eFloor==null)q.eFloor=true;for(const q of P.cabinets)if(q.upper&&q.hood&&!q.hsV2){if(q.hoodStrip!=null&&+q.c===1490)q.c=1450;q.hsV2=true}for(const[kk,vv]of[['wDrSd',2],['wDrGrip',35],['wDrFw',7],['wDrIns',32],['wSlOv',30],['wSlHd',40],['wSlTrack',100],['backTot',5],['cdFuga',5],['drFuga',5],['hfSet',40],['boardDens',680],['handleKg',0.3],['alFuga',3],['alW',42],['alT',25],['glassDed',7]])if(P.settings[kk]==null)P.settings[kk]=vv;if(+P.settings.glassDed===70)P.settings.glassDed=7;if(+P.settings.alT===20)P.settings.alT=25; // стъклото = вратата − 7 мм
   for(const m of MATS.filter(m=>m.id.startsWith('pl')))if(!P.materials.some(q=>q.id===m.id))P.materials.push({...m});
   if(!P.materials.some(m=>m.id==='p8'||m.name==='ПДЧ 8'))P.materials.push({id:'p8',name:'ПДЧ 8',t:8,color:'#cfc8bb'});
   P.settings={...SETTINGS,...P.settings};if(!P.settings.faFix){if(+P.settings.fillAllow===20)P.settings.fillAllow=50;P.settings.faFix=true}if(!P.settings.eoFix){if(P.settings.edgeOff==='0')P.settings.edgeOff='';P.settings.eoFix=true} // без кант = празно поле (OptiCut)if(P.settings.slides===SLIDES)P.settings.slides=SLIDES.map(x=>({...x}));
@@ -1621,7 +1643,8 @@ function renderTable(){
   for(const r of rs){if(r.kind==='alu'||r.kind==='glass'&&!mat(r.m).glass)continue;const a=agg[r.m]||(agg[r.m]={area:0,edge:0,n:0});a.area+=r.L*r.Wd*r.n/1e6;a.edge+=((r.e[0]+r.e[1])*r.L+(r.e[2]+r.e[3])*r.Wd)*r.n/1000;a.n+=r.n}
   $('#sum').innerHTML=Object.entries(agg).map(([m,a])=>`<div><small>${esc(mLbl(mat(m)))} · ${a.n} бр.</small><b>${fmt(a.area)} м²${a.edge?` · кант ${fmt(a.edge)} м`:''}</b></div>`).join('');
 }
-function cutRows(sc,withSz){const keep=scope;scope=sc||scope;try{const list=scope==='all'?P.cabinets:P.cabinets.filter(c=>c.id===sel);
+function cutRows(sc,withSz){if(sc==='proj'){if(nRooms()<2)return cutRows('all',withSz);const m=new Map();for(let i=0;i<P.rooms.length;i++)for(const r of withRoom(i,()=>cutRows('all',withSz))){const key=r.filter((_,j)=>j!==3).join('\t'),o=m.get(key);if(o)o[3]=+o[3]+ +r[3];else m.set(key,[...r])}return[...m.values()]} // целия проект — всички стаи, еднаквите детайли се събират
+  const keep=scope;scope=sc||scope;try{const list=scope==='all'?P.cabinets:P.cabinets.filter(c=>c.id===sel);
   const S=P.settings;return rows(list).map(r=>{const m=mat(r.m),lb=mLbl(m),q=[r.type,fmt(r.L),fmt(r.Wd),r.n,...r.e.map(v=>v?S.edgeOn:S.edgeOff),lb!==m.name&&+m.t>0?`${lb} ${fmt(m.t)}`:lb];if(withSz&&+m.sheetL>0&&+m.sheetW>0)q.push(`${Math.round(m.sheetL)}×${Math.round(m.sheetW)}`);return q})}finally{scope=keep}} /* размерът на плочата (от библиотеката) — за KRAFTCUT */
 function exportText(sc,withSz){return cutRows(sc,withSz).map(r=>r.join('\t')).join('\n')}
 function exportCSV(sc){const q=v=>/[;"\n]/.test(String(v))?'"'+String(v).replace(/"/g,'""')+'"':String(v);
@@ -2537,9 +2560,10 @@ function openCtx(id,x,y){ctx.dataset.door='';if(!(multiSel.size>1&&multiSel.has(
     (((k.type==='wardrobe'&&k.wDoor!=='slide'&&k.wDoor!=='none')||((k.type||'doors')==='doors'&&!k.upper&&!k.open))&&k.antr&&(k.doors|0)>0?(k.wCD?it('wcdOff','Отделни врати','за долната част и за надстройката'):it('wcdOn','Обща врата','една за долната част и надстройката')):'')+
     (grp.some(q=>build(q).parts.some(p=>p.kind==='door'||p.kind==='alu'))?(grp.every(q=>q.hideD)?it('showD','Покажи вратите','само в картинката'):it('hideD','Скрий вратите','само в картинката — остават в разкроя')):'')+
     (!isAcc(k)?it('pedit','Редактирай детайлите…','всеки детайл поотделно'):'')+
-    (on?it('detach','Откачи от стената'):'')+it('dup','Копие','до него')+'<div style="border-top:1px solid var(--line);margin:4px 0"></div>'+it('del','Изтрий');
+    (on?it('detach','Откачи от стената'):'')+it('dup','Копие','до него')+((P.rooms||[]).length>1?P.rooms.map((r,i)=>i===(P.ri|0)?'':it('mvr'+i,`Премести в „${esc(r.name)}“`,grp.length>1?`избраните ${grp.length}`:'в другата стая')).join(''):'')+'<div style="border-top:1px solid var(--line);margin:4px 0"></div>'+it('del','Изтрий');
   ctx.hidden=false;const w=ctx.offsetWidth,h=ctx.offsetHeight;ctx.style.left=Math.min(x,innerWidth-w-8)+'px';ctx.style.top=Math.max(8,Math.min(y,innerHeight-h-8))+'px';ctx.dataset.id=id}
 ctx.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-ctx]');if(!b)return;const k=cab(ctx.dataset.id);if(!k){ctx.hidden=true;return}const a=b.dataset.ctx;
+  if(/^mvr\d+$/.test(a)){ctx.hidden=true;const g=multiSel.has(k.id)&&multiSel.size>1?[...multiSel].map(cab).filter(Boolean):[k];moveToRoom(g,+a.slice(3));return}
   if(a==='del'){if(!b.classList.contains('sure')){b.classList.add('sure');b.querySelector('span').textContent='Натисни пак за изтриване';return}
     P.cabinets=P.cabinets.filter(c=>c!==k);sel=P.cabinets[0]?.id||null;ctx.hidden=true;changed(true);return}
   ctx.hidden=true;
@@ -3446,12 +3470,12 @@ function toggleCut(open){const m=$('#cutMenu');open=open??m.hidden;m.hidden=!ope
 $('#bCut').onclick=e=>{e.stopPropagation();toggleKit(false);toggleFile(false);toggleCut()};
 document.addEventListener('click',()=>{if(!$('#cutMenu').hidden)toggleCut(false)});
 $('#cutMenu').addEventListener('click',async e=>{e.stopPropagation();const b=e.target.closest('[data-cut]');if(!b)return;toggleCut(false);const a=b.dataset.cut;
-  if(a==='copy-all'||a==='copy-cab'){const t=exportText(a==='copy-all'?'all':'cab',true);if(!t){toast('Няма детайли');return}copyText(t,'Копирано — постави в разкроя');return}
+  if(a==='copy-all'||a==='copy-cab'||a==='copy-room'){const t=exportText(a==='copy-all'?'proj':a==='copy-room'?'all':'cab',true);if(!t){toast('Няма детайли');return}copyText(t,'Копирано — постави в разкроя');return}
   if(!P.cabinets.length){toast('Няма детайли');return}
   const date=new Date().toISOString().slice(0,10);
   if(a==='dxf'){const d=panelsDXF();if(!d){toast('Няма скосени панели — правите се режат на циркуляра');return}await saveFile(`${projBase()} CNC ${date}.dxf`,new Blob([d],{type:'application/dxf'}));return}
-  const ok=a==='csv'?await saveFile(`${projBase()} разкрой ${date}.csv`,exportCSV('all')):await saveFile(`${projBase()} разкрой ${date}.txt`,exportText('all'));
-  if(!ok){copyText(exportText('all'),'Запазването на файл не е позволено тук — детайлите са копирани')}});
+  const ok=a==='csv'?await saveFile(`${projBase()} разкрой ${date}.csv`,exportCSV('proj')):await saveFile(`${projBase()} разкрой ${date}.txt`,exportText('proj'));
+  if(!ok){copyText(exportText('proj'),'Запазването на файл не е позволено тук — детайлите са копирани')}});
 function newProject(){projFH=null;curSet(null);$('#bSaveSm').textContent='като файл на компютъра';P={room:{h:P.room.h,t:P.room.t,pts:SHAPES.rect(3600,3000),shape:{kind:'rect',W:3600,L:3000,a:1200,b:1000},items:[]},settings:{...SETTINGS,...userSet()},materials:MATS.map(m=>({...m})),cabinets:[]};afterLoad()} /* нов проект — цветовете на корпус/лице са тези по подразбиране; промените остават само в своя проект */
 $('#fNew').onclick=e=>sureItem(e.currentTarget,newProject);
 $('#fSample').onclick=e=>sureItem(e.currentTarget,()=>{P=sample();afterLoad()});
@@ -3772,7 +3796,7 @@ document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.
 $('#pjName').addEventListener('input',e=>{P.name=e.target.value;save()});
 $('#bProj').onclick=()=>{toggleFile(false);$('#pjName').value=P.name||'';$('#pjText').value=JSON.stringify(P,null,1);$('#pjNew').textContent='Нов празен проект';$('#pjNew').classList.remove('sure');open('#ovProj')};
 $('#pjCopy').onclick=()=>copyText($('#pjText').value,'Проектът е копиран');
-function afterLoad(){setTimeout(()=>{if(typeof markSaved==='function')markSaved()},0);migrate();snapSplash();snapAcc();sel=P.cabinets[0]?.id||null;selWall=null;save();renderList();renderEditor();renderTable();if(tab==='room')renderRoom();rebuild3D();renderPlan();fit()}
+function afterLoad(){setTimeout(()=>{if(typeof markSaved==='function')markSaved()},0);migrate();snapSplash();snapAcc();sel=P.cabinets[0]?.id||null;selWall=null;save();renderList();renderEditor();renderTable();if(tab==='room')renderRoom();rebuild3D();renderPlan();fit();renderRoomTabs()}
 function loadProject(txt){try{const o=JSON.parse(txt);if(!o.cabinets||!o.materials||!o.room)throw 0;P=o;afterLoad();$('#ovProj').hidden=true;toast('Проектът е зареден')}
   catch(e){toast('Текстът не е проект от тази програма')}}
 $('#pjLoad').onclick=()=>{projFH=null;curSet(null);loadProject($('#pjText').value)};
