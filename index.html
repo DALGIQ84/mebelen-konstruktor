@@ -160,7 +160,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 12:30 · Гардероб: общата врата — с фугата на вратите</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 12:45 · Изтрита витрина — изчезва и стъклото</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -811,6 +811,9 @@ function applyPOv(k,r){partKeys(r.parts);carryPOv(k,r.parts);const ov=k.pOv||{},
     out.push(p)}
   for(let i=out.length-1;i>=0;i--){const p=out[i],f=p._cOf;if(!f)continue;if(!out.includes(f)){out.splice(i,1);continue}if(f.hidden)p.hidden=true;
     if(f.box0){const b=p.box.slice();for(let j=0;j<6;j++){if(j===4&&p._noZ0)continue;b[j]+=f.box[j]-f.box0[j]}p.box=b;p.ov=true}}
+  {const gone=q=>!out.includes(q)||q.hidden; // витрина: изтриеш ли профилите ѝ — изчезва и стъклото
+    for(const g of r.parts.filter(q=>/^Витрина — стъкло/.test(q.name)&&out.includes(q)&&!q.hidden)){const b=g.box,al=r.parts.filter(q=>q.kind==='alu'&&/^Витрина — ал\. профил/.test(q.name)&&q.box0?.length!==-1&&(q.box0||q.box)[0]<b[1]+60&&(q.box0||q.box)[1]>b[0]-60&&(q.box0||q.box)[4]<b[5]+60&&(q.box0||q.box)[5]>b[4]-60);
+      if(al.length&&al.every(gone)){if(k._showHidden)g.hidden=true;else out.splice(out.indexOf(g),1)}}}
   if(k.type==='bed'){const fr=out.find(q=>q.bFront&&!q.hidden),all=r.parts;if(fr){const tf=fr.bTf||18; // махнеш ли страница — челото не стърчи от тази страна (и е право там)
     for(const sd of['L','R']){const s0=all.find(q=>q.bSide===sd);if(!s0||(out.includes(s0)&&!s0.hidden))continue;const b=fr.box.slice();
       if(sd==='L'){b[0]+=tf;if(fr.pl)fr.pl=fr.pl.map(([x,y])=>[Math.max(x,b[0]),y])}else{b[1]-=tf;if(fr.pl)fr.pl=fr.pl.map(([x,y])=>[Math.min(x,b[1]),y])}
