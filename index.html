@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 00:05 · Умен рафт: размери на ръка</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 00:15 · 2 части: таванът на долната е умният рафт</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -810,13 +810,14 @@ function carryPOv(k,parts){const old=PK.get(k),ov=k.pOv;const cur=new Map();for(
 const splitLate=k=>k.type==='doors'&&!!k.open&&+k.split>0&&(k.pAdd||[]).some(a=>a.smart===true&&!a.hd&&!a.virt); /* етажерка от 2 части и рафтове от „Детайли“ — разделя се след тях */
 function splitPost(k,r){const parts=r.parts,T=+mat(k.mc).t||18,sh=parts.filter(p=>p.name==='Рафт'&&!p.hidden&&p.box),lv=[...new Set(sh.map(p=>p.box[4]))].sort((a,b)=>a-b),zS0=lv[(k.split|0)-1];if(zS0==null)return;
   const zS=Math.floor(zS0),me=sh.find(p=>p.box[4]===zS0),bt=parts.find(p=>/^Дъно/.test(p.name)&&p.box),out=[];
-  for(const p of parts){const[x0,x1,y0,y1,z0,z1]=p.box||[];if(p.name==='Рафт'&&p.box&&p.box[4]===zS0)continue;
+  for(const p of parts){const[x0,x1,y0,y1,z0,z1]=p.box||[];if(p===me)continue;
     if(p.box&&!p.hidden&&(p.name==='Страница'||p.name==='Делител'||p.name==='Гръб'||/^Страница \((лява|дясна)\)$/.test(p.name))&&z0<zS&&z1>zS+T){const fem=/^Страница/.test(p.name),lo=fem?zS+T:zS,e=fem?[1,0,1,1]:p.e,b=p.name.replace(/ \(.*\)$/,''),sfx=p.name.slice(b.length);
       out.push({...p,e,name:b+(fem?' долна':' долен')+sfx,L:r1(lo-z0),box:[x0,x1,y0,y1,z0,lo],key:p.key+'·д'});
       out.push({...p,e:[...e],name:b+(fem?' горна':' горен')+sfx,L:r1(z1-(zS+T)),box:[x0,x1,y0,y1,zS+T,z1],key:p.key+'·г'});continue}
     out.push(p)}
   const x0=me.box[0],x1=me.box[1],Dk=bt?bt.box[3]:me.box[3];
-  out.push({name:'Таван долна част',L:r1(x1-x0),Wd:r1(Dk),t:T,m:k.mc,e:[1,0,0,0],box:[x0,x1,0,Dk,zS,zS+T],key:'Таван долна част#1'});
+  out.push(me.added?{...me,name:'Таван долна част',L:r1(x1-x0),Wd:r1(Dk),t:T,e:[1,0,0,0],box:[x0,x1,0,Dk,zS,zS+T]} /* рафтът от „Детайли“ става таван на долната част — остава умен (светло отдолу/отгоре) */
+    :{name:'Таван долна част',L:r1(x1-x0),Wd:r1(Dk),t:T,m:k.mc,e:[1,0,0,0],box:[x0,x1,0,Dk,zS,zS+T],key:'Таван долна част#1'});
   parts.length=0;parts.push(...out);(r.warn=r.warn||[]).push(`Етажерката е от 2 части: долна до ${Math.round(zS+T)} мм от пода, горна — без дъно, стъпва на нея.`)}
 function ovOne(k,p,o){p.box0=[...p.box];if(o.hide){if(!k._showHidden)return false;p.hidden=true} /* промяна от „Детайли“ върху един детайл */
       if(+o.dL||+o.dW){const[aL,aW]=partAxes(p),grow=(ax,d)=>{const c=(p.box[2*ax]+p.box[2*ax+1])/2;p.box[2*ax+1]+=d;if(p.pl&&ax<2)p.pl=p.pl.map(v=>{const w=[...v];if(w[ax]>c)w[ax]+=d;return w})}; /* и детайлите с форма (скосени под 45°) — крайните точки отзад се местят */
