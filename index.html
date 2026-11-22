@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 01:30 · Наклонен рафт</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 01:40 · Рафт без страница — до гърба</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -991,9 +991,10 @@ function smartShelf(k,ps,a,p){ // „умен“ рафт: даваш светл
     if(c){const d0=ps.find(q=>q.kind==='door'&&!q.pl&&!q.added),JJ=pedJoints(c,d0?d0.box[2]:Math.min(c.L.box[3],c.R.box[3])+P.settings.doorGap);zq=JJ.b+a.eq[0]*(JJ.t-JJ.b)/(a.eq[1]+1)-(a.virt?0:+mat(a.m).t)/2}}
   if(zq==null&&a.anc==='t'){const ps2=ps.filter(q=>q!==p&&!(a.eg&&q.added&&((k.pAdd||[])[parseInt(q.key.split('#')[1])]||{}).eg===a.eg)),ab=(a.atk&&ps2.find(q=>q.key===a.atk&&!q.hidden))||pedAbove(ps2,p,+a.cx,+a.cz);if(ab)zq=ab.box[4]-(+a.off||0)-(a.virt?0:+mat(a.m).t)} // светло отгоре — от детайла над него
   const S=P.settings,cl=a.hd?0:S.shelfClear,t=a.virt?0:+mat(a.m).t,z=zq!=null?zq:rq?rq.box[5]+(+a.gap||0):+a.z||0,cx=a.cx!=null?+a.cx:+k.W/2,live=ps.filter(q=>!q.hidden&&q!==p&&q.kind!=='door'&&q.kind!=='hw'&&q.kind!=='appl'&&!q.pl);
-  const vert=live.filter(q=>{const b=q.box;return b[1]-b[0]<=40&&b[3]-b[2]>=80&&b[4]<=z+1&&b[5]>=z+t-1});
+  const vert=live.filter(q=>{const b=q.box;return q.kind!=='alu'&&q.kind!=='glass'&&b[1]-b[0]<=40&&b[3]-b[2]>=80&&b[4]<=z+1&&b[5]>=z+t-1});
   const L=vert.filter(q=>(q.box[0]+q.box[1])/2<cx).sort((u,v)=>v.box[1]-u.box[1])[0],Rr=vert.filter(q=>(q.box[0]+q.box[1])/2>cx).sort((u,v)=>u.box[0]-v.box[0])[0];
-  const x0=L?L.box[1]+cl:0,x1=Rr?Rr.box[0]-cl:+k.W,yf=Math.min(L?L.box[3]:1e9,Rr?Rr.box[3]:1e9),yF=(yf<1e8?yf:+k.D)-(a.hd?0:S.shelfFront); // хоризонтален делител — до лицето, без светло отстрани
+  const bkZ=live.filter(q=>q.kind==='back'&&q.box[4]<=z+1&&q.box[5]>=z+t-1),bxL=bkZ.length?Math.min(...bkZ.map(q=>q.box[0])):0,bxR=bkZ.length?Math.max(...bkZ.map(q=>q.box[1])):+k.W; /* няма страница (опира в стена) — краят е до гърба */
+  const x0=L?L.box[1]+cl:bxL,x1=Rr?Rr.box[0]-cl:bxR,yf=Math.min(L?L.box[3]:1e9,Rr?Rr.box[3]:1e9),yF=(yf<1e8?yf:+k.D)-(a.hd?0:S.shelfFront); // хоризонтален делител — до лицето, без светло отстрани
   const bk=live.filter(q=>q.kind==='back'&&q.box[3]>0.5&&q.box[3]<yF-50&&q.box[0]<x1&&q.box[1]>x0&&q.box[4]<=z&&q.box[5]>=z+t).reduce((m,q)=>Math.max(m,q.box[3]),0);
   const xE=+a.oL>0?Math.min(x1,x0+ +a.oL):x1,yB=+a.oW>0?Math.max(bk,yF- +a.oW):bk; /* размер, даден на ръка в „Детайли“ — дължината от лявата страница, дълбочината от лицето назад */
   p.box=[x0,xE,yB,yF,z,z+t];p.L=r1(xE-x0);p.Wd=r1(yF-yB);p.smart=true;if(+a.oL>0||+a.oW>0)p.autoLW=[r1(x1-x0),r1(yF-bk)];if(a.virt){p.kind='virt';p.t=0}
