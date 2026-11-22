@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 02:00 · Умен рафт: по-дълбок до лицето</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 02:15 · 2 части: тавани вътрешни пред гърба</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -830,6 +830,12 @@ function tiltPost(k,parts){ /* наклонен рафт (и преместен 
     const us=poly.map(q=>q[0]),zs=poly.map(q=>q[1]),u0=Math.min(...us),u1=Math.max(...us),z0=Math.min(...zs),z1=Math.max(...zs),pr=poly.map(q=>q[0]*dc+q[1]*ds),len=Math.max(...pr)-Math.min(...pr);
     if(SV){p.box=[b[0]+(a&&a.smart?sx:0),b[1]+(a&&a.smart?sx:0),u0,u1,z0,z1];p.Wd=r1(len)}else{p.box=[u0,u1,b[2]+sy,b[3]+sy,z0,z1];p.L=r1(len)}
     if(th){if(SV)p.sp=poly;else p.fp=poly;p.tilt=th;if(!/наклон/.test(p.name))p.name+=` (наклон ${th}°)`}p.ov=true}}
+function splitBackFix(k,parts){ /* етажерка от 2 части: таванът на долната и таванът горе — вътрешни, пред гърба (дъно 400×400 → тавани 382×382); гърбът е до горе на всяка част */
+  const tl=parts.find(p=>p.name==='Таван долна част'&&p.box);if(!tl)return;const lo=parts.filter(p=>p.box&&/^Гръб долен/.test(p.name)),hi=parts.filter(p=>p.box&&/^Гръб горен/.test(p.name));if(!lo.length&&!hi.length)return;
+  const bY=Math.max(...[...lo,...hi].map(q=>q.box[3])),y0s=Math.min(...[...lo,...hi].map(q=>q.box[2]));if(y0s>1)return; /* гърбът е отзад между страниците */
+  const fit=(p,a,b)=>{p.box=p.box.slice();p.box[4]=a;p.box[5]=b;p.L=r1(b-a)},dep=p=>{const b=p.box,D=b[3];p.box=b.slice();p.box[2]=bY;p.Wd=r1(D-bY)};
+  dep(tl);for(const g of lo)fit(g,g.box[4],tl.box[5]);for(const g of hi)fit(g,tl.box[5],g.box[5]);
+  const tp=parts.find(p=>p.name==='Таван'&&p.box&&!p.added);if(tp&&tp.box[2]<bY-0.5){dep(tp);for(const g of hi)if(g.box[5]<tp.box[5])fit(g,g.box[4],tp.box[5])}}
 function vitGroups(parts){ /* витрините — профилите (рамка под 45°) и стъклото на една врата са една група */
   const G=new Map(),fr=parts.filter(p=>p.kind==='alu'&&p.fr);
   for(const p of fr){const gid=p.vitOf||'В'+Math.round(p.fr.x0)+'_'+Math.round(p.fr.z0)+(p.fr.ax||'');if(!G.has(gid))G.set(gid,{gid,fr:{...p.fr},ps:[]});G.get(gid).ps.push(p)}
@@ -874,7 +880,7 @@ function applyPOv(k,r){for(const a of k.pAdd||[])if(!a.mOwn&&a.smart&&a.smart!==
   for(const p of out){if(!p.key||!/[↓↑]/.test(p.key))continue;const o=ov[p.key];if(!o)continue; // частите на разделена врата (над/под чекмеджета) — също се трият и сменят от „Детайли“
     if(o.hide){if(k._showHidden)p.hidden=true;else p._kill=true}if(o.m){p.m=o.m;p.t=+mat(o.m).t}if(o.e)p.e=[...o.e];if(o.name)p.name=o.name;p.ov=true}
   {const mo=k.matOv||{};for(const p of out)if((p.added||p.grp!=null)&&p.m0===undefined){const id=(p.sd&&mo[p.name+'|'+p.sd])||mo[p.name];if(id&&id!==p.m&&P.materials.some(m=>m.id===id)){p.m0=p.m;p.m=id;p.t=+mat(id).t}}} // добавени в „Детайли“ (и групите врати/чекмеджета) — и те слушат материала от таблицата
-  r.parts=out.filter(q=>!q._kill);if(splitLate(k))splitPost(k,r);relink(k,r.parts);addVits(k,r.parts);addMirrors(k,r.parts);{const ov=k.pOv||{};r.parts=r.parts.filter(p=>p.ov||!p.key||!ov[p.key]||ovOne(k,p,ov[p.key]))}tiltPost(k,r.parts);vitGrpOv(k,r.parts);return r} // и детайлите, които се правят накрая (витрина, огледало, етажерка от 2 части) — и те се редактират
+  r.parts=out.filter(q=>!q._kill);if(splitLate(k))splitPost(k,r);relink(k,r.parts);addVits(k,r.parts);addMirrors(k,r.parts);{const ov=k.pOv||{};r.parts=r.parts.filter(p=>p.ov||!p.key||!ov[p.key]||ovOne(k,p,ov[p.key]))}splitBackFix(k,r.parts);tiltPost(k,r.parts);vitGrpOv(k,r.parts);return r} // и детайлите, които се правят накрая (витрина, огледало, етажерка от 2 части) — и те се редактират
 const isVitDoor=(k,d)=>d.kind==='door'&&!d.hidden&&!d.pl&&!d.fp&&/^([АБ] )?Врата/.test(d.name)&&d.box[5]-d.box[4]>40&&k.wDoor!=='slide'&&!/плъзг/i.test(d.name); // само отваряемите врати
 function addVits(k,parts){ /* ал. витрина на избрана врата (гардероби и кухни) — рамка от профила под 45° + стъкло; цвят на профила и стъклото — за всяка поотделно */
   const V=k.vit||{};if(!Object.keys(V).length)return;const S=P.settings,fu=+S.fuga||3,aF=+(S.alFuga??S.fuga)||3,aw=+(S.alW??42),gd=+(S.glassDed??7),aT=+(S.alT??25);
