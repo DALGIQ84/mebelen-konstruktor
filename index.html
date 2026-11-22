@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 00:15 · 2 части: таванът на долната е умният рафт</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 00:25 · Врата отстрани: новите рафтове не я намаляват</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -892,7 +892,7 @@ function pedSideCell(k,ps,side,y,z){ /* секция, гледана отстр�
   const car=lv.filter(q=>q.kind!=='back'),y0=Math.max(0,Math.min(...car.map(q=>q.box[2]))),y1=Math.max(...car.map(q=>q.box[3]));
   return{side,xs,y0,y1,z0:B.box[5],z1:T.box[4],B,T,outB:B.box[4]<=zmin+1,outT:T.box[5]>=zmax-1}}
 function smartSideDoor(k,out,a,i){ /* врата отстрани — на мястото на страницата (изтрита), покрива секцията */
-  const r=pedSideCell(k,out,a.side,+a.cy,+a.cz);if(!r){a._warn='секцията не е намерена';return}delete a._warn;const S=P.settings,fu=+(S.drFuga??5),m=a.m||k.mf,tF=+mat(m).t||18,n=Math.max(1,Math.min(4,a.n|0));
+  const r=pedSideCell(k,out.filter(q=>!(q.added&&q.key&&/^\+#\d+/.test(q.key)&&parseInt(q.key.slice(2))>i)),a.side,+a.cy,+a.cz);if(!r){a._warn='секцията не е намерена';return}delete a._warn;const S=P.settings,fu=+(S.drFuga??5),m=a.m||k.mf,tF=+mat(m).t||18,n=Math.max(1,Math.min(4,a.n|0));
   const zA=(r.outB?r.B.box[4]:(r.B.box[4]+r.B.box[5])/2)+fu/2,zB=+a.L>0?zA+ +a.L:(r.outT?r.T.box[5]:(r.T.box[4]+r.T.box[5])/2)-fu/2,yB=r.y1,wd=+a.Wd>0?+a.Wd:(yB-r.y0-(n-1)*fu)/n,yA=yB-n*wd-(n-1)*fu, /* размерите — и на ръка: височината от долния ръб нагоре, ширината от лицето назад */x0=a.side==='R'?r.xs:r.xs-tF;
   for(let j=0;j<n;j++){const ya=yA+j*(wd+fu),dx=+a.dx||0,dy=+a.dy||0,dz=+a.dz||0;out.push({name:'Врата отстрани',L:r1(zB-zA),Wd:r1(wd),t:tF,m,e:[1,1,1,1],box:[x0+dx,x0+tF+dx,ya+dy,ya+wd+dy,zA+dz,zB+dz],kind:'door',sdor:a.side,smart:true,added:true,grp:i,key:'+#'+i+(j?'~'+j:'')})}}
 function smartZig(k,out,a,i){ /* зиг-заг (наклонени) рафтове в секция: всеки цял от страница до страница, краищата под ъгъла; редуват се / \ / \ */
