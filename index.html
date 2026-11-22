@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 00:25 · Врата отстрани: новите рафтове не я намаляват</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 00:35 · Врата отстрани: рафтовете не я режат</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -887,7 +887,7 @@ function smartDoorGrp(k,out,a,i){ /* рафтовете зад нея не я р
 function pedSideCell(k,ps,side,y,z){ /* секция, гледана отстрани (отляво/отдясно) — между рафтовете/дъното/тавана при тази страна */
   const lv=ps.filter(q=>!q.hidden&&q.box&&!['door','alu','glass','hw','appl','virt'].includes(q.kind)&&!q.pl);if(!lv.length)return null;
   const xs=side==='R'?Math.max(...lv.map(q=>q.box[1])):Math.min(...lv.map(q=>q.box[0])),zmin=Math.min(...lv.map(q=>q.box[4])),zmax=Math.max(...lv.map(q=>q.box[5]));
-  const hor=lv.filter(q=>q.box[5]-q.box[4]<=40&&q.box[1]-q.box[0]>40&&(side==='R'?q.box[1]>=xs-60:q.box[0]<=xs+60));
+  const hor=lv.filter(q=>!(q.gsh||/^Рафт/.test(q.name)&&!/над чекмеджетата/.test(q.name)||q.name==='Стъклен рафт')&&q.box[5]-q.box[4]<=40&&q.box[1]-q.box[0]>40&&(side==='R'?q.box[1]>=xs-60:q.box[0]<=xs+60));
   const B=hor.filter(q=>(q.box[4]+q.box[5])/2<z).sort((u,w)=>w.box[5]-u.box[5])[0],T=hor.filter(q=>(q.box[4]+q.box[5])/2>z).sort((u,w)=>u.box[4]-w.box[4])[0];if(!B||!T)return null;
   const car=lv.filter(q=>q.kind!=='back'),y0=Math.max(0,Math.min(...car.map(q=>q.box[2]))),y1=Math.max(...car.map(q=>q.box[3]));
   return{side,xs,y0,y1,z0:B.box[5],z1:T.box[4],B,T,outB:B.box[4]<=zmin+1,outT:T.box[5]>=zmax-1}}
