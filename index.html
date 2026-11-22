@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.22 · 21:50 · Мивка: коритото е вдлъбнато в плота</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.22 · 22:00 · Гръб над плота — спира до колоната</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2519,9 +2519,12 @@ function addSplash(grp){ // гръб над всеки избран плот; в
     const other=P.cabinets.filter(q=>q.type==='top'&&q.wall!==t.wall);
     if(a0>0&&a0<=t.D+50&&other.some(o=>o.off+o.W>=wallInfo(o.wall).len-1||o.off<=1))a0=bt; // плотът опира в другия — гърбът продължава до ъгъла
     if(a1<wi.len&&a1>=wi.len-t.D-50&&other.some(o=>o.off<=1||o.off+o.W>=wallInfo(o.wall).len-1))a1=wi.len-bt;
-    const z0=+t.c+tt,p=cabDef({type:'splash',name:'Гръб кухня',W:Math.round(a1-a0),c:z0,H:z0+600,D:bt,mf:'plbs',wall:t.wall,off:a0,gap:0,plinth:false});
+    const z0=+t.c+tt;
+    for(const q of P.cabinets){if(q.wall!==t.wall||isAcc(q)||['top','splash','plinthRun','wpanel','wshelf','ubottom','filler','tfill'].includes(q.type))continue; /* колона / хладилник / висок шкаф — гърбът спира до него, не минава зад него */
+      if(!(+q.c<z0+590&&+q.H>z0+10))continue;const q0=+q.off,q1=q0+ +q.W;if(q1<=a0+1||q0>=a1-1)continue;if(q0>=+t.off+ +t.W-1)a1=Math.min(a1,q0);else if(q1<=+t.off+1)a0=Math.max(a0,q1)}
+    if(a1-a0<20)continue;const p=cabDef({type:'splash',name:'Гръб кухня',W:Math.round(a1-a0),c:z0,H:z0+600,D:bt,mf:'plbs',wall:t.wall,off:a0,gap:0,plinth:false});
     place(p);P.cabinets.push(p);made.push(p)}
-  sel=made[0].id;multiSel=new Set(made.map(p=>p.id));P.example=false;changed(true);toast(made.length>1?`${made.length} гърба`:`Гръб ${made[0].W} × 600 мм`)}
+  if(!made.length){changed(true);return}sel=made[0].id;multiSel=new Set(made.map(p=>p.id));P.example=false;changed(true);toast(made.length>1?`${made.length} гърба`:`Гръб ${made[0].W} × 600 мм`)}
 function addUBottom(grp){ // цяло дъно под избраните горни шкафове — по стена, до лицето на вратите
   const ok=grp.filter(q=>q.wall!==null&&q.upper&&!['ubottom','wpanel','wshelf'].includes(q.type));if(!ok.length){toast('Избери горни шкафове');return}pushUndo();const byW={},made=[];for(const q of ok)(byW[q.wall]=byW[q.wall]||[]).push(q);
   for(const w in byW){const g=byW[w],a0=Math.min(...g.map(q=>q.off)),a1=Math.max(...g.map(q=>q.off+q.W)),mf=g[0].mf,t=+mat(mf).t||18,c=Math.min(...g.map(q=>+q.c)),D=Math.round(Math.max(...g.map(q=>build(q).Dk))); /* до корпуса — вратите са пред него */ /* цялото дъно е на мястото на дъната — корпусите се вдигат с 20 мм */
