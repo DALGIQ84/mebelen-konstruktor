@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.22 · 19:05 · Фото: правилните цветове на всеки детайл</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.22 · 21:05 · Стаи: всеки декор в 3D си е свой (не се бърка с друга стая)</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2141,14 +2141,15 @@ const cssVar=n=>getComputedStyle(document.documentElement).getPropertyValue(n).t
 function isDark(){const t=document.documentElement.dataset.theme;return t==='dark'||(t!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches)}
 function themeScene(){scene.background=new THREE.Color(cssVar('--stage')||'#dfe4e7');rebuild3D();renderPlan()}
 const matCache={},texCache={};
-function texFor(m){if(!m.tex)return null;const key=m.id+':'+m.tex.length+':'+m.tex.slice(-24);
+const TXH=new Map();function texKey(m){const t=m.tex;let h=TXH.get(t);if(h==null){h=5381;for(let i=0;i<t.length;i+=7)h=((h<<5)+h+t.charCodeAt(i))|0;h=t.length+'.'+(h>>>0).toString(36);if(TXH.size>200)TXH.clear();TXH.set(t,h)}return m.id+':'+h} // ключ по цялата снимка — два декора с еднаква дължина на файла не се бъркат
+function texFor(m){if(!m.tex)return null;const key=texKey(m);
   if(!texCache[key]){const t=new THREE.TextureLoader().load(m.tex,tt=>{if(!m.texAvg){m.texAvg=avgColor(tt.image);save();rebuild3D()}});t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=4;texCache[key]=t}return texCache[key]}
 function grainOf(src){ /* в коя посока са ивиците на снимката: 'h' легнали, 'v' изправени (по разликите между съседни пиксели) */
   try{const c=document.createElement('canvas'),n=96;c.width=c.height=n;const g=c.getContext('2d');g.drawImage(src,0,0,n,n);const d=g.getImageData(0,0,n,n).data,Y=i=>d[i]*.3+d[i+1]*.59+d[i+2]*.11;let dx=0,dy=0;
     for(let y=0;y<n-1;y++)for(let x=0;x<n-1;x++){const i=(y*n+x)*4;dx+=Math.abs(Y(i)-Y(i+4));dy+=Math.abs(Y(i)-Y(i+n*4))}return dy>dx*1.08?'h':dx>dy*1.08?'v':null}catch(e){return null}}
 function avgColor(img){try{const c=document.createElement('canvas');c.width=c.height=1;const g=c.getContext('2d');g.drawImage(img,0,0,1,1);const d=g.getImageData(0,0,1,1).data;
   return '#'+[d[0],d[1],d[2]].map(v=>v.toString(16).padStart(2,'0')).join('')}catch(e){return null}}
-function texMat(m,op){const t=texFor(m),key='tex:'+m.id+':'+m.tex.length+op;
+function texMat(m,op){const t=texFor(m),key='tex:'+texKey(m)+':'+op;
   return matCache[key]||(matCache[key]=new THREE.MeshStandardMaterial({map:t,color:0xffffff,roughness:.8,metalness:0,transparent:op<1,opacity:op}))}
 // UV в реален мащаб; шарката следва първия размер на детайла (L)
 function realUV(geo,sx,sy,sz,L,m){
