@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.22 · 21:05 · Стаи: всеки декор в 3D си е свой (не се бърка с друга стая)</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.22 · 21:50 · Мивка: коритото е вдлъбнато в плота</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2221,7 +2221,7 @@ function rebuild3D(){
     if(isoCab?k.id!==isoCab:onlySel&&k.id!==sel)continue;
     const g=new THREE.Group();g.position.set(k.x*M,0,k.y*M);g.rotation.y=-k.rot*Math.PI/180;
     if(isAcc(k)){accModel(g,k,M,isSel(k.id)?selCol:null);world.add(g);continue}
-    for(const p of build(k).parts){if(p.hid3d)continue;
+    for(const p of topHoles(k,build(k).parts)){if(p.hid3d)continue;
       if(p.kind==='appl'){applFront(g,p,M,k.id);continue}
       if((!showDoors||(k.hideD&&!noHideD))&&(p.kind==='door'||p.kind==='alu'||p.kind==='glass')&&!p.gsh)continue; // скрити врати — само за картинката
       const [x0,x1,y0,y1,z0,z1]=p.box;
@@ -2306,19 +2306,27 @@ function decoModel(g,k,W,D,z0,H,B,cyl,body,dark,glass,ring,mid){ // декора
   else if(t==='bread'){B(W,H*0.55,D,cx,z0+H*0.275,cz,col('#b88a56'));const c=new THREE.Mesh(new THREE.CylinderGeometry(D/2,D/2,W,24,1,false,0,Math.PI),col('#a07445'));c.rotation.z=Math.PI/2;c.position.set(cx,z0+H*0.55,cz);g.add(c)}
   else B(W,H,D,cx,z0+H/2,cz,body);
 }
+function sinkBowls(k){const W=+k.W,D=+k.D,nb=+k.bowls===2?2:1,drain=+k.bowls===3,bw=drain?W*0.52:(W-60*(nb+1))/nb,bd=D-100,cz=D/2+20,out=[]; /* коритата на мивката (мм, от левия заден ъгъл) */
+  for(let i=0;i<(drain?1:nb);i++){const x0=drain?40:30+i*(bw+30);out.push({x0,x1:x0+bw,y0:cz-bd/2,y1:cz+bd/2})}return out}
+function topHoles(k,parts){if(k.wall==null||isAcc(k))return parts;const isT=k.type==='top',sinks=P.cabinets.filter(q=>q.type==='acc'&&q.acc==='sink'&&q.wall===k.wall&&+q.off<+k.off+ +k.W&&+q.off+ +q.W>+k.off&&(isT?Math.abs((+q.c)-(+k.H))<8:+q.c-200<+k.H&&+q.c>=+k.H-5));if(!sinks.length)return parts; /* отвор в плота под коритото, а в шкафа под мивката коритото минава през блендите — само в 3D */
+  let out=[...parts];for(const s of sinks)for(const b of sinkBowls(s)){const hx0=+s.off-+k.off+b.x0,hx1=+s.off-+k.off+b.x1,hy0=(+s.gap||0)-(+k.gap||0)+b.y0,hy1=(+s.gap||0)-(+k.gap||0)+b.y1,nx=[];
+    for(const p of out){const[x0,x1,y0,y1,z0,z1]=p.box,zb=+s.c-190;if((isT&&p.kind==='hw')||p.kind==='door'||p.kind==='appl'||p.gp||p.pl||hx1<=x0||hx0>=x1||hy1<=y0||hy0>=y1||!isT&&z1<=zb){nx.push(p);continue}const zc=!isT&&z0<zb?zb:z0,cp=b=>{const q={...p,box:b,key:p.key+'~'};delete q.notch;delete q.fp;delete q.cut;delete q.sp;delete q.sd;delete q.gp;return q};if(zc>z0)nx.push(cp([x0,x1,y0,y1,z0,zc]));const pc=(a,b2,c,d)=>{if(b2-a>0.5&&d-c>0.5)nx.push(cp([a,b2,c,d,zc,z1]))};
+      pc(x0,hx0,y0,y1);pc(hx1,x1,y0,y1);pc(Math.max(x0,hx0),Math.min(x1,hx1),y0,Math.max(y0,hy0));pc(Math.max(x0,hx0),Math.min(x1,hx1),Math.min(y1,hy1),y1)}out=nx}return out}
 function accModel(g,k,M,hl){ // проста, но разпознаваема форма на уреда; локално: x = ширина, y = височина, z = от стената към лицето
   const W=+k.W*M,D=+k.D*M,z0=+k.c*M,Hh=(+k.H-k.c)*M,col=(ACOL[k.acol]||ACOL.white)[1],inox=k.acol==='inox',blk=k.acol==='black';
   const body=accMat(col,inox?.35:.45,inox?.35:0),dark=accMat('#1d2124',.25,0),mid=accMat('#7d868b',.4,.3),glass=accMat('#14181b',.12,0),ring=accMat('#9aa3a8',.3,.5);
   const B=(w,h,d,x,y,z,m)=>boxAt(g,w,h,d,x,y,z,m);
   const cyl=(r,h,x,y,z,m,ax)=>{const c=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,40),m);if(ax==='z')c.rotation.x=Math.PI/2;c.position.set(x,y,z);g.add(c);return c};
   const t=k.acc;
-  if(t==='sink'){const rim=0.012,dep=0.18,y=z0;
-    B(W,rim,D,W/2,y+rim/2,D/2,accMat(inox?'#c4c9cc':col,.3,inox?.4:0));
-    const nb=+k.bowls===2?2:1,drain=+k.bowls===3,bw=drain?W*0.52:(W-0.06*(nb+1))/nb,bd=D-0.1;
-    for(let i=0;i<nb;i++){const x=drain?0.04+bw/2:0.03+bw/2+i*(bw+0.03);
-      B(bw,0.004,bd,x,y+rim+0.001,D/2+0.02,accMat('#5d6569',.35,.3));cyl(0.022,0.003,x,y+rim+0.004,D/2+0.02,dark)}
-    if(drain)for(let i=0;i<7;i++)B(0.004,0.002,bd*0.8,W*0.6+i*W*0.05,y+rim+0.002,D/2+0.02,accMat('#9aa1a5',.35,.3));
-    const fx=drain?0.04+bw/2:W/2;cyl(0.018,0.28,fx,y+rim+0.14,0.06,ring);const sp=B(0.024,0.024,0.2,fx,y+rim+0.27,0.15,ring);}
+  if(t==='sink'){const rim=0.012,dep=0.18,y=z0,rm=accMat(inox?'#c4c9cc':col,.3,inox?.4:0),inn=accMat('#5d6569',.35,.3); /* коритото е вдлъбнато — под плота */
+    const R=sinkBowls(k).map(b=>({x0:b.x0/1000,x1:b.x1/1000,z0:b.y0/1000,z1:b.y1/1000}));
+    const zs=R[0].z0,ze=R[0].z1;B(W,rim,zs,W/2,y+rim/2,zs/2,rm);B(W,rim,D-ze,W/2,y+rim/2,(ze+D)/2,rm); // ръб отзад и отпред
+    let xa=0;for(const b of[...R].sort((a,c)=>a.x0-c.x0)){if(b.x0-xa>0.0005)B(b.x0-xa,rim,ze-zs,(xa+b.x0)/2,y+rim/2,(zs+ze)/2,rm);xa=b.x1}if(W-xa>0.0005)B(W-xa,rim,ze-zs,(xa+W)/2,y+rim/2,(zs+ze)/2,rm);
+    for(const b of R){const bw=b.x1-b.x0,bd=b.z1-b.z0,cx=(b.x0+b.x1)/2,cz=(b.z0+b.z1)/2,wt=0.003,h=dep+rim;
+      B(bw,0.004,bd,cx,y-dep,cz,inn);B(bw,h,wt,cx,y+rim-h/2,b.z0+wt/2,inn);B(bw,h,wt,cx,y+rim-h/2,b.z1-wt/2,inn);B(wt,h,bd,b.x0+wt/2,y+rim-h/2,cz,inn);B(wt,h,bd,b.x1-wt/2,y+rim-h/2,cz,inn);
+      cyl(0.022,0.003,cx,y-dep+0.003,cz,dark)}
+    const drain=+k.bowls===3,bd0=ze-zs;if(drain)for(let i=0;i<7;i++)B(0.004,0.002,bd0*0.8,W*0.6+i*W*0.05,y+rim+0.002,(zs+ze)/2,accMat('#9aa1a5',.35,.3));
+    const fx=drain?(R[0].x0+R[0].x1)/2:W/2;cyl(0.018,0.28,fx,y+rim+0.14,0.06,ring);const sp=B(0.024,0.024,0.2,fx,y+rim+0.27,0.15,ring);}
   else if(t==='hob'&&+k.zones===22){const th=Math.max(0.004,Hh),gp=0.01,hw=(W-gp)/2; // двоен: два котлона домино с фуга
     for(const x0 of[0,hw+gp]){B(hw,th,D,x0+hw/2,z0+th/2,D/2,glass);
       for(const[b,r]of[[.3,.085],[.72,.1]]){const m=new THREE.Mesh(new THREE.RingGeometry(r*0.92,r,48),accMat('#6f777b',.4,0));m.rotation.x=-Math.PI/2;m.position.set(x0+hw/2,z0+th+0.001,D*b);g.add(m)}
