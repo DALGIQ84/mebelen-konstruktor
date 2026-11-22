@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 03:00 · Наклонени рафтове един в друг, шарка</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 03:10 · Витрина: ширината от средата</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -850,20 +850,20 @@ function lateFin(k,parts){ /* детайлите от „Детайли“ и н
   const ov=k.edgeOv||{};for(const p of parts){const q=(p.sd&&ov[p.name+'|'+p.sd])||ov[p.name];if(q)p.e=[...q]}}
 function vitGroups(parts){ /* витрините — профилите (рамка под 45°) и стъклото на една врата са една група */
   const G=new Map(),fr=parts.filter(p=>p.kind==='alu'&&p.fr);
-  for(const p of fr){const gid=p.vitOf||'В'+Math.round(p.fr.x0)+'_'+Math.round(p.fr.z0)+(p.fr.ax||'');if(!G.has(gid))G.set(gid,{gid,fr:{...p.fr},ps:[]});G.get(gid).ps.push(p)}
+  for(const p of fr){const gid=p.vg||p.vitOf||'В'+Math.round(p.fr.x0)+'_'+Math.round(p.fr.z0)+(p.fr.ax||'');if(!G.has(gid))G.set(gid,{gid,fr:{...p.fr},ps:[]});G.get(gid).ps.push(p)}
   for(const p of parts){if(p.kind!=='glass'||!/^Витрина — стъкло/.test(p.name)||!p.box)continue;const b=p.box;let g=p.vitOf&&G.get(p.vitOf);
     if(!g)for(const q of G.values()){const f=q.fr,u=f.ax==='x'?(b[2]+b[3])/2:(b[0]+b[1])/2,z=(b[4]+b[5])/2;if(u>f.x0&&u<f.x1&&z>f.z0&&z<f.z1){g=q;break}}if(g)g.ps.push(p)}
   return[...G.values()]}
 function vitGrpOv(k,parts){ /* размер и място на цялата витрина от „Детайли“ — рамката и стъклото се правят наново */
   const V=k.vitOv||{},gd=+(P.settings.glassDed??7);for(const g of vitGroups(parts)){for(const p of g.ps)p.vg=g.gid;const o=V[g.gid];if(!o)continue;
-    const f=g.fr,aw=f.aw,SX=f.ax==='x',uS=SX?+o.dy||0:+o.dx||0,u1=SX?f.x1+uS:+o.W>0?f.x0+uS+ +o.W:f.x1+uS,u0=SX?(+o.W>0?u1- +o.W:f.x0+uS):f.x0+uS,z0=f.z0+(+o.dz||0),z1=+o.L>0?z0+ +o.L:z0+(f.z1-f.z0),dt=SX?+o.dx||0:+o.dy||0,dw=u1-u0,dh=z1-z0;
+    const f=g.fr,aw=f.aw,SX=f.ax==='x',uS=SX?+o.dy||0:+o.dx||0,um=(f.x0+f.x1)/2+uS,u1=SX?f.x1+uS:+o.W>0?um+ +o.W/2:f.x1+uS,u0=SX?(+o.W>0?u1- +o.W:f.x0+uS):+o.W>0?um- +o.W/2:f.x0+uS,z0=f.z0+(+o.dz||0),z1=+o.L>0?z0+ +o.L:z0+(f.z1-f.z0),dt=SX?+o.dx||0:+o.dy||0,dw=u1-u0,dh=z1-z0;
     const put=(p,ua,ub,za,zb)=>{const b=p.box.slice();if(SX){b[2]=ua;b[3]=ub;b[0]+=dt;b[1]+=dt}else{b[0]=ua;b[1]=ub;b[2]+=dt;b[3]+=dt}b[4]=za;b[5]=zb;p.box=b;p.ov=true};
     for(const p of g.ps){if(p.fr){const sd=p.fr.sd;p.fr={...p.fr,x0:u0,x1:u1,z0,z1};if(sd==='L')put(p,u0,u0+aw,z0,z1);else if(sd==='R')put(p,u1-aw,u1,z0,z1);else if(sd==='B')put(p,u0,u1,z0,z0+aw);else put(p,u0,u1,z1-aw,z1);p.L=r1(sd==='L'||sd==='R'?dh:dw)}
       else{put(p,u0+aw,u1-aw,z0+aw,z1-aw);p.L=r1(dh-gd);p.Wd=r1(dw-gd)}}}}
 function vitGrpForm(k,p){const g=vitGroups(pedParts(k)).find(q=>q.gid===p.vg);if(!g)return '';const o=(k.vitOv||{})[p.vg]||{},f=g.fr,c=(l,n,v)=>`<label style="display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--muted)">${l}<input class="f" type="number" data-vg="${n}" value="${v}" style="font-family:var(--f-mono)"></label>`;
   return `<div style="padding:10px 12px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><div style="grid-column:1/-1;font-size:12.5px"><b>Витрина — цялата врата</b> <span style="color:var(--muted);font-size:11.5px">(профилите и стъклото се правят наново)</span></div>
     ${c('Височина, мм','L',r1(f.z1-f.z0))}${c('Ширина, мм','W',r1(f.x1-f.x0))}<div></div><div style="grid-column:1/-1;font-size:11.5px;color:var(--muted)">Премести, мм (+/−)</div>${c('→ надясно','dx',+o.dx||0)}${c('↗ напред','dy',+o.dy||0)}${c('↑ нагоре','dz',+o.dz||0)}
-    <div style="grid-column:1/-1;font-size:11.5px;color:var(--muted)">Височината се мени от долния ръб нагоре, ширината — ${f.ax?'от лицето назад':'от левия край надясно'}.</div>
+    <div style="grid-column:1/-1;font-size:11.5px;color:var(--muted)">Височината се мени от долния ръб нагоре, ширината — ${f.ax?'от лицето назад':'еднакво от двете страни (от средата)'}.</div>
     <div style="grid-column:1/-1"><button class="btn sm" data-vgr="1" ${Object.keys(o).length?'':'disabled'}>↺ Върни витрината</button></div></div>`}
 function ovOne(k,p,o){p.box0=[...p.box];if(o.hide){if(!k._showHidden)return false;p.hidden=true} /* промяна от „Детайли“ върху един детайл */
       if(+o.dL||+o.dW){const[aL,aW]=partAxes(p),grow=(ax,d)=>{const c=(p.box[2*ax]+p.box[2*ax+1])/2;p.box[2*ax+1]+=d;if(p.pl&&ax<2)p.pl=p.pl.map(v=>{const w=[...v];if(w[ax]>c)w[ax]+=d;return w})}; /* и детайлите с форма (скосени под 45°) — крайните точки отзад се местят */
@@ -3930,7 +3930,8 @@ $('#ped').addEventListener('change',e=>{const k=cab(pedK),t=e.target;if(t.id==='
     if(ids.length===1){const i=ids[0];pedSel=(v.length?`Растер — летва ${i+1}.1`:`Растер — летва ${i+1}`)+'#1';pedMulti=new Set([pedSel])}else{pedSel=null;pedMulti=new Set()}P.example=false;changed(false);setTimeout(()=>{renderPed();rebuild3D()},0);return}
   if(k&&t.dataset.vg!=null){const p=pedParts(k).find(q=>q.key===pedSel);if(!p||!p.vg)return;pushUndo();const g=vitGroups(build({...k,vitOv:{...(k.vitOv||{}),[p.vg]:undefined}}).parts).find(q=>q.gid===p.vg),n=t.dataset.vg,v=+t.value||0;
     k.vitOv={...(k.vitOv||{})};const o={...(k.vitOv[p.vg]||{})};if(n==='L'||n==='W'){const base=g?(n==='L'?g.fr.z1-g.fr.z0:g.fr.x1-g.fr.x0):0;if(v>0&&Math.abs(v-base)>0.05)o[n]=v;else delete o[n]}else{if(v)o[n]=v;else delete o[n]}
-    if(Object.keys(o).length)k.vitOv[p.vg]=o;else delete k.vitOv[p.vg];P.example=false;changed(false);setTimeout(()=>{renderPed();rebuild3D()},0);return}
+    if(Object.keys(o).length)k.vitOv[p.vg]=o;else delete k.vitOv[p.vg];if(k.pOv){k.pOv={...k.pOv};for(const q of pedParts(k))if((q.vg===p.vg||q.vitOf&&q.vitOf===p.vg)&&k.pOv[q.key])delete k.pOv[q.key]} /* размерът на цялата витрина — старите поправки на отделни профили отпадат */
+    P.example=false;changed(false);setTimeout(()=>{renderPed();rebuild3D()},0);return}
   if(k&&t.dataset.vit!=null){pushUndo();const keys=pedMulti.size>1?[...pedMulti].map(x=>x.startsWith('Вит@')?x.slice(4).replace(/#\d+$/,''):x):[t.dataset.vit];for(const dk of keys)if((k.vit||{})[dk])k.vit={...k.vit,[dk]:{...k.vit[dk],[t.dataset.vk]:t.value}};P.example=false;changed(false);setTimeout(()=>{renderPed();rebuild3D()},0);return}
   if(k&&t.dataset.mir!=null){pushUndo();const keys=pedMulti.size>1?[...pedMulti].map(x=>x.startsWith('Огледало@')?x.slice(9):x):[t.dataset.mir];const v=Math.max(0,+t.value||0),sd=t.dataset.ms||'all';for(const dk of keys)if((k.mir||{})[dk]){const q={...k.mir[dk]};for(const n of['l','r','t','b'])q[n]=sd==='all'||sd===n?v:+(q[n]??q.o)||0;delete q.o;k.mir={...k.mir,[dk]:q}}P.example=false;changed(false);setTimeout(()=>{renderPed();rebuild3D()},0);return}
   if(k&&t.dataset.ub){pushUndo();k[t.dataset.ub]=t.dataset.ub==='ubAng'?clamp(+t.value||45,5,85):t.value;if(t.dataset.ub==='ubEdge'&&UB_PROF[t.value])k.ubCol=UB_PROF[t.value].col0||'black';P.example=false;changed(false);renderPed();rebuild3D();return}
