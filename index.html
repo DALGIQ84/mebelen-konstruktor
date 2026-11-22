@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 00:35 · Врата отстрани: рафтовете не я режат</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 00:45 · Витрина отстрани: профилът навън</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -850,7 +850,7 @@ const isVitDoor=(k,d)=>d.kind==='door'&&!d.hidden&&!d.pl&&!d.fp&&/^([АБ] )?В�
 function addVits(k,parts){ /* ал. витрина на избрана врата (гардероби и кухни) — рамка от профила под 45° + стъкло; цвят на профила и стъклото — за всяка поотделно */
   const V=k.vit||{};if(!Object.keys(V).length)return;const S=P.settings,fu=+S.fuga||3,aF=+(S.alFuga??S.fuga)||3,aw=+(S.alW??42),gd=+(S.glassDed??7),aT=+(S.alT??25);
   for(let i=parts.length-1;i>=0;i--){const d=parts[i];if(!isVitDoor(k,d)||!V[d.key])continue;const v=V[d.key],am=ALCOL[v.al]?'__alu'+v.al:'__alu10T',gc=GLCOL[v.gl]?v.gl:'clear',gm=mat(k.mGv||'gl4').glass?k.mGv||'gl4':'gl4';
-    const b=d.box,e=(fu-aF)/2,SD=d.sdor,x=SD?b[2]-e:b[0]-e,dw=SD?b[3]-b[2]+2*e:b[1]-b[0]+2*e,z0=b[4]-e,dh=b[5]-b[4]+2*e,tk=Math.max(5,aT-(+S.doorGap||0)),y0=SD==='R'?b[1]-tk:b[0],y1=SD==='R'?b[1]:SD?b[0]+tk:b[2]+tk,vT=y1-y0,fr=sd=>({x0:x,x1:x+dw,z0,z1:z0+dh,aw,sd,ax:SD?'x':undefined}),key=d.key,nw=[];
+    const b=d.box,e=(fu-aF)/2,SD=d.sdor,x=SD?b[2]-e:b[0]-e,dw=SD?b[3]-b[2]+2*e:b[1]-b[0]+2*e,z0=b[4]-e,dh=b[5]-b[4]+2*e,tk=Math.max(5,aT-(+S.doorGap||0)),y0=SD==='R'?b[0]:SD?b[1]-tk:b[2],y1=SD==='R'?b[0]+tk:SD?b[1]:b[2]+tk,vT=y1-y0,fr=sd=>({x0:x,x1:x+dw,z0,z1:z0+dh,aw,sd,ax:SD?'x':undefined}),key=d.key,nw=[];
     const SW=bx=>SD?[bx[2],bx[3],bx[0],bx[1],bx[4],bx[5]]:bx; /* врата отстрани — рамката е в равнината y–z */
     const A=(nm,L,W,m,bx,kind,extra)=>{nw.push({name:nm,L:r1(L),Wd:r1(W),t:+mat(m).t||20,m,e:[0,0,0,0],box:bx,kind,vitOf:key,key:'Вит@'+key+'#'+nw.length,...extra})};
     A('Витрина — ал. профил (верт.)',dh,aw,am,SW([x,x+aw,y0,y1,z0,z0+dh]),'alu',{fr:fr('L')});A('Витрина — ал. профил (верт.)',dh,aw,am,SW([x+dw-aw,x+dw,y0,y1,z0,z0+dh]),'alu',{fr:fr('R')});
