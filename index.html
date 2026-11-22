@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.22 · 18:40 · Лента с икони отляво</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.22 · 19:05 · Фото: правилните цветове на всеки детайл</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2366,6 +2366,8 @@ new ResizeObserver(resize).observe(canvas.parentElement);
 const halton=(i,b)=>{let f=1,r=0;while(i>0){f/=b;r+=f*(i%b);i=Math.floor(i/b)}return r};
 let ptLoad=null;const loadPT=()=>ptLoad||(ptLoad=new Promise((ok,no)=>{if(window.KPT)return ok();const sc=document.createElement('script');sc.src=(window.KP_PT||'libs/pt.js');sc.onload=()=>ok();sc.onerror=()=>{ptLoad=null;no(new Error('pt'))};document.head.appendChild(sc)}));
 let weakGpuV=null;function weakGPU(){if(weakGpuV!=null)return weakGpuV;try{const gl=renderer.getContext(),x=gl.getExtension('WEBGL_debug_renderer_info'),n=String(x?gl.getParameter(x.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER));weakGpuV=/Intel|HD Graphics|UHD|Iris|Mali|Adreno|PowerVR|SwiftShader|llvmpipe|Microsoft Basic/i.test(n)&&!/Arc/i.test(n)}catch(e){weakGpuV=false}return weakGpuV} // вградена видеокарта — фото HD по-леко
+function splitGroups(geo){const g=geo.index?geo.toNonIndexed():geo,out=[];const gr=g.groups.length?g.groups:[{start:0,count:g.attributes.position.count,materialIndex:0}];
+  for(const q of gr){const n=new THREE.BufferGeometry();for(const k in g.attributes){const a=g.attributes[k],sz=a.itemSize;n.setAttribute(k,new THREE.BufferAttribute(a.array.slice(q.start*sz,(q.start+q.count)*sz),sz,a.normalized))}out.push([n,q.materialIndex||0])}return out}
 async function photoHD(){ /* истински фото-рендер: лъчите се проследяват — отражения, отразена светлина, меки сенки */
   if(photoBusy)return;photoBusy=true;photoStop=false;const NFq=+$('#phQ').value||320,warm=$('#phL').value==='warm';
   $('#ovPhoto').hidden=false;$('#phSave').disabled=true;$('#phInfo').textContent='зареждам…';
@@ -2379,7 +2381,8 @@ async function photoHD(){ /* истински фото-рендер: лъчит�
     world.traverse(o=>{if(!o.isMesh||!o.visible)return;let v=o;while(v){if(!v.visible)return;v=v.parent}
       const u=o.userData,m0=mat(u.mid),glass=u.knd==='glass'&&!u.mir,ud=u.mid==null?{keepR:1}:u.knd==='hw'?{keepR:1}:{fin:m0.fin||'mat',glass,mirror:!!u.mir,gloss:(m0.fin==='gloss'),glassCol:glass?m0.color:undefined};
       if([].concat(o.material).some(q=>q.transparent&&!glass&&q.opacity<.5))return;
-      const mm=new THREE.Mesh(o.geometry,Array.isArray(o.material)?o.material.map(q=>cm(q,ud)):cm(o.material,ud));mm.matrixAutoUpdate=false;mm.matrix.copy(o.matrixWorld);grp.add(mm)});
+      if(Array.isArray(o.material)){for(const[gg,mi]of splitGroups(o.geometry)){const q=o.material[mi];if(!q)continue;const mm=new THREE.Mesh(gg,cm(q,ud));mm.matrixAutoUpdate=false;mm.matrix.copy(o.matrixWorld);grp.add(mm)}} /* детайл с няколко материала — на отделни парчета (иначе фото-рендерът бърка цветовете) */
+      else{const mm=new THREE.Mesh(o.geometry.clone(),cm(o.material,ud));mm.matrixAutoUpdate=false;mm.matrix.copy(o.matrixWorld);grp.add(mm)}});
     const M=1/1000,rb=roomBox(),cx=(rb[0]+rb[1])/2*M,cz=(rb[2]+rb[3])/2*M,rh=P.room.h*M,rw=(rb[1]-rb[0])*M,rd=(rb[3]-rb[2])*M;
     const lights=[{p:[cx,rh-0.02,cz],t:[cx,0,cz],w:Math.max(.6,rw*.45),h:Math.max(.6,rd*.45),i:warm?4.5:5}]; // таванна светлина
     const json=grp.toJSON(),q=camera.quaternion;
