@@ -36,8 +36,14 @@ button,select,input{font:inherit;color:inherit}
 .btn.sm{padding:3px 8px;font-size:12.5px}
 .btn.sure{border-color:var(--warn);color:var(--warn)}
 .btn:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--mark);outline-offset:1px}
-.wrap{display:grid;grid-template-columns:350px minmax(0,1fr);gap:14px;padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-@media (max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}}
+.wrap{display:grid;grid-template-columns:42px 350px minmax(0,1fr);gap:12px;padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+@media (max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.rail{display:none!important}}
+@media (min-width:901px){#leftCol>.tabs{display:none}} /* има лента с икони отляво — табовете горе не трябват */
+.rail{display:flex;flex-direction:column;gap:6px;position:sticky;top:12px;align-self:start;padding:6px 0;background:var(--card,#fff);border:1px solid var(--line);border-radius:12px;align-items:center}
+.rail button{width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:var(--fg);display:grid;place-items:center;cursor:pointer;padding:0}
+.rail button:hover{background:var(--soft,#f1f1ee)}.rail button.on{background:var(--acc,#f2b01e);color:#111}
+.rail .sep{width:24px;height:1px;background:var(--line);margin:4px 0}
+.rail svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .col{display:flex;flex-direction:column;gap:14px;min-width:0}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;min-width:0}
 .card h2{font-family:var(--f-display);font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0;padding:10px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -140,8 +146,9 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 .vmenu .tog:hover{background:var(--field)}
 .vmenu .tog small{color:var(--muted);font-size:11px}
 .vmenu .vsep{border-top:1px solid var(--line);margin:4px 0}
-.wrap.noLeft{grid-template-columns:minmax(0,1fr)}
-.wrap.noLeft>.col:first-child{display:none}
+.wrap.noLeft{grid-template-columns:42px minmax(0,1fr)}
+.wrap.noLeft>#leftCol{display:none}
+@media (max-width:900px){.wrap.noLeft{grid-template-columns:minmax(0,1fr)}}
 #stageCard.maxi{position:fixed;inset:0;z-index:40;border-radius:0;border:0}
 #stageCard.maxi .stage{border-radius:0}
 .ddm{position:absolute;left:0;top:calc(100% + 6px);z-index:15;background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.18);width:min(320px,calc(100vw - 32px));max-height:72vh;overflow:auto;padding:6px}
@@ -160,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.21 · 18:40 · Детайли ↔ параметри: и панел, рафт, завършваща страница</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.22 · 18:40 · Лента с икони отляво</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -191,7 +198,8 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </header>
 
 <main class="wrap">
-  <div class="col">
+  <nav class="rail" id="rail" aria-label="Панели"><button data-rail="room" title="Стая — стени, прозорци, текстури"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></button><button data-rail="cab" title="Шкафове и параметри"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M12 3v18M10 12h-1M15 12h-1"/></svg></button><button data-rail="acc" title="Аксесоари и декорации"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></button><span class="sep"></span><button data-rail="det" title="Детайли (таблицата отдолу)"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></button><button data-rail="lib" title="Библиотека — декори и тапицерии"><svg viewBox="0 0 24 24"><path d="M5 4h4v16H5zM10 4h4v16h-4z"/><path d="M15.5 5l3.5-1 3 15-3.5 1z"/></svg></button><button data-rail="set" title="Настройки"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button><span class="sep"></span><button data-rail="fold" title="Скрий / покажи лявата колона"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button></nav>
+  <div class="col" id="leftCol">
     <div class="tabs"><button id="tRoom">Стая</button><button id="tCab" class="on">Шкафове</button><button id="tAcc">Аксесоари</button></div>
 
     <div class="col" id="paneCab">
@@ -3372,7 +3380,7 @@ function setView(v){
   ['tDoors','tWalls','tOnly'].forEach(id=>$('#'+id).parentElement.hidden=v!=='3d');$('#tDims').parentElement.hidden=v==='3d';
   $('#hint').textContent=v==='3d'?HINTS['3d']:v==='wall'?HINTS.wall:tab==='room'?HINTS.room:HINTS.plan;
   if(v==='3d')resize();else renderPlan()}
-function setTab(t){if(t!=='room'&&drawRoom){if(drawRoom.pts.length>=2)drawFinish(true);drawRoom=null}const was=tab;tab=t;$('#tCab').classList.toggle('on',t==='cab');$('#tRoom').classList.toggle('on',t==='room');$('#tAcc').classList.toggle('on',t==='acc');
+function setTab(t){if(t!=='room'&&drawRoom){if(drawRoom.pts.length>=2)drawFinish(true);drawRoom=null}const was=tab;tab=t;setTimeout(railSync,0);$('#tCab').classList.toggle('on',t==='cab');$('#tRoom').classList.toggle('on',t==='room');$('#tAcc').classList.toggle('on',t==='acc');
   $('#paneCab').hidden=t!=='cab'&&t!=='acc';$('#paneRoom').hidden=t!=='room';$('#accAdd').hidden=t!=='acc';$('#lsBar').hidden=t==='acc';
   if((t==='acc'||t==='cab')&&was!==t){const k=cab(sel);if(!k||isAcc(k)!==(t==='acc')){const f=P.cabinets.find(q=>isAcc(q)===(t==='acc'));sel=f?f.id:null;multiSel=new Set(sel?[sel]:[])}renderList();renderEditor();renderTable();rebuild3D()}
   if(t==='room'){renderRoom();setView(view==='wall'?'wall':'plan')}else{selWall=null;setView(view)}renderPlan()}
@@ -3405,7 +3413,11 @@ function fitStage(){const st=$('#stage'),card=$('#stageCard');
   else{st.style.height='0px';const top=st.getBoundingClientRect().top+scrollY;st.style.height=Math.max(340,innerHeight-top-14)+'px'}
   if(view==='3d')resize();else renderPlan()}
 addEventListener('resize',()=>fitStage());
-function applyVw(){$('.wrap').classList.toggle('noLeft',!$('#tLeft').checked);$('#detCard').hidden=!$('#tDet').checked;fitStage()}
+function applyVw(){$('.wrap').classList.toggle('noLeft',!$('#tLeft').checked);$('#detCard').hidden=!$('#tDet').checked;fitStage();railSync()}
+function railSync(){const r=$('#rail');if(!r)return;const L=$('#tLeft').checked;for(const b of r.querySelectorAll('[data-rail]')){const a=b.dataset.rail;b.classList.toggle('on',L&&a===tab||a==='det'&&$('#tDet').checked)}const f=r.querySelector('[data-rail="fold"] svg');if(f)f.style.transform=L?'':'scaleX(-1)'}
+$('#rail').addEventListener('click',e=>{const b=e.target.closest('[data-rail]');if(!b)return;const a=b.dataset.rail,L=$('#tLeft');
+  if(a==='room'||a==='cab'||a==='acc'){if(L.checked&&tab===a)L.checked=false;else{L.checked=true;setTab(a)}applyVw();saveVw()} /* същата икона пак — прибира панела */
+  else if(a==='det'){$('#tDet').checked=!$('#tDet').checked;applyVw();saveVw()}else if(a==='lib')$('#bLib').click();else if(a==='set')$('#bSet').click();else if(a==='fold'){L.checked=!L.checked;applyVw();saveVw()}});
 $('#tLeft').onchange=()=>{applyVw();saveVw()};$('#tDet').onchange=()=>{applyVw();saveVw()};
 function toggleView(open){const m=$('#viewMenu');open=open??m.hidden;m.hidden=!open;$('#bView').setAttribute('aria-expanded',String(open))}
 $('#bView').onclick=e=>{e.stopPropagation();toggleView()};
