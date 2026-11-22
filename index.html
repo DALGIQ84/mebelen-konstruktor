@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 01:40 · Рафт без страница — до гърба</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 01:50 · Детайли: следват материала на шкафа</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -856,7 +856,8 @@ function ovOne(k,p,o){p.box0=[...p.box];if(o.hide){if(!k._showHidden)return fals
         if(nm.glass){if(p.kind!=='glass'){p.kind='glass';p.e=[0,0,0,0];if(/^Рафт/.test(p.name))p.gsh=true;p.glc=p.glc||'clear'}}else if(p.kind==='glass'&&!p.vitOf)p.kind=''}
       if(p.fr&&(+o.dL||+o.dW))delete p.fr;else if(p.fr&&(+o.dx||+o.dy||+o.dz)){const f=p.fr,ux=f.ax==='x'?+o.dy||0:+o.dx||0,uz=+o.dz||0;p.fr={...f,x0:f.x0+ux,x1:f.x1+ux,z0:f.z0+uz,z1:f.z1+uz}} // ал. профил под 45° — и рамката
       p.ov=true;return true}
-function applyPOv(k,r){partKeys(r.parts);carryPOv(k,r.parts);const ov=k.pOv||{},out=[];
+const pAddM=(k,a)=>a.mOwn?a.m:a.smart==='sdor'||a.smart==='dor'?k.mf||a.m:a.smart===true||a.smart==='dv'?k.mc||a.m:a.m; // умните — винаги с материала на шкафа, ако не е сменен на ръка
+function applyPOv(k,r){for(const a of k.pAdd||[])if(!a.mOwn&&a.smart&&a.smart!=='drs'&&a.smart!=='zz'){const m=pAddM(k,a);if(m&&m!==a.m)a.m=m}partKeys(r.parts);carryPOv(k,r.parts);const ov=k.pOv||{},out=[];
   for(const p of r.parts){const o=ov[p.key];if(o&&!ovOne(k,p,o))continue;out.push(p)}
   for(let i=out.length-1;i>=0;i--){const p=out[i],f=p._cOf;if(!f)continue;if(!out.includes(f)){out.splice(i,1);continue}if(f.hidden)p.hidden=true;
     if(f.box0){const b=p.box.slice();for(let j=0;j<6;j++){if(j===4&&p._noZ0)continue;b[j]+=f.box[j]-f.box0[j]}p.box=b;p.ov=true}}
@@ -1931,6 +1932,7 @@ $('#ed').addEventListener('input',e=>{
   if(e.target.dataset.bh!==undefined){const k=cab(sel),i=+e.target.dataset.bh;k.bh=k.bh||[];const v=e.target.value;k.bh[i]=v===''?null:+v;P.example=false;changed(false);return}
   const f=e.target.dataset.f,k=cab(sel);if(!f||!k)return;
   let v=e.target.type==='checkbox'?e.target.checked:e.target.value;
+  if((f==='mc'||f==='mf')&&k[f]&&v&&v!==k[f]&&k.pAdd){const o=k[f];k.pAdd=k.pAdd.map(a=>!a.mOwn&&a.m===o?{...a,m:v}:a)} /* добавените в „Детайли“ със стария материал — сменят се и те */
   if(f==='wall'){if(v===''){k.wall=null}else{k.wall=+v;k.off=0;place(k)}P.example=false;changed(true);return}
   if(isAcc(k)&&f==='acc'){const a=ACC[v]||ACC.sink;k.acc=v;if(/^(Мивка|Котлон|Готварска|Хладилник|Пералня|Съдомиялна|Сушилня)/.test(k.name))k.name=a.name.replace(/ \(.*\)/,'');k.W=a.W;k.D=a.D;k.c=a.free?0:900;k.H=k.c+a.h;k.gap=a.gap||0;place(k);P.example=false;changed(true);return}
   if(isAcc(k)&&f==='accZ'){k.accZ=v===''?0:Math.max(0,+v)||0;P.example=false;edPending=true;changed(false);return} /* пишеш спокойно — полето не се презарежда при всяка цифра */
