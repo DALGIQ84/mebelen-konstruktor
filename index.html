@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 01:00 · Махнат зиг-заг</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 01:30 · Наклонен рафт</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -819,6 +819,17 @@ function splitPost(k,r){const parts=r.parts,T=+mat(k.mc).t||18,sh=parts.filter(p
   out.push(me.added?{...me,name:'Таван долна част',L:r1(x1-x0),Wd:r1(Dk),t:T,e:[1,0,0,0],box:[x0,x1,0,Dk,zS,zS+T]} /* рафтът от „Детайли“ става таван на долната част — остава умен (светло отдолу/отгоре) */
     :{name:'Таван долна част',L:r1(x1-x0),Wd:r1(Dk),t:T,m:k.mc,e:[1,0,0,0],box:[x0,x1,0,Dk,zS,zS+T],key:'Таван долна част#1'});
   parts.length=0;parts.push(...out);(r.warn=r.warn||[]).push(`Етажерката е от 2 части: долна до ${Math.round(zS+T)} мм от пода, горна — без дъно, стъпва на нея.`)}
+const isHorP=p=>p&&p.box&&!['door','alu','hw','appl','back','virt','drawer'].includes(p.kind)&&!p.vitOf&&!p.mir&&p.box[5]-p.box[4]<=40&&p.box[1]-p.box[0]>40&&p.box[3]-p.box[2]>40; // лежащ детайл (рафт, делител…)
+function clipPoly(P0,a0,a1,b0,b1){let P=P0;for(const[ax,v,sg]of[[0,a0,1],[0,a1,-1],[1,b0,1],[1,b1,-1]]){const o=[];for(let i=0;i<P.length;i++){const A=P[i],B=P[(i+1)%P.length],ia=(A[ax]-v)*sg>=0,ib=(B[ax]-v)*sg>=0;if(ia)o.push(A);if(ia!==ib){const t=(v-A[ax])/(B[ax]-A[ax]);o.push([A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t])}}P=o;if(!P.length)break}return P}
+function tiltPost(k,parts){ /* наклонен рафт (и преместен умен рафт) — завърта се около средата си; където опре в страница/рафт, се скъсява откъм нея (краят — под ъгъла) */
+  const ov=k.pOv||{};for(const p of parts){if(!isHorP(p)||p.hidden)continue;const a=p.added&&/^\+#\d+$/.test(p.key)?(k.pAdd||[])[parseInt(p.key.slice(2))]:null,o=a||ov[p.key]||{};
+    const th=+o.tilt||0,sx=a&&a.smart?+a.dx||0:0,sy=a&&a.smart?+a.dy||0:0,sz=a&&a.smart?+a.dz||0:0;if(!th&&!sx&&!sy&&!sz)continue;
+    const SV=o.tiltV==='s',b=p.box,b0=a?b:(p.box0||b),t=b[5]-b[4],uc=SV?(b[2]+b[3])/2+sy:(b[0]+b[1])/2+sx,zc=(b[4]+b[5])/2+sz;
+    const oth=parts.filter(q=>q!==p&&!q.hidden&&q.box),c=pedCell(k,oth,(b[0]+b[1])/2+sx,zc),zA=c?c.z0:-1e6,zB=c?c.z1:1e6,uA=SV?b0[2]:b0[0],uB=SV?b0[3]:b0[1];
+    const r=th*Math.PI/180,dc=Math.cos(r),ds=Math.sin(r),H=6000,h=t/2,rect=[[-H,-h],[H,-h],[H,h],[-H,h]].map(([u,v])=>[uc+u*dc-v*ds,zc+u*ds+v*dc]),poly=clipPoly(rect,uA,uB,zA,zB);if(poly.length<3)continue;
+    const us=poly.map(q=>q[0]),zs=poly.map(q=>q[1]),u0=Math.min(...us),u1=Math.max(...us),z0=Math.min(...zs),z1=Math.max(...zs),pr=poly.map(q=>q[0]*dc+q[1]*ds),len=Math.max(...pr)-Math.min(...pr);
+    if(SV){p.box=[b[0]+(a&&a.smart?sx:0),b[1]+(a&&a.smart?sx:0),u0,u1,z0,z1];p.Wd=r1(len)}else{p.box=[u0,u1,b[2]+sy,b[3]+sy,z0,z1];p.L=r1(len)}
+    if(th){if(SV)p.sp=poly;else p.fp=poly;p.tilt=th;if(!/наклон/.test(p.name))p.name+=` (наклон ${th}°)`}p.ov=true}}
 function vitGroups(parts){ /* витрините — профилите (рамка под 45°) и стъклото на една врата са една група */
   const G=new Map(),fr=parts.filter(p=>p.kind==='alu'&&p.fr);
   for(const p of fr){const gid=p.vitOf||'В'+Math.round(p.fr.x0)+'_'+Math.round(p.fr.z0)+(p.fr.ax||'');if(!G.has(gid))G.set(gid,{gid,fr:{...p.fr},ps:[]});G.get(gid).ps.push(p)}
@@ -862,7 +873,7 @@ function applyPOv(k,r){partKeys(r.parts);carryPOv(k,r.parts);const ov=k.pOv||{},
   for(const p of out){if(!p.key||!/[↓↑]/.test(p.key))continue;const o=ov[p.key];if(!o)continue; // частите на разделена врата (над/под чекмеджета) — също се трият и сменят от „Детайли“
     if(o.hide){if(k._showHidden)p.hidden=true;else p._kill=true}if(o.m){p.m=o.m;p.t=+mat(o.m).t}if(o.e)p.e=[...o.e];if(o.name)p.name=o.name;p.ov=true}
   {const mo=k.matOv||{};for(const p of out)if((p.added||p.grp!=null)&&p.m0===undefined){const id=(p.sd&&mo[p.name+'|'+p.sd])||mo[p.name];if(id&&id!==p.m&&P.materials.some(m=>m.id===id)){p.m0=p.m;p.m=id;p.t=+mat(id).t}}} // добавени в „Детайли“ (и групите врати/чекмеджета) — и те слушат материала от таблицата
-  r.parts=out.filter(q=>!q._kill);if(splitLate(k))splitPost(k,r);relink(k,r.parts);addVits(k,r.parts);addMirrors(k,r.parts);{const ov=k.pOv||{};r.parts=r.parts.filter(p=>p.ov||!p.key||!ov[p.key]||ovOne(k,p,ov[p.key]))}vitGrpOv(k,r.parts);return r} // и детайлите, които се правят накрая (витрина, огледало, етажерка от 2 части) — и те се редактират
+  r.parts=out.filter(q=>!q._kill);if(splitLate(k))splitPost(k,r);relink(k,r.parts);addVits(k,r.parts);addMirrors(k,r.parts);{const ov=k.pOv||{};r.parts=r.parts.filter(p=>p.ov||!p.key||!ov[p.key]||ovOne(k,p,ov[p.key]))}tiltPost(k,r.parts);vitGrpOv(k,r.parts);return r} // и детайлите, които се правят накрая (витрина, огледало, етажерка от 2 части) — и те се редактират
 const isVitDoor=(k,d)=>d.kind==='door'&&!d.hidden&&!d.pl&&!d.fp&&/^([АБ] )?Врата/.test(d.name)&&d.box[5]-d.box[4]>40&&k.wDoor!=='slide'&&!/плъзг/i.test(d.name); // само отваряемите врати
 function addVits(k,parts){ /* ал. витрина на избрана врата (гардероби и кухни) — рамка от профила под 45° + стъкло; цвят на профила и стъклото — за всяка поотделно */
   const V=k.vit||{};if(!Object.keys(V).length)return;const S=P.settings,fu=+S.fuga||3,aF=+(S.alFuga??S.fuga)||3,aw=+(S.alW??42),gd=+(S.glassDed??7),aT=+(S.alT??25);
@@ -3679,7 +3690,7 @@ for(const id of['#v3','#vp','#vw'])$(id).addEventListener('click',()=>{if(measOn
 
 /* ---------- Редактор на детайлите: панел вдясно ---------- */
 let pedHelp=false,pedK=null,pedSel=null,pedMulti=new Set(),pedCells=[],pedZ={},pedPanned=false; // pedZ — зум/местене на чертежите // pedCells — избрани свободни секции {cx,cz}
-let pedDoors=true;
+let pedDoors=true,pedSelV='front'; // pedSelV — в кой изглед е маркиран детайлът (за наклона)
 function openPed(id){const k=cab(id);if(!k||isAcc(k))return;pedK=id;pedDoors=!k.hideD;if(sel!==id)select(id);pedSel=null;pedMulti=new Set();pedCells=[];{const vis=pedParts(k).filter(q=>!q.hidden&&q.kind!=='hw');if(k.type==='wpanel'||vis.length===1){const p0=vis[0];if(p0){pedSel=p0.key;pedMulti=new Set([p0.key])}}} /* един детайл (панел, завършваща страница, пълнеж, плот…) — маркиран веднага */ /* панелът — веднага маркиран, за скосяванията */$('#ped').hidden=false;$('#pedOv').hidden=false;renderPed();rebuild3D()}
 function closePed(){pedK=null;pedSel=null;pedMulti=new Set();pedCells=[];pedZ={};$('#ped').hidden=true;$('#pedOv').hidden=true;rebuild3D()}
 $('#pedOv').onclick=()=>closePed();
@@ -3699,6 +3710,7 @@ function pedSvg(k,ps,view){ // чертеж: front (x–z), side (y–z, отл�
     const col=on?'#f0b429':p.kind==='back'?'#c9a27a':dr?mat(p.m).color:p.kind==='drawer'?'#e4ddd0':'#d8d2c7';
     const st=p.kind==='virt'?`fill:none;stroke:${on?'#b4472c':'#2f7fc1'};stroke-width:${on?3:2};stroke-dasharray:7 5;vector-effect:non-scaling-stroke;cursor:pointer`:`fill:${col};fill-opacity:${on?(dr?.5:.9):dr?.55:.9};stroke:${on?'#b4472c':'#4a555c'};stroke-width:${on?2.5:1};vector-effect:non-scaling-stroke;cursor:pointer`;
     if(view==='front'&&p.fp)g+=`<polygon data-pk="${esc(p.key)}" points="${p.fp.map(([u,v])=>u+','+Y(v)).join(' ')}" style="${st}"><title>${esc(p.name)} ${fmt(p.L)} × ${fmt(p.Wd)}</title></polygon>`;
+    else if(view==='side'&&p.sp&&p.tilt)g+=`<polygon data-pk="${esc(p.key)}" points="${p.sp.map(([u,v])=>(SR?-u:u)+','+Y(v)).join(' ')}" style="${st}"><title>${esc(p.name)} ${fmt(p.L)} × ${fmt(p.Wd)}</title></polygon>`;
     else if(view==='side'&&p.fr&&p.fr.ax)g+=`<polygon data-pk="${esc(p.key)}" points="${miterPts(p.fr).map(([u,v])=>(SR?-u:u)+','+Y(v)).join(' ')}" style="${st}"><title>${esc(p.name)} ${fmt(p.L)} × ${fmt(p.Wd)}</title></polygon>`;
     else if(view==='front'&&p.fr&&!p.fr.ax)g+=`<polygon data-pk="${esc(p.key)}" points="${miterPts(p.fr).map(([u,v])=>u+','+Y(v)).join(' ')}" style="${st}"><title>${esc(p.name)} ${fmt(p.L)} × ${fmt(p.Wd)}</title></polygon>`; /* ал. профил — под 45° */
     else if(view==='top'&&p.pl)g+=`<polygon data-pk="${esc(p.key)}" points="${p.pl.map(([x,y])=>x+','+y).join(' ')}" style="${st}"><title>${esc(p.name)} ${fmt(p.L)} × ${fmt(p.Wd)}</title></polygon>`;
@@ -3772,10 +3784,11 @@ function renderPed0(){const k=cab(pedK),el=$('#ped');if(!k){closePed();return}pe
       :a&&a.smart?`<div style="grid-column:1/-1;font-size:11.5px;color:var(--muted)">${a.hd?'Умен хоризонтален делител — между страниците/делителите без светло, дълбочината до гърба и до лицето.':`Умен рафт — ширината и дълбочината се взимат сами (между страниците/делителите, до гърба, ${P.settings.shelfFront} мм назад от лицето).`}</div>${(()=>{const bl=pedBelow(ps,p,(p.box[0]+p.box[1])/2,p.box[4]),ab=pedAbove(ps,p,(p.box[0]+p.box[1])/2,p.box[5]);
           return f('Светло отдолу, мм','gap',Math.round(bl?p.box[4]-bl.box[5]:p.box[4]))+f('Светло отгоре, мм','gapT',ab?Math.round(ab.box[4]-p.box[5]):'')+f('От пода (Z)','z',Math.round(p.box[4]))+f('Секция — място отляво','cx',Math.round(a.cx!=null?+a.cx:+k.W/2))+
           `<div style="grid-column:1/-1;font-size:12px;color:var(--fg);background:var(--field);border-radius:6px;padding:6px 8px">↓ отдолу: <b>${bl?esc(bl.name):'—'}</b> — светло <b>${bl?Math.round(p.box[4]-bl.box[5]):'—'}</b> мм &nbsp; ↑ отгоре: <b>${ab?esc(ab.name):'—'}</b> — светло <b>${ab?Math.round(ab.box[4]-p.box[5]):'—'}</b> мм</div>`})()}
+        ${isHorP(p)?(()=>{const q=a||(k.pOv||{})[p.key]||{},sv=q.tilt?q.tiltV==='s':/^side/.test(pedSelV);return f('Наклон, ° ('+(sv?'отстрани':'отпред')+')','tilt',+q.tilt||0)})():''}${a.hd?'':`<div style="grid-column:1/-1;font-size:11.5px;color:var(--muted)">Премести, мм (+/−) — опре ли в страница/рафт, се скъсява откъм нея</div>${f('→ надясно','dx',+a.dx||0)}${f('↗ напред','dy',+a.dy||0)}${f('↑ нагоре','dz',+a.dz||0)}`}
         <label class="tog" style="grid-column:1/-1;color:var(--fg)"><input type="checkbox" data-pe="smart" checked> Умен (махни отметката, за да го въвеждаш на ръка)</label>`
       :a?`<div style="grid-column:1/-1;font-size:11.5px;color:var(--muted)">Място (от левия заден долен ъгъл на шкафа), мм</div>${f('Отляво (X)','x',+a.x||0)}${f('Отзад (Y)','y',+a.y||0)}${f('От пода (Z)','z',+a.z||0)}
         <label style="grid-column:1/-1;display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--muted)">Положение<select class="f" data-pe="or">${[['h','лежи (като рафт/дъно)'],['vx','стои напречно (като страница/делител)'],['vy','стои по ширината (като гръб/бленда)']].map(([v,t])=>`<option value="${v}" ${(a.or||'h')===v?'selected':''}>${t}</option>`).join('')}</select></label>`
-        :`<div style="grid-column:1/-1;font-size:11.5px;color:var(--muted)">Премести, мм (+/−)</div>${f('→ надясно','dx',+o.dx||0)}${f('↗ напред','dy',+o.dy||0)}${f('↑ нагоре','dz',+o.dz||0)}
+        :`<div style="grid-column:1/-1;font-size:11.5px;color:var(--muted)">Премести, мм (+/−)</div>${f('→ надясно','dx',+o.dx||0)}${f('↗ напред','dy',+o.dy||0)}${f('↑ нагоре','dz',+o.dz||0)}${isHorP(p)?(()=>{const q=a||(k.pOv||{})[p.key]||{},sv=q.tilt?q.tiltV==='s':/^side/.test(pedSelV);return f('Наклон, ° ('+(sv?'отстрани':'отпред')+')','tilt',+q.tilt||0)})():''}
         ${o.hide?'<div style="grid-column:1/-1;font-size:12px;color:var(--mark)">Изтрит — няма го в шкафа и в разкроя. „↺ Върни“ го връща.</div>':''}
         <div style="grid-column:1/-1;font-size:11.5px;color:var(--muted)">По програмата: ${fmt(b.L)} × ${fmt(b.Wd)}${o.dL||o.dW||o.dx||o.dy||o.dz||o.name||o.m?' · сега е поправен':''}</div>`}
       ${a&&(a.smart==='dv'||a.smart===true&&a.hd)?`<label class="tog" style="grid-column:1/-1;color:var(--fg)"><input type="checkbox" data-pe="virt" ${a.virt?'checked':''}> Виртуален — само помощна линия (0 мм, не влиза в разкроя)</label>`:''}
@@ -3814,7 +3827,7 @@ $('#ped').addEventListener('click',e=>{if(pedPanned){pedPanned=false;return}{con
           if(e.ctrlKey||e.metaKey){if(i>=0)pedCells.splice(i,1);else pedCells.push({cx,cz})}else pedCells=[{cx,cz}];pedSel=null;renderPed();rebuild3D();return}
         if(!hp){pedCells=[];pedSel=null;pedMulti=new Set();renderPed();rebuild3D();return}}}} /* клик на празно — отмаркира */
   if(e.target.closest('[data-pa="cClr"]')){pedCells=[];renderPed();return}
-  const row=e.target.closest('[data-pk]');if(row){const key=row.dataset.pk;pedCells=[];
+  const row=e.target.closest('[data-pk]');if(row){const key=row.dataset.pk;pedCells=[];{const vv=e.target.closest('svg[data-view]')?.dataset.view;if(vv&&vv!=='cuts')pedSelV=vv}
     if((e.ctrlKey||e.metaKey)&&pedSel){if(!pedMulti.size)pedMulti.add(pedSel);if(pedMulti.has(key)&&pedMulti.size>1){pedMulti.delete(key);if(pedSel===key)pedSel=[...pedMulti][0]}else{pedMulti.add(key);pedSel=key}} // Ctrl + клик — още детайли
     else if(pedSel===key&&pedMulti.size<=1){pedSel=null;pedMulti=new Set()} /* втори клик върху маркирания — отмаркира */
     else{pedSel=key;pedMulti=new Set([key])}renderPed();rebuild3D();return}
@@ -3863,7 +3876,9 @@ $('#ped').addEventListener('click',e=>{if(pedPanned){pedPanned=false;return}{con
   else if(a==='cDr'&&pedCells.length){const n=clamp(+($('#pedN')?.value)||1,1,12),h=+($('#pedDH')?.value)>=60?+$('#pedDH').value:0;const dv=!!$('#pedDV')?.checked,ps0=pedParts(k);for(const c of pedCells){const rc=pedCell(k,ps0,c.cx,c.cz);k.pAdd.push({name:'Чекмеджета',smart:'drs',n,h,dv,bk:rc?.bk,lk:rc?.L.key,rk:rc?.R.key,cx:c.cx,cz:c.cz,m:k.mf,e:[1,1,1,1],L:0,Wd:0})}pedCells=[];pedSel='+#'+(k.pAdd.length-1)}
   P.example=false;changed(false);renderPed();renderEditor()});
 function pedEdit(k,f,v){ // една промяна върху маркирания детайл (pedSel)
+  const tV=()=>/^side/.test(pedSelV)?'s':'f';
   if(pedSel.startsWith('+#')){k.pAdd=[...(k.pAdd||[])].map(q=>({...q}));const a=k.pAdd[parseInt(pedSel.split('#')[1])];if(!a)return;
+    if(f==='tilt'){if(+v){a.tilt=+v;a.tiltV=tV()}else{delete a.tilt;delete a.tiltV}return}
     if(f==='smart'&&!v){const q=pedParts(k).find(q=>q.key===pedSel);if(q){Object.assign(a,{L:q.L,Wd:q.Wd,x:Math.round(q.box[0]),y:Math.round(q.box[2]),z:Math.round(q.box[4]),or:'h'})}delete a.smart}
     else if(a.smart==='dv'&&(f==='gapL'||f==='gapR'||f==='cx')){const ps=pedParts(k),me=ps.find(q=>q.key===pedSel);if(!me)return;delete a.eg;delete a.eq;
       if(f==='cx'){a.cx=+v;delete a.anx}else{a.anx=f==='gapL'?'l':'r';a.offx=+v;const xc=(me.box[0]+me.box[1])/2,zc=(me.box[4]+me.box[5])/2,vv=pedVert(ps,zc,zc,me),nb=f==='gapL'?vv.filter(q=>(q.box[0]+q.box[1])/2<xc).sort((u,w)=>w.box[1]-u.box[1])[0]:vv.filter(q=>(q.box[0]+q.box[1])/2>xc).sort((u,w)=>u.box[0]-w.box[0])[0];a.axk=nb?.key;a.cxr=Math.round(xc);a.cz=Math.round(zc)}}
@@ -3875,7 +3890,7 @@ function pedEdit(k,f,v){ // една промяна върху маркиран�
       else{if(f==='cx'){delete a.lk;delete a.rk}const z=f==='z'?+v:me.box[4],bl=pedBelow(ps,me,cx,z);a.z=Math.round(z);if(bl){a.ref=bl.key;a.gap=Math.round(z-bl.box[5])}else delete a.ref}}
     else{a[f]=['L','Wd','x','y','z','cx','cz','n','h','nl','ang','dx','dy','dz'].includes(f)?+v:v;if(f==='virt'){a.virt=v||undefined;a.name=(v?'Виртуален делител ':'')+(a.smart==='dv'?(v?'(верт.)':'Вертикален делител'):(v?'(хор.)':'Хоризонтален делител'));a.e=v?[0,0,0,0]:[1,0,0,0]}if(f==='sl')a.nl=0;if(f==='m')a.mOwn=true}}
   else{k.pOv={...(k.pOv||{})};const o={...(k.pOv[pedSel]||{})},b=pedBase(k,pedSel);if(!b)return;
-    if(f==='L')o.dL=+v-b.L;else if(f==='Wd')o.dW=+v-b.Wd;else if(f==='name')o.name=v&&v!==b.name?v:undefined;else if(f==='m')o.m=v!==b.m?v:undefined;else if(f==='hide')o.hide=v||undefined;else o[f]=+v||undefined;
+    if(f==='tilt'){o.tilt=+v||undefined;o.tiltV=+v?tV():undefined}else if(f==='L')o.dL=+v-b.L;else if(f==='Wd')o.dW=+v-b.Wd;else if(f==='name')o.name=v&&v!==b.name?v:undefined;else if(f==='m')o.m=v!==b.m?v:undefined;else if(f==='hide')o.hide=v||undefined;else o[f]=+v||undefined;
     for(const q in o)if(o[q]===undefined||o[q]===0)delete o[q];if(Object.keys(o).length)k.pOv[pedSel]=o;else delete k.pOv[pedSel];}
 }
 $('#ped').addEventListener('change',e=>{const k=cab(pedK),t=e.target;if(t.id==='pedDr')return;
