@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.22 · 23:45 · Етажерка от 2 части и с рафтове от Детайли</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.22 · 23:55 · Детайли: и витрини, огледала, 2 части се редактират</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -818,16 +818,17 @@ function splitPost(k,r){const parts=r.parts,T=+mat(k.mc).t||18,sh=parts.filter(p
   const x0=me.box[0],x1=me.box[1],Dk=bt?bt.box[3]:me.box[3];
   out.push({name:'Таван долна част',L:r1(x1-x0),Wd:r1(Dk),t:T,m:k.mc,e:[1,0,0,0],box:[x0,x1,0,Dk,zS,zS+T],key:'Таван долна част#1'});
   parts.length=0;parts.push(...out);(r.warn=r.warn||[]).push(`Етажерката е от 2 части: долна до ${Math.round(zS+T)} мм от пода, горна — без дъно, стъпва на нея.`)}
-function applyPOv(k,r){partKeys(r.parts);carryPOv(k,r.parts);const ov=k.pOv||{},out=[];
-  for(const p of r.parts){const o=ov[p.key];if(o){p.box0=[...p.box];if(o.hide){if(!k._showHidden)continue;p.hidden=true}
+function ovOne(k,p,o){p.box0=[...p.box];if(o.hide){if(!k._showHidden)return false;p.hidden=true} /* промяна от „Детайли“ върху един детайл */
       if(+o.dL||+o.dW){const[aL,aW]=partAxes(p),grow=(ax,d)=>{const c=(p.box[2*ax]+p.box[2*ax+1])/2;p.box[2*ax+1]+=d;if(p.pl&&ax<2)p.pl=p.pl.map(v=>{const w=[...v];if(w[ax]>c)w[ax]+=d;return w})}; /* и детайлите с форма (скосени под 45°) — крайните точки отзад се местят */
         if(+o.dL){grow(aL,+o.dL);p.L=r1(p.L+ +o.dL)}if(+o.dW){grow(aW,+o.dW);p.Wd=r1(p.Wd+ +o.dW)}}
       const dx=+o.dx||0,dy=+o.dy||0,dz=+o.dz||0;if(dx||dy||dz){p.box=[p.box[0]+dx,p.box[1]+dx,p.box[2]+dy,p.box[3]+dy,p.box[4]+dz,p.box[5]+dz];if(p.pl)p.pl=p.pl.map(([x,y])=>[x+dx,y+dy])}
       if(o.fs)p.fs=+o.fs;if(o.name)p.name=o.name;if(o.m){const nm=mat(o.m),t0=+p.t||0,t1=+nm.t||t0;p.m=o.m;p.t=t1;
         if(p.box&&t1>0&&Math.abs(t1-t0)>0.1){const b=p.box,ex=[b[1]-b[0],b[3]-b[2],b[5]-b[4]],ax=ex.indexOf(Math.min(...ex)),c=(b[2*ax]+b[2*ax+1])/2;p.box=b.slice();p.box[2*ax]=c-t1/2;p.box[2*ax+1]=c+t1/2} // друга дебелина (напр. стъкло 6 вместо ПДЧ 18) — и в чертежа
         if(nm.glass){if(p.kind!=='glass'){p.kind='glass';p.e=[0,0,0,0];if(/^Рафт/.test(p.name))p.gsh=true;p.glc=p.glc||'clear'}}else if(p.kind==='glass'&&!p.vitOf)p.kind=''}
-      p.ov=true}
-    out.push(p)}
+      if(p.fr&&(+o.dL||+o.dW))delete p.fr;else if(p.fr&&(+o.dx||+o.dy||+o.dz)){const f=p.fr,ux=f.ax==='x'?+o.dy||0:+o.dx||0,uz=+o.dz||0;p.fr={...f,x0:f.x0+ux,x1:f.x1+ux,z0:f.z0+uz,z1:f.z1+uz}} // ал. профил под 45° — и рамката
+      p.ov=true;return true}
+function applyPOv(k,r){partKeys(r.parts);carryPOv(k,r.parts);const ov=k.pOv||{},out=[];
+  for(const p of r.parts){const o=ov[p.key];if(o&&!ovOne(k,p,o))continue;out.push(p)}
   for(let i=out.length-1;i>=0;i--){const p=out[i],f=p._cOf;if(!f)continue;if(!out.includes(f)){out.splice(i,1);continue}if(f.hidden)p.hidden=true;
     if(f.box0){const b=p.box.slice();for(let j=0;j<6;j++){if(j===4&&p._noZ0)continue;b[j]+=f.box[j]-f.box0[j]}p.box=b;p.ov=true}}
   {const gone=q=>!out.includes(q)||q.hidden; // витрина: изтриеш ли профилите ѝ — изчезва и стъклото
@@ -843,7 +844,7 @@ function applyPOv(k,r){partKeys(r.parts);carryPOv(k,r.parts);const ov=k.pOv||{},
   for(const p of out){if(!p.key||!/[↓↑]/.test(p.key))continue;const o=ov[p.key];if(!o)continue; // частите на разделена врата (над/под чекмеджета) — също се трият и сменят от „Детайли“
     if(o.hide){if(k._showHidden)p.hidden=true;else p._kill=true}if(o.m){p.m=o.m;p.t=+mat(o.m).t}if(o.e)p.e=[...o.e];if(o.name)p.name=o.name;p.ov=true}
   {const mo=k.matOv||{};for(const p of out)if((p.added||p.grp!=null)&&p.m0===undefined){const id=(p.sd&&mo[p.name+'|'+p.sd])||mo[p.name];if(id&&id!==p.m&&P.materials.some(m=>m.id===id)){p.m0=p.m;p.m=id;p.t=+mat(id).t}}} // добавени в „Детайли“ (и групите врати/чекмеджета) — и те слушат материала от таблицата
-  r.parts=out.filter(q=>!q._kill);if(splitLate(k))splitPost(k,r);relink(k,r.parts);addVits(k,r.parts);addMirrors(k,r.parts);return r}
+  r.parts=out.filter(q=>!q._kill);if(splitLate(k))splitPost(k,r);relink(k,r.parts);addVits(k,r.parts);addMirrors(k,r.parts);{const ov=k.pOv||{};r.parts=r.parts.filter(p=>p.ov||!p.key||!ov[p.key]||ovOne(k,p,ov[p.key]))}return r} // и детайлите, които се правят накрая (витрина, огледало, етажерка от 2 части) — и те се редактират
 const isVitDoor=(k,d)=>d.kind==='door'&&!d.hidden&&!d.pl&&!d.fp&&/^([АБ] )?Врата/.test(d.name)&&d.box[5]-d.box[4]>40&&k.wDoor!=='slide'&&!/плъзг/i.test(d.name); // само отваряемите врати
 function addVits(k,parts){ /* ал. витрина на избрана врата (гардероби и кухни) — рамка от профила под 45° + стъкло; цвят на профила и стъклото — за всяка поотделно */
   const V=k.vit||{};if(!Object.keys(V).length)return;const S=P.settings,fu=+S.fuga||3,aF=+(S.alFuga??S.fuga)||3,aw=+(S.alW??42),gd=+(S.glassDed??7),aT=+(S.alT??25);
@@ -3769,7 +3770,7 @@ function renderPed0(){const k=cab(pedK),el=$('#ped');if(!k){closePed();return}pe
   else if(!pedCells.length&&p&&(p.vitOf||p.kind==='door'&&isVitDoor(k,p)&&!(k.mir||{})[p.key])){const dk=p.vitOf||p.key,vo=(k.vit||{})[dk],sel_=(n,o,v)=>`<select data-vit="${esc(dk)}" data-vk="${n}" style="background:var(--field);border:1px solid var(--line);border-radius:5px;padding:3px 4px;color:var(--fg)">${Object.entries(o).map(([c,q])=>`<option value="${c}" ${c===v?'selected':''}>${q[0]}</option>`).join('')}</select>`;
     form=`<div style="padding:8px 12px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px">${vo
       ?`<b>▣ Ал. витрина</b> профил ${sel_('al',ALCOL,vo.al||'10T')} стъкло ${sel_('gl',GLCOL,vo.gl||'clear')}<button class="btn sm" data-vitx="${esc(dk)}">Махни витрината</button>`
-      :`<button class="btn sm" data-viton="${esc(dk)}">▣ Ал. витрина</button>`}</div>`+(p.vitOf?'':form)}
+      :`<button class="btn sm" data-viton="${esc(dk)}">▣ Ал. витрина</button>`}</div>`+form}
   if(!pedCells.length&&p&&(mirOK(k,p)||p.mir)&&!(k.vit||{})[p.mir?p.mirOf:p.key]){const dk=p.mir?p.mirOf:p.key,mo=(k.mir||{})[dk],onW=k.type==='wpanel'?'панела':'вратата',isFp=!!pedParts(k).find(q=>q.key===dk)?.fp;
     form=`<div style="padding:8px 12px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px">${mo
       ?`<b style="flex-basis:100%">🪞 Огледало — залепено отпред; отстъп от ръба на ${onW}, мм <span style="color:var(--muted);font-weight:400">(0 = до ръба)</span></b>${(isFp?[]:[['l','← отляво'],['r','→ отдясно'],['t','↑ горе'],['b','↓ долу']]).map(([n,l])=>`<label style="display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--muted)">${l}<input class="f" type="number" min="0" data-mir="${esc(dk)}" data-ms="${n}" value="${+(mo[n]??mo.o)||0}" style="width:72px;font-family:var(--f-mono)"></label>`).join('')}<label style="display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--muted)">${isFp?'отстъп навсякъде (по шаблон)':'всички наведнъж'}<input class="f" type="number" min="0" data-mir="${esc(dk)}" data-ms="all" ${isFp?`value="${+(mo.o??mo.l)||0}"`:'placeholder="—"'} style="width:72px;font-family:var(--f-mono)"></label><button class="btn sm" data-mirx="${esc(dk)}" style="align-self:end">Махни огледалото</button>`
