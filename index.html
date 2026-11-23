@@ -169,7 +169,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.24 · 00:35 · Наклонените рафтове — цвят и от двете страни</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.24 · 00:50 · Наклонените рафтове — истинската шарка</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2438,7 +2438,7 @@ function rebuild3D(){
       if((!showDoors||(k.hideD&&!noHideD))&&(p.kind==='door'||p.kind==='alu'||p.kind==='glass')&&!p.gsh)continue; // скрити врати — само за картинката
       const [x0,x1,y0,y1,z0,z1]=p.box;
       if(p.kind==='virt'||p.noDraw)continue; // виртуален делител — само помощна линия; цял гръб, показан изрязан
-      const gc=p.kind==='glass'?GLCOL[p.glc||String(p.m).replace('__glass_','')]:null,pm=gc&&p.glc&&p.glc!=='clear'?{...mat(p.m),color:gc[1]}:mat(p.m),op=p.kind==='glass'?(gc?gc[2]:.3):1,tx=p.kind!=='hw'&&!p.fr&&!p.pl&&!p.sp&&pm.tex;
+      const gc=p.kind==='glass'?GLCOL[p.glc||String(p.m).replace('__glass_','')]:null,pm=gc&&p.glc&&p.glc!=='clear'?{...mat(p.m),color:gc[1]}:mat(p.m),op=p.kind==='glass'?(gc?gc[2]:.3):1,tx=p.kind!=='hw'&&!p.fr&&!p.pl&&!p.sp&&!((p.tilt||p.shp)&&p.fp)&&pm.tex;
       let mesh;
       if(p.cush&&p.cushAx==='x'&&!p.hidden){const r=p.cush,bs=Math.max(1,Math.min(r,(y1-y0)/2-1,(z1-z0)/2-1)),bt=Math.max(1,Math.min(r,(x1-x0)/2-1)),sh=new THREE.Shape();sh.moveTo((y0+bs)*M,(z0+bs)*M);sh.lineTo((y1-bs)*M,(z0+bs)*M);sh.lineTo((y1-bs)*M,(z1-bs)*M);sh.lineTo((y0+bs)*M,(z1-bs)*M);sh.lineTo((y0+bs)*M,(z0+bs)*M); // тапицерия отстрани
         mesh=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:Math.max(.001,(x1-x0-2*bt)*M),bevelEnabled:true,bevelThickness:bt*M,bevelSize:bs*M,bevelSegments:6,curveSegments:8}),(()=>{const fs=fabSlot(k,p.fs||1);return (fs.id&&fabMat(fs.id,fs.col,fs.w))||accMat((p.fs>1&&fs.col)||p.col||'#8e8a84',.95,0)})());mesh.rotation.y=-Math.PI/2;mesh.position.set((x1-bt)*M,0,0);g.add(mesh)}
