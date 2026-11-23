@@ -5,6 +5,8 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
+#ctxMenu{width:auto!important;min-width:260px;max-width:calc(100vw - 16px)}#ctxMenu .crow{display:flex;align-items:center;gap:6px;padding:4px 8px;min-height:40px}#ctxMenu .crow>span{flex:1;font-size:13.5px;white-space:nowrap;margin-right:8px}#ctxMenu .chip{min-height:30px!important;padding:4px 8px!important;min-width:50px;white-space:nowrap;flex:none;border:1px solid var(--line);border-radius:6px;background:var(--field);color:var(--fg);font-size:12.5px;cursor:pointer;width:auto}#ctxMenu .chip:hover,#ctxMenu .chip:focus-visible{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}#ctxMenu .item small.in{display:inline;margin-left:6px;color:var(--muted)}
+
 /* Layout: workshop tool — editor column left (cabinets / room tabs), 3D/plan stage right, cut list below the stage */
 :root{
   --bg:#e9edef; --panel:#ffffff; --line:#d0d7db; --fg:#1a2227; --muted:#5a6870;
@@ -167,7 +169,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.24 · 00:05 · Blum HK-XS (не TIP-ON)</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.24 · 00:15 · По-кратко меню с десния бутон</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2827,12 +2829,13 @@ ctx.addEventListener('click',e=>{const b=e.target.closest('[data-dctx],[data-dco
 ctx.addEventListener('input',e=>{if(e.target.matches('[data-dcolp]')&&ctx.dataset.door)setDoor(it=>{it.col=e.target.value})});
 ctx.addEventListener('click',e=>{if(e.target.closest('[data-dcolp],label'))e.stopPropagation()});
 function openCtx(id,x,y){ctx.dataset.door='';if(!(multiSel.size>1&&multiSel.has(id))&&id!==sel)select(id);const k=cab(id);if(!k)return;const on=k.wall!==null,grp=groupOf(id);
-  const it=(a,t,sm)=>`<button class="item" data-ctx="${a}"><span>${t}</span>${sm?`<small>${sm}</small>`:''}</button>`;
+  const it=(a,t,sm)=>`<button class="item" data-ctx="${a}" ${sm?`title="${esc(String(sm).replace(/<[^>]*>/g,''))}"`:''}><span>${t}${sm&&/\d/.test(sm)?`<small class="in">${sm}</small>`:''}</span></button>`, /* поясненията — като подсказка; с размер — на същия ред */
+    row=(t,bs)=>`<div class="crow"><span>${t}</span>${bs.map(([a,l,tt])=>`<button class="chip" data-ctx="${a}" ${tt?`title="${esc(tt)}"`:''}>${l}</button>`).join('')}</div>`;
   ctx.innerHTML=`<div class="gh" style="padding:6px 8px;font-weight:600">${esc(k.name)}</div>`+
     (on?it('align','Подравни отпред','лицето на линия със съседите')+(+k.gap?it('wall0','Долепи до стената','отстъп 0'):''):'')+
-    it('rot90','Завърти на 90°',on?'откача го от стената':'')+it('rot180','Завърти на 180°',on?'откача го от стената':'')+
+    row('Завърти',[['rot90','90°',on?'откача го от стената':''],['rot180','180°',on?'откача го от стената':'']])+
     (grp.length>1?`<div class="gh" style="padding:2px 8px 6px;color:var(--muted)">избрани ${grp.length} шкафа</div>`:'')+
-    ((on||grp.every(q=>q.wall===null))&&!['plinthRun','filler','endPanel','acc'].includes(k.type)?it('endL','Завършваща страница отляво',grp.length>1?'обща за избраните':'цяло платно до пода')+it('endR','Завършваща страница отдясно',grp.length>1?'обща за избраните':'цяло платно до пода'):'')+
+    ((on||grp.every(q=>q.wall===null))&&!['plinthRun','filler','endPanel','acc'].includes(k.type)?row('Завършваща страница',[['endL','отляво',grp.length>1?'обща за избраните':'цяло платно до пода'],['endR','отдясно',grp.length>1?'обща за избраните':'цяло платно до пода']]):'')+
     (grp.some(q=>q.type==='top')?it('splash','Гръб над плота',grp.length>1?'за избраните плотове':'по дължината на плота'):'')+
     (grp.some(q=>q.wall!==null&&q.upper&&!['ubottom','wpanel','wshelf'].includes(q.type))?it('ubot','Цяло дъно отдолу',grp.length>1?'общо под избраните горни':'под този горен шкаф'):'')+
     (grp.some(q=>q.wall!==null&&(BASE.includes(q.type)||q.type==='nstand')&&!q.upper)?it('top','Плот',grp.length>1?'общ за избраните':'за този шкаф'):'')+
