@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 23:00 · Декори: отметка „Шарка“ (и в KRAFTCUT)</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 23:15 · Blum HF top — по нашата таблица HF1…HF11</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -456,6 +456,8 @@ const LIFT={ // LF = височина на корпуса (мм) × тегло �
   hf:{name:'Blum Aventos HF top (2 сгъващи се врати)',h:[480,1200],t:[['22F2500',2700,13500],['22F2800',10000,19300]],arm:[['22F3200',480,610],['22F3500',600,910],['22F3800',840,1220]],both:true,strong:true}, // HF top: 1 к-т механизъм (2 бр.) + 1 к-т телескопични рамена (2 бр.) по височината на корпуса
   hl:{name:'Blum Aventos HL (вдига се успоредно)',h:[300,580]},
   hs:{name:'Blum Aventos HS (нагоре и над шкафа)',h:[350,800]}};
+const HFT=[[600,[1,1,1,1,1,1,4,4,4,4,4,4,7]],[650,[1,1,1,1,1,1,4,4,4,4,4,4,7]],[700,[1,1,1,1,1,1,4,4,4,4,4,4,7]],[750,[1,1,1,1,1,1,4,4,4,4,4,4,8]],[800,[1,1,1,1,1,1,4,4,4,4,5,5,8]],[850,[1,1,1,1,1,1,4,4,5,5,5,5,8]],[900,[2,2,2,2,2,2,6,6,6,6,6,6,11]],[950,[2,2,2,2,2,3,6,6,6,6,6,10,11]],[1000,[2,2,2,2,3,3,6,6,6,10,10,10,11]],[1050,[2,2,2,3,3,3,6,6,10,10,10,10,11]],[1100,[2,2,2,3,3,3,6,10,10,10,10,10,11]],[1150,[2,2,3,3,3,3,10,10,10,10,10,0,0]],[1200,[2,3,3,3,3,9,10,10,10,10,0,0,0]]]; // таблицата на М Плюс за Blum AVENTOS HF top: височина на фронта (600…1200 през 50) × ширина (600…1800 през 100) → комплект HF1…HF11 (0 = не става)
+const hfSet=(h,w)=>{const r=HFT.find(([hh])=>h<=hh+0.5),ci=Math.max(0,Math.ceil((w-600-0.5)/100));if(!r||ci>12)return 0;return r[1][ci]}; // междинен размер — към по-големия ред/колона
 const GASN=[60,80,100,120]; // газови амортисьори с плавно — 60 до 120 N
 const isPt=t=>t==='water'||t==='power'||t==='gas'||t==='duct'; // точкови елементи — мерят се до центъра
 const isBox=t=>t==='radiator'||t==='panel'; // елементи с габарит по стената
@@ -1816,6 +1818,7 @@ function hwList(cabs){const S=P.settings,M=new Map(),C=id=>String(S['hwC_'+id]||
     if(+k.lift>0){const ci=null,L=liftCalc(k,ci?.calc); /* механизмът от каталога за реда — програмата сама избира кой точно */
       if(L&&ci&&L.code){const nm=ci.name||L.name;put('lf_'+L.mech+'_'+L.code,nm+' — механизъм '+L.code,L.code,1,'к-т',k);if(L.arm)put('lf_'+L.mech+'_arm_'+L.arm,nm+' — телескопично рамо '+L.arm,L.arm,1,'к-т',k)}
       else if(L&&ci&&L.mech==='gas')put('lf_gas_'+L.short,(ci.name||'Газов амортисьор')+' — '+L.short.replace('газови амортисьори ',''),'',1,'к-т',k);
+      else if(L&&L.mech==='hf'&&L.hfSet)put('lf_hf_set_'+L.hfSet,'Blum Aventos HF top — комплект HF'+L.hfSet,'HF'+L.hfSet,1,'к-т',k);
       else if(L&&L.code){const nm=L.name.replace(/ \(.*\)$/,'');put('lf_'+L.mech+'_'+L.code,nm+' — механизъм '+L.code,L.code,1,'к-т',k);if(L.arm)put('lf_'+L.mech+'_arm_'+L.arm,nm+' — телескопично рамо '+L.arm,L.arm,1,'к-т',k)}
       else if(L)put('lf_'+L.mech+'_'+L.short,L.short.replace(/ · LF \d+$/,''),C('lf_'+L.mech),1,'к-т',k);for(const d of ps.filter(p=>p.name==='Врата повдигаща'))handle(d.box[1]-d.box[0])}
     /* Gola */
@@ -2480,6 +2483,7 @@ function liftCalc(k,mo){if(!(+k.lift>0))return null;const S=P.settings,ds=+(S.bo
     r.short=`газови амортисьори ${doors.map(d=>'2 × '+d.n+' N').join(' + ')}`;return r}
   if(M.h&&(hc<M.h[0]||hc>M.h[1]))r.warn.push(`${M.name} е за корпус ${M.h[0]}–${M.h[1]} мм, а този е ${hc} мм.`);
   if(mech==='hf'&&doors.length!==2)r.warn.push('HF е за 2 сгъващи се врати — избери „2 повдигащи“.');
+  if(mech==='hf'){const fd=bp.filter(p=>p.name==='Врата повдигаща'),fh=fd.length?Math.max(...fd.map(p=>p.box[5]))-Math.min(...fd.map(p=>p.box[4])):hc,fw=fd.length?Math.max(...fd.map(p=>p.box[1]-p.box[0])):+k.W,n=hfSet(fh,fw);r.hfSet=n;r.fh=Math.round(fh);r.fw=Math.round(fw);r.msg.push(n?`по нашата таблица: фронт ${r.fh} × ${r.fw} мм → комплект HF${n}`:`по нашата таблица: фронт ${r.fh} × ${r.fw} мм — HF top не става`);if(!n)r.warn.push(`Фронт ${r.fh} × ${r.fw} мм е извън таблицата за HF top.`)}
   if(M.t){const kg=M.both?doors.reduce((a,d)=>a+d.kg+2*hw,0):doors[0].kg+2*hw,LF=Math.round(hc*kg),hit=M.t.filter(([,a,b])=>LF>=a&&LF<=b).map(q=>q[0]);if(M.strong)hit.reverse(); /* в общия диапазон — по-силния (както препоръчва Blum) */r.code=hit[0];if(M.arm){const a=M.arm.filter(([,x,y])=>hc>=x&&hc<=y).sort((u,w)=>Math.abs(hc-(u[1]+u[2])/2)-Math.abs(hc-(w[1]+w[2])/2)).map(q=>q[0]);r.arm=a[0];if(r.arm)r.msg.push('телескопично рамо: '+r.arm+(a.length>1?' (става и '+a.slice(1).join(', ')+')':''));if(!r.arm)r.warn.push(`Няма телескопично рамо за корпус ${hc} мм.`)}
     r.LF=LF;r.msg.push(`тегло ${M.both?'на двете врати':'на вратата'} ~${fmt(kg)} кг (с дръжка ×2) · LF = ${hc} × ${fmt(kg)} = ${LF}`);
     if(hit.length)r.msg.push(`механизъм: ${hit.join(' или ')} (ориентировъчно — провери в каталога на Blum)`);else r.warn.push(`LF ${LF} е извън диапазоните на ${M.name} (${M.t[0][1]}–${M.t.at(-1)[2]}) — избери друг механизъм.`);
