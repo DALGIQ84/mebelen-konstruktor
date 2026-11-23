@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 09:30 · Коментар към детайла (и в KRAFTCUT)</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 09:50 · Кутиите на чекмеджетата следват корпуса</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1055,7 +1055,8 @@ function relink(k,ps){ // „умните“ връзки след ръчна п
     if(!L||!R||!(L.ov||R.ov||L.added||R.added)||(k.pOv||{})[sh.key]?.dL)continue;setAx(sh,0,L.box[1]+cl,R.box[0]-cl)}}
 function addBox(a){const L=+a.L,W=+a.Wd,t=+mat(a.m).t,x=+a.x||0,y=+a.y||0,z=+a.z||0;
   return a.or==='vx'?[x,x+t,y,y+W,z,z+L]:a.or==='vy'?[x,x+L,y,y+t,z,z+W]:[x,x+L,y,y+W,z,z+t]} // h — лежи (дъно/рафт); vx — стои напречно (страница/делител); vy — стои по ширината (гръб/бленда отпред)
-function build(k){k._gvw=null;const r=buildCD(k);if(k._gvw&&r.warn)r.warn.push(...k._gvw);if(r.warn&&(k.type==='bed'&&k.bClad==='uph'||k.type==='hboard'&&(k.hbType==='uph'||k.hbType==='uphP'))){const L=[1,2,3].map(i=>[i,fabSlot(k,i)]).filter(([,q])=>q.n);if(L.length)r.warn.push(L.length===1&&L[0][0]===1?'Плат: '+L[0][1].n:L.map(([i,q])=>'Плат '+i+': '+q.n).join(' · '))}if(k._hs!=null||k._noOv)return r;return applyPOv(k,r)}
+const mxOwn=k=>k.mxOwn!=null?!!k.mxOwn:!!(k.mx&&k.mx!=='k1'&&k.mx!==k.mc); // кутиите на чекмеджетата — с корпуса на шкафа, освен ако са сменени на ръка
+function build(k){if(k.mc&&!mxOwn(k)&&k.mx!==k.mc)k={...k,mx:k.mc};k._gvw=null;const r=buildCD(k);if(k._gvw&&r.warn)r.warn.push(...k._gvw);if(r.warn&&(k.type==='bed'&&k.bClad==='uph'||k.type==='hboard'&&(k.hbType==='uph'||k.hbType==='uphP'))){const L=[1,2,3].map(i=>[i,fabSlot(k,i)]).filter(([,q])=>q.n);if(L.length)r.warn.push(L.length===1&&L[0][0]===1?'Плат: '+L[0][1].n:L.map(([i,q])=>'Плат '+i+': '+q.n).join(' · '))}if(k._hs!=null||k._noOv)return r;return applyPOv(k,r)}
 function buildCD(k){const r=buildRaw(k);if(k.type!=='doors')return r;const o=cdPartner(k);if(!o)return r;const f=+(P.settings.cdFuga??5);
   if(k.cdOf){r.parts=r.parts.filter(p=>p.kind!=='door');r.warn.push(`Вратата е обща с „${o.name}“ — тя е в неговите детайли.`);return r}
   const z0=Math.min(+k.c,+o.c),z1=Math.max(+k.H,+o.H),h=r1(z1-z0-f);
@@ -1910,7 +1911,7 @@ function renderEditor(){
     if((f==='mb'||f==='backPos'||f==='bRails'||f==='floor')&&k.type==='doors'&&(k.half==='L'||k.half==='R'))return ''; // ъглова част Б — гърбът е твърд, от корпуса
     if(f==='top'&&k.type==='oven')return '';
     if(t==='color')return `<label>${l}<input id="${id}" data-f="${f}" type="color" value="${esc(k[f]||'#8e8a84')}" style="height:34px;padding:2px"></label>`;
-    if(t==='mat') return `<label>${l}<select id="${id}" data-f="${f}">${f==='mb'?`<option value="none" ${k.mb==='none'?'selected':''}>Без гръб</option>`:''}${P.materials.filter(m=>!m.glass).map(m=>`<option value="${m.id}" ${m.id===k[f]?'selected':''}>${esc(m.name)}${String(m.name).trim().endsWith(' '+m.t)?'':' '+m.t} мм</option>`).join('')}</select></label>`;
+    if(t==='mat') return `<label>${l}<select id="${id}" data-f="${f}">${f==='mb'?`<option value="none" ${k.mb==='none'?'selected':''}>Без гръб</option>`:''}${P.materials.filter(m=>!m.glass).map(m=>`<option value="${m.id}" ${m.id===(f==='mx'&&!mxOwn(k)?k.mc:k[f])?'selected':''}>${esc(m.name)}${String(m.name).trim().endsWith(' '+m.t)?'':' '+m.t} мм</option>`).join('')}</select></label>`;
     if(t==='matG'){const df=f==='mGs'?'gl6':'gl4',cur=k[f]||df;return `<label>${l}<select id="${id}" data-f="${f}">${P.materials.filter(m=>m.glass).map(m=>`<option value="${m.id}" ${m.id===cur?'selected':''}>${esc(m.name)}${String(m.name).trim().endsWith(' '+m.t)?'':' '+m.t} мм</option>`).join('')}</select></label>`}
     if(t==='sel') return `<label>${l}<select id="${id}" data-f="${f}">${x.map(([v,n])=>`<option value="${v}" ${String(v)===String(f==='divRef'?divMode(k):k[f])?'selected':''}>${n}</option>`).join('')}</select></label>`;
     if(t==='wall') return `<label>${l}<select id="${id}" data-f="wall"><option value="">Свободно</option>${P.room.pts.map((_,i)=>`<option value="${i}" ${k.wall===i?'selected':''}>Стена ${i+1} · ${Math.round(wallInfo(i).len)}</option>`).join('')}</select></label>`;
@@ -1959,6 +1960,7 @@ $('#ed').addEventListener('input',e=>{
   if(e.target.dataset.bh!==undefined){const k=cab(sel),i=+e.target.dataset.bh;k.bh=k.bh||[];const v=e.target.value;k.bh[i]=v===''?null:+v;P.example=false;changed(false);return}
   const f=e.target.dataset.f,k=cab(sel);if(!f||!k)return;
   let v=e.target.type==='checkbox'?e.target.checked:e.target.value;
+  if(f==='mx'){k.mxOwn=v!==k.mc} /* същият като корпуса — пак следва корпуса */
   if((f==='mc'||f==='mf')&&k[f]&&v&&v!==k[f]&&k.pAdd){const o=k[f];k.pAdd=k.pAdd.map(a=>!a.mOwn&&a.m===o?{...a,m:v}:a)} /* добавените в „Детайли“ със стария материал — сменят се и те */
   if(f==='wall'){if(v===''){k.wall=null}else{k.wall=+v;k.off=0;place(k)}P.example=false;changed(true);return}
   if(isAcc(k)&&f==='acc'){const a=ACC[v]||ACC.sink;k.acc=v;if(/^(Мивка|Котлон|Готварска|Хладилник|Пералня|Съдомиялна|Сушилня)/.test(k.name))k.name=a.name.replace(/ \(.*\)/,'');k.W=a.W;k.D=a.D;k.c=a.free?0:900;k.H=k.c+a.h;k.gap=a.gap||0;place(k);P.example=false;changed(true);return}
