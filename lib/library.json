@@ -26,7 +26,7 @@
   },
   {
    "id": "asals2c",
-   "ts": 1795463303482,
+   "ts": 1795463309594,
    "folder": "Егер",
    "name": "Акация Лейкленд светла",
    "code": "H1277 ST9",
@@ -34,7 +34,10 @@
    "dir": "v",
    "ar": 1.7753086419753086,
    "rot": 0,
-   "img": "lib/img/asals2c.jpg"
+   "img": "lib/img/asals2c.jpg",
+   "sl": 2800,
+   "sw": 2070,
+   "grain": true
   },
   {
    "id": "xangank",
