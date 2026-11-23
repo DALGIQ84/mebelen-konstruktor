@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 22:30 · Механизмите (долен/горен ред) — махнати засега</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 22:35 · Обковът — само в таба отляво</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -267,7 +267,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
     <section class="card" id="detCard">
       <h2>Детайли
         <span class="sp">
-          <span class="seg"><button id="sCab" class="on">Избран шкаф</button><button id="sAll">Целия проект</button></span><span class="seg" style="margin-left:6px"><button id="tParts" class="on">Детайли</button><button id="tHw">Обков</button></span>
+          <span class="seg"><button id="sCab" class="on">Избран шкаф</button><button id="sAll">Целия проект</button></span>
           <button class="btn sm primary" id="bCopy">Копирай за разкроя</button>
         </span>
       </h2>
@@ -3664,7 +3664,7 @@ $('#tClear').onchange=e=>{showClear=e.target.checked;if(showClear&&view!=='wall'
 $('#bFit').onclick=()=>{toggleView(false);if(view==='3d')fit();else{camV=null;renderPlan()}};
 $('#sCab').onclick=()=>{scope='cab';$('#sCab').classList.add('on');$('#sAll').classList.remove('on');renderTable()};
 $('#sAll').onclick=()=>{scope='all';$('#sAll').classList.add('on');$('#sCab').classList.remove('on');renderTable()};
-$('#tParts').onclick=()=>{tblMode='parts';$('#tParts').classList.add('on');$('#tHw').classList.remove('on');renderTable()};$('#tHw').onclick=()=>{tblMode='hw';$('#tHw').classList.add('on');$('#tParts').classList.remove('on');renderTable()};
+
 /* ---------- Меню Кухни ---------- */
 const KITCHEN_UP={cat:'Горни шкафове',items:[
     {name:'Горен с врати',p:{upper:true,W:600,c:1450,H:2170,D:320,doors:1,div:0,sh:2,plinth:false}},
