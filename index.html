@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 22:45 · Обков: количествата се виждат</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 23:00 · Декори: отметка „Шарка“ (и в KRAFTCUT)</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -872,6 +872,7 @@ function splitBackFix(k,parts){ /* етажерка от 2 части: тава�
   const tp=parts.find(p=>p.name==='Таван'&&p.box&&!p.added);if(tp&&tp.box[2]<bY-0.5){dep(tp);for(const g of hi)if(g.box[5]<tp.box[5])fit(g,g.box[4],tp.box[5])}}
 const cncShape=p=>{if(!p||!p.box||p.hidden||['hw','alu','glass','appl','virt'].includes(p.kind)||p.tilt)return null;const b=p.box; /* формата на лицето на фигурния детайл (u,v), от 0 */
   if(!p.shp&&!p.pl)return null; /* Gola изрезите на страниците — на циркуляра, не тук */let P0=null;if(p.fp)P0=p.fp.map(([x,z])=>[x-b[0],z-b[4]]);else if(p.sp)P0=p.sp.map(([y,z])=>[y-b[2],z-b[4]]);else if(p.pl)P0=p.pl.map(([x,y])=>[x-b[0],y-b[2]]);return P0&&P0.length>=3?P0:null};
+const matGrain=m=>{if(!m)return false;if(m.dec){const it=libAll().items.find(q=>q.id===m.dec);if(it)return !!it.grain}return !!m.grain}; /* шарка — от декора в библиотеката (отметка „Шарка“); без отметка — без шарка */
 function lateFin(k,parts){if(k.type!=='wpanel'&&!(k.type==='endShelf'&&(k.eShape||'45')!=='r')){ /* крайна етажерка 45°/права — прави срезове, на циркуляра */const ov=Math.max(0,+(P.settings.cncOver??0));for(const p of parts){if(p.cnc||!cncShape(p))continue;p.cnc=true;p.cncOv=ov;p.net=[p.L,p.Wd];if(ov>0){p.L=r1(+p.L+2*ov);p.Wd=r1(+p.Wd+2*ov)}}} /* фигурните детайли — на CNC, в разкроя с надмярка */ /* детайлите от „Детайли“ и направените накрая — и те слушат канта/шарката от таблицата */
   for(const p of parts)if(/^Страница/.test(p.name)&&p.box&&!p.sd)p.sd=(p.box[0]+p.box[1])/2<+k.W/2?'L':'R';
   const go=k.grainOv||{};for(const p of parts)if(!p._gs&&go[p.name]&&p.e){[p.L,p.Wd]=[p.Wd,p.L];p.e=[p.e[2],p.e[3],p.e[0],p.e[1]];p._gs=true}
@@ -1875,10 +1876,10 @@ function renderTable(){if(tab==='hw')setTimeout(renderHwPane,0);if(tblMode==='hw
 }
 function cutRows(sc,withSz){if(sc==='proj'){if(nRooms()<2)return cutRows('all',withSz);const m=new Map();for(let i=0;i<P.rooms.length;i++)for(const r of withRoom(i,()=>cutRows('all',withSz))){const key=r.filter((_,j)=>j!==3).join('\t'),o=m.get(key);if(o)o[3]=+o[3]+ +r[3];else m.set(key,[...r])}return[...m.values()]} // целия проект — всички стаи, еднаквите детайли се събират
   const keep=scope;scope=sc||scope;try{const list=scope==='all'?P.cabinets:P.cabinets.filter(c=>c.id===sel);
-  const S=P.settings;return rows(list).map(r=>{const m=mat(r.m),lb=mLbl(m),q=[r.type,fmt(r.L),fmt(r.Wd),r.n,...r.e.map(v=>v?S.edgeOn:S.edgeOff),lb!==m.name&&+m.t>0?`${lb} ${fmt(m.t)}`:lb];if(r.note)q.push('','','',String(r.note).replace(/[\t\r\n;]+/g,' '));if(withSz&&+m.sheetL>0&&+m.sheetW>0)q.push(`${Math.round(m.sheetL)}×${Math.round(m.sheetW)}`);return q})}finally{scope=keep}} /* размерът на плочата (от библиотеката) — за KRAFTCUT */
+  const S=P.settings;return rows(list).map(r=>{const m=mat(r.m),lb=mLbl(m),q=[r.type,fmt(r.L),fmt(r.Wd),r.n,...r.e.map(v=>v?S.edgeOn:S.edgeOff),lb!==m.name&&+m.t>0?`${lb} ${fmt(m.t)}`:lb];q.push(matGrain(m)?'шарка':'върти');if(r.note)q.push('','',String(r.note).replace(/[\t\r\n;]+/g,' ')); /* KRAFTCUT: материал, посока (шарка/върти), група, ред, коментар */if(withSz&&+m.sheetL>0&&+m.sheetW>0)q.push(`${Math.round(m.sheetL)}×${Math.round(m.sheetW)}`);return q})}finally{scope=keep}} /* размерът на плочата (от библиотеката) — за KRAFTCUT */
 function exportText(sc,withSz){return cutRows(sc,withSz).map(r=>r.join('\t')).join('\n')}
 function exportCSV(sc){const q=v=>/[;"\n]/.test(String(v))?'"'+String(v).replace(/"/g,'""')+'"':String(v);
-  return '\ufeff'+[['Детайл','Дължина','Ширина','Брой','Кант дълга 1','Кант дълга 2','Кант къса 1','Кант къса 2','Материал','Коментар'],...cutRows(sc).map(r=>[...r.slice(0,9),r[12]||''])].map(r=>r.map(q).join(';')).join('\r\n')}
+  return '\ufeff'+[['Детайл','Дължина','Ширина','Брой','Кант дълга 1','Кант дълга 2','Кант къса 1','Кант къса 2','Материал','Шарка','Коментар'],...cutRows(sc).map(r=>[...r.slice(0,9),r[9]==='шарка'?'да':'не',r[12]||''])].map(r=>r.map(q).join(';')).join('\r\n')}
 const OFFLINE=!window.claude; // инсталираната версия — файл на компютъра, без Claude
 function plainDownload(name,data){const b=data instanceof Blob?data:new Blob([data]);const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
 async function saveFile(name,data){if(OFFLINE){plainDownload(name,data);toast('Запазено: '+name);return true}
@@ -4391,6 +4392,7 @@ function renderLib(){const A=libView(),q=($('#libQ').value||'').toLowerCase().tr
       <label>Име<input id="leN" value="${esc(it.name)}"></label><label>Код<input id="leC" value="${esc(it.code||'')}"></label>
       <label>Папка<select id="leF">${libAll().folders.map(f=>`<option ${f===it.folder?'selected':''}>${esc(f)}</option>`).join('')}</select></label>
       <label>Плоча — дължина (по фладера) × ширина, мм<span style="display:flex;gap:4px;align-items:center"><input id="leSL" type="number" value="${it.sl||2800}" style="width:76px">×<input id="leSW" type="number" value="${it.sw||2070}" style="width:76px"></span></label>
+      <label class="tog" style="align-self:end"><input type="checkbox" id="leG" ${it.grain?'checked':''}> Шарка (детайлите не се въртят в разкроя)</label>
       <label>Нова снимка (по желание)<input id="leI" type="file" accept="image/*"></label>
       <div style="display:flex;align-items:end"><button class="btn sm primary" id="leSave">Запази промените</button></div></div></details>
     <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font-size:12.5px">Фладер:</span><button class="btn sm${libLook(it)==='v'?' primary':''}" data-ldir="v">↕ вертикален</button><button class="btn sm${libLook(it)==='h'?' primary':''}" data-ldir="h">↔ хоризонтален</button>
@@ -4409,11 +4411,12 @@ function libFormHtml(){const A=libView();if(libMode==='fab')return `<b style="gr
   <label>Име<input id="lfN" placeholder="напр. Дъб Халифакс"></label><label>Код<input id="lfC" placeholder="напр. H1180 ST37"></label>
   <label>Снимката е широка, мм<input id="lfW" type="number" value="1000"></label>
   <label>Плоча — дължина (по фладера) × ширина, мм<span style="display:flex;gap:4px;align-items:center"><input id="lfSL" type="number" value="2800" style="width:80px">×<input id="lfSW" type="number" value="2070" style="width:80px"></span></label><label>Фладер<select id="lfD"><option value="v">↕ вертикален</option><option value="h">↔ хоризонтален</option></select></label>
+  <label class="tog" style="align-self:end"><input type="checkbox" id="lfG"> Шарка (детайлите не се въртят в разкроя)</label>
   <label>Снимка<input id="lfI" type="file" accept="image/*"></label>
   <div style="grid-column:1/-1;display:flex;gap:6px"><button class="btn primary sm" id="lfSave">Запази</button><button class="btn sm" id="lfX">Откажи</button></div>`}
 function libAddSave(){const f=$('#lfI').files[0],name=$('#lfN').value.trim();if(!name){toast('Напиши име');return}if(!f){toast('Избери снимка');return}
   const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const sc=Math.min(1,1024/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);
-    c.getContext('2d').drawImage(img,0,0,c.width,c.height);const it={id:uid(),ts:Date.now(),folder:$('#lfF').value,name,code:$('#lfC').value.trim(),w:+$('#lfW').value||1000,sl:+$('#lfSL').value||2800,sw:+$('#lfSW').value||2070,dir:grainOf(c)||(img.width>=img.height?'h':'v'),ar:img.height/img.width,data:c.toDataURL('image/jpeg',0.82),pend:true};
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);const it={id:uid(),ts:Date.now(),folder:$('#lfF').value,name,code:$('#lfC').value.trim(),w:+$('#lfW').value||1000,sl:+$('#lfSL').value||2800,sw:+$('#lfSW').value||2070,dir:grainOf(c)||(img.width>=img.height?'h':'v'),ar:img.height/img.width,data:c.toDataURL('image/jpeg',0.82),pend:true,...($('#lfG')?{grain:!!$('#lfG').checked}:{})};
     it.rot=$('#lfD').value===it.dir?0:90;const L=libLocal();L.items.push(it);libLocalSet(L);$('#libForm').hidden=true;libOpenId=it.id;renderLib();libPush()};img.onerror=()=>toast('Файлът не е картинка');img.src=r.result};r.readAsDataURL(f)}
 async function libApply(it,mid,quiet){const m=P.materials.find(q=>q.id===mid);if(!m)return;const src=libImg(it);
   const img=new Image();img.crossOrigin='anonymous';img.onload=()=>{const sc=Math.min(1,1024/Math.max(img.width,img.height)),w=Math.round(img.width*sc),h=Math.round(img.height*sc),rt=!!it.rot,c=document.createElement('canvas');c.width=rt?h:w;c.height=rt?w:h;const g=c.getContext('2d');
@@ -4437,7 +4440,7 @@ $('#ovLib').addEventListener('click',e=>{const f=e.target.closest('[data-lf]');i
 $('#ovLib').addEventListener('toggle',e=>{if(e.target.id==='libEd')libEditOpen=e.target.open},true);
 function libEditSave(){ /* промяна на име, код, папка, размер на плочата и снимка на декор, който вече е в библиотеката */
   const it=libAll().items.find(q=>q.id===libOpenId);if(!it)return;const name=$('#leN').value.trim();if(!name){toast('Напиши име');return}
-  const ch=$('#leSL')?{name,code:$('#leC').value.trim(),folder:$('#leF').value,sl:+$('#leSL').value||2800,sw:+$('#leSW').value||2070}:{name,code:$('#leC').value.trim(),folder:$('#leF').value,w:+$('#leW').value||300},f=$('#leI').files[0];
+  const ch=$('#leSL')?{name,code:$('#leC').value.trim(),folder:$('#leF').value,sl:+$('#leSL').value||2800,sw:+$('#leSW').value||2070,grain:!!$('#leG')?.checked}:{name,code:$('#leC').value.trim(),folder:$('#leF').value,w:+$('#leW').value||300},f=$('#leI').files[0];
   const done=()=>{libEditOpen=false;libEdit(ch);if(isFabF(it.folder)){const n2=libAll().items.find(q=>q.id===it.id);for(const c of P.cabinets)for(const i of [1,2,3])if(fabSlot(c,i).id===it.id&&n2)fabApply(n2,c,true,i)}toast('Промените са запазени')};
   if(!f){done();return}
   const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const sc=Math.min(1,1024/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);
