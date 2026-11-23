@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 22:00 · Обков: механизми — долен/горен ред</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 22:20 · Механизми, които се изчисляват сами (Blum HF)</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -453,7 +453,7 @@ const LIFT={ // LF = височина на корпуса (мм) × тегло �
   hkxs:{name:'Blum Aventos HK-XS',h:[240,600],t:[['20K1101',200,1000],['20K1301',500,1500],['20K1501',800,1800]]},
   hks:{name:'Blum Aventos HK-S',h:[180,400],t:[['20K2300',220,500],['20K2500',400,1000],['20K2700',960,2215]]},
   hk:{name:'Blum Aventos HK top',h:[350,600],t:[['22K2300',400,1000],['22K2500',930,2800],['22K2700',2600,5350],['22K2900',5000,10150]]},
-  hf:{name:'Blum Aventos HF (2 сгъващи се врати)',h:[560,1040],t:[['22F2500',2600,5500],['22F2800',5350,10150],['22F3200',9000,17250]],both:true},
+  hf:{name:'Blum Aventos HF top (2 сгъващи се врати)',h:[480,1200],t:[['22F2500',2700,13500],['22F2800',10000,19300]],arm:[['22F3200',480,610],['22F3500',600,910],['22F3800',840,1220]],both:true,strong:true}, // HF top: 1 к-т механизъм (2 бр.) + 1 к-т телескопични рамена (2 бр.) по височината на корпуса
   hl:{name:'Blum Aventos HL (вдига се успоредно)',h:[300,580]},
   hs:{name:'Blum Aventos HS (нагоре и над шкафа)',h:[350,800]}};
 const GASN=[60,80,100,120]; // газови амортисьори с плавно — 60 до 120 N
@@ -1812,7 +1812,10 @@ function hwList(cabs){const S=P.settings,M=new Map(),C=id=>String(S['hwC_'+id]||
       for(const q of sd){const qb=q.box0||q.box,NL=Math.round(+q.slL>0?+q.slL:(qb[3]-qb[2])+(met?+sl.bD||0:+sl.lenDed||0)); /* дължината на водача — както е избрана при правенето на чекмеджето */by.set(NL,(by.get(NL)||0)+(met?1:0.5))}
       for(const[NL,n]of by)put('sl_'+sl.id+'_'+NL+(pushD?'p':''),'Водачи '+sl.name+' '+NL+' мм'+(pushD?' (push)':''),C('sl_'+sl.id),Math.round(n),'чифт',k)}
     /* повдигащи врати — механизъм */
-    if(+k.lift>0){const L=liftCalc(k);if(L)put('lf_'+L.mech+'_'+L.short,L.short,C('lf_'+L.mech),1,'к-т',k);for(const d of ps.filter(p=>p.name==='Врата повдигаща'))handle(d.box[1]-d.box[0])}
+    if(+k.lift>0){const ci=libAll().items.find(i=>i.hw&&i.calc&&(i.row||'low')===(k.upper?'up':'low')&&LIFT[i.calc]&&!(i.calc==='hf'&&+k.lift!==2)),L=liftCalc(k,ci?.calc); /* механизмът от каталога за реда — програмата сама избира кой точно */
+      if(L&&ci&&L.code){const nm=ci.name||L.name;put('lf_'+L.mech+'_'+L.code,nm+' — механизъм '+L.code,L.code,1,'к-т',k);if(L.arm)put('lf_'+L.mech+'_arm_'+L.arm,nm+' — телескопично рамо '+L.arm,L.arm,1,'к-т',k)}
+      else if(L&&ci&&L.mech==='gas')put('lf_gas_'+L.short,(ci.name||'Газов амортисьор')+' — '+L.short.replace('газови амортисьори ',''),'',1,'к-т',k);
+      else if(L)put('lf_'+L.mech+'_'+L.short,L.short,C('lf_'+L.mech),1,'к-т',k);for(const d of ps.filter(p=>p.name==='Врата повдигаща'))handle(d.box[1]-d.box[0])}
     /* Gola */
     for(const g of ps.filter(p=>/^Gola (L|C) профил/.test(p.name))){const L=/^Gola L/.test(g.name),b=g.box,len=Math.max(b[1]-b[0],b[3]-b[2],b[5]-b[4]);put(L?'golaL':'golaC','Gola '+(L?'L':'C')+' профил',C(L?'golaL':'golaC'),len/1000,'м',k)}
     /* крачета и щипки */
@@ -1830,13 +1833,14 @@ const HWR=[['low','Долен ред'],['up','Горен ред']];
 function hwCatHtml(){const its=libAll().items.filter(i=>i.hw&&(i.row||'low')===hwRow).sort((a,b)=>String(a.name).localeCompare(b.name,'bg',{numeric:true}));
   return `<div style="margin-top:14px;border-top:1px solid var(--line);padding-top:10px"><div style="font-size:12px;font-weight:600;margin-bottom:6px">Механизми</div><span class="seg" id="hwRowSeg">${HWR.map(([v,l])=>`<button data-hwr="${v}" class="${v===hwRow?'on':''}">${l}</button>`).join('')}</span>
     <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">${its.length?its.map(i=>`<div style="display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:6px">${i.data||i.img?`<img src="${esc(libImg(i))}" alt="" style="width:46px;height:46px;object-fit:cover;border-radius:6px;background:#eee">`:'<div style="width:46px;height:46px;border-radius:6px;background:var(--bg2,#eef1f3)"></div>'}
-      <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">${esc(i.name)}</div><div style="font-size:11.5px;color:var(--muted)">${esc([i.brand,i.code].filter(Boolean).join(' · '))}</div></div><button class="btn sm" data-hwe="${esc(i.id)}" title="Редактирай" aria-label="Редактирай ${esc(i.name)}">✎</button><button class="btn sm" data-hwd="${esc(i.id)}" title="Изтрий" aria-label="Изтрий ${esc(i.name)}">×</button></div>`).join(''):'<div style="font-size:12px;color:var(--muted)">Още няма — добави механизмите, които ползваш за този ред.</div>'}</div>
+      <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">${esc(i.name)}</div><div style="font-size:11.5px;color:var(--muted)">${esc([i.brand,i.code].filter(Boolean).join(' · '))}${i.calc&&LIFT[i.calc]?` · <b style="color:var(--fg)">смята сам: ${esc(LIFT[i.calc].name.replace('Blum Aventos ',''))}</b>`:''}</div></div><button class="btn sm" data-hwe="${esc(i.id)}" title="Редактирай" aria-label="Редактирай ${esc(i.name)}">✎</button><button class="btn sm" data-hwd="${esc(i.id)}" title="Изтрий" aria-label="Изтрий ${esc(i.name)}">×</button></div>`).join(''):'<div style="font-size:12px;color:var(--muted)">Още няма — добави механизмите, които ползваш за този ред.</div>'}</div>
     ${hwForm?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;border:1px solid var(--line);border-radius:8px;padding:8px">
       <label style="grid-column:1/-1;font-size:11.5px;color:var(--muted)">Име<input class="f" id="hwfN" value="${esc(hwForm.name||'')}" placeholder="напр. Панта с плавно затваряне"></label>
       <label style="font-size:11.5px;color:var(--muted)">Марка<input class="f" id="hwfB" value="${esc(hwForm.brand||'')}" placeholder="Blum, Hettich, GTV…"></label><label style="font-size:11.5px;color:var(--muted)">Код<input class="f" id="hwfC" value="${esc(hwForm.code||'')}"></label>
+      <label style="grid-column:1/-1;font-size:11.5px;color:var(--muted)">Изчислява се сам (кой точно е нужен за всеки шкаф от реда)<select class="f" id="hwfK"><option value="">не — само в списъка</option>${Object.entries(LIFT).filter(([v,o])=>o.t||v==='gas').map(([v,o])=>`<option value="${v}" ${hwForm.calc===v?'selected':''}>${esc(o.name)}</option>`).join('')}</select></label>
       <label style="grid-column:1/-1;font-size:11.5px;color:var(--muted)">Снимка<input id="hwfI" type="file" accept="image/*"></label>
       <div style="grid-column:1/-1;display:flex;gap:6px"><button class="btn primary sm" id="hwfSave">Запази</button><button class="btn sm" id="hwfX">Откажи</button></div></div>`:`<button class="btn sm" id="hwAdd" style="margin-top:8px">+ Добави механизъм</button>`}</div>`}
-function hwCatSave(){const name=$('#hwfN').value.trim();if(!name){toast('Напиши име');return}const f=$('#hwfI').files[0],base={...(hwForm.id?libAll().items.find(q=>q.id===hwForm.id):{}),hw:true,folder:'Обков',row:hwForm.row||hwRow,name,brand:$('#hwfB').value.trim(),code:$('#hwfC').value.trim()};
+function hwCatSave(){const name=$('#hwfN').value.trim();if(!name){toast('Напиши име');return}const f=$('#hwfI').files[0],base={...(hwForm.id?libAll().items.find(q=>q.id===hwForm.id):{}),hw:true,folder:'Обков',row:hwForm.row||hwRow,name,brand:$('#hwfB').value.trim(),code:$('#hwfC').value.trim(),calc:$('#hwfK').value||undefined};
   const fin=it=>{const L=libLocal(),i=L.items.findIndex(q=>q.id===it.id);if(i<0)L.items.push(it);else L.items[i]=it;libLocalSet(L);hwForm=null;renderHwPane();libPush()};
   if(!f){fin({...base,id:base.id||uid(),ts:Date.now(),pend:true});return}
   const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const sc=Math.min(1,512/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
@@ -2464,7 +2468,7 @@ function miterPts(f){const{x0,x1,z0,z1,aw,sd}=f;return sd==='L'?[[x0,z0],[x0+aw,
 /* ---------- Повдигащи се врати: механизъм и сила ---------- */
 
 function liftInfoHtml(k){const r=liftCalc(k);if(!r)return '';return r.msg.map(m=>`<span>${esc(m)}</span>`).join('')+r.warn.map(m=>`<span style="color:var(--mark)">${esc(m)}</span>`).join('')}
-function liftCalc(k){if(!(+k.lift>0))return null;const S=P.settings,ds=+(S.boardDens??680),hw=+(S.handleKg??0.3),mech=LIFT[k.liftMech]?k.liftMech:'gas',M=LIFT[mech];
+function liftCalc(k,mo){if(!(+k.lift>0))return null;const S=P.settings,ds=+(S.boardDens??680),hw=+(S.handleKg??0.3),mech=LIFT[mo]?mo:LIFT[k.liftMech]?k.liftMech:'gas',M=LIFT[mech];
   const bp=build(k).parts,ds2=bp.filter(p=>p.name==='Врата повдигаща'),hc=Math.round(+k.H-+k.c);let doors;
   if(ds2.length){const wt=p=>p.L*p.Wd/1e6*(+mat(p.m).t||18)/1000*ds;doors=ds2.map(p=>({L:p.L,Wd:p.Wd,kg:wt(p)}))}
   else{const fs=bp.filter(p=>p.fr&&p.fr.sd==='B');if(!fs.length)return null; // ал. врата: стъкло ~10 кг/м² + профил ~0,5 кг/м
@@ -2474,7 +2478,7 @@ function liftCalc(k){if(!(+k.lift>0))return null;const S=P.settings,ds=+(S.board
     r.short=`газови амортисьори ${doors.map(d=>'2 × '+d.n+' N').join(' + ')}`;return r}
   if(M.h&&(hc<M.h[0]||hc>M.h[1]))r.warn.push(`${M.name} е за корпус ${M.h[0]}–${M.h[1]} мм, а този е ${hc} мм.`);
   if(mech==='hf'&&doors.length!==2)r.warn.push('HF е за 2 сгъващи се врати — избери „2 повдигащи“.');
-  if(M.t){const kg=M.both?doors.reduce((a,d)=>a+d.kg+2*hw,0):doors[0].kg+2*hw,LF=Math.round(hc*kg),hit=M.t.filter(([,a,b])=>LF>=a&&LF<=b).map(q=>q[0]);
+  if(M.t){const kg=M.both?doors.reduce((a,d)=>a+d.kg+2*hw,0):doors[0].kg+2*hw,LF=Math.round(hc*kg),hit=M.t.filter(([,a,b])=>LF>=a&&LF<=b).map(q=>q[0]);if(M.strong)hit.reverse(); /* в общия диапазон — по-силния (както препоръчва Blum) */r.code=hit[0];if(M.arm){const a=M.arm.filter(([,x,y])=>hc>=x&&hc<=y).sort((u,w)=>Math.abs(hc-(u[1]+u[2])/2)-Math.abs(hc-(w[1]+w[2])/2)).map(q=>q[0]);r.arm=a[0];if(r.arm)r.msg.push('телескопично рамо: '+r.arm+(a.length>1?' (става и '+a.slice(1).join(', ')+')':''));if(!r.arm)r.warn.push(`Няма телескопично рамо за корпус ${hc} мм.`)}
     r.LF=LF;r.msg.push(`тегло ${M.both?'на двете врати':'на вратата'} ~${fmt(kg)} кг (с дръжка ×2) · LF = ${hc} × ${fmt(kg)} = ${LF}`);
     if(hit.length)r.msg.push(`механизъм: ${hit.join(' или ')} (ориентировъчно — провери в каталога на Blum)`);else r.warn.push(`LF ${LF} е извън диапазоните на ${M.name} (${M.t[0][1]}–${M.t.at(-1)[2]}) — избери друг механизъм.`);
     r.short=`${M.name}${hit.length?' '+hit[0]:''} · LF ${LF}`;return r}
