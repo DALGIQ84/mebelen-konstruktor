@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 21:30 · Обков без кодове</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 21:45 · Таб „Обков“ отляво</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -200,9 +200,9 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </header>
 
 <main class="wrap">
-  <nav class="rail" id="rail" aria-label="Панели"><button data-rail="room" title="Стая — стени, прозорци, текстури"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></button><button data-rail="cab" title="Шкафове и параметри"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M12 3v18M10 12h-1M15 12h-1"/></svg></button><button data-rail="acc" title="Аксесоари и декорации"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></button><span class="sep"></span><button data-rail="det" title="Детайли (таблицата отдолу)"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></button><button data-rail="lib" title="Библиотека — декори и тапицерии"><svg viewBox="0 0 24 24"><path d="M5 4h4v16H5zM10 4h4v16h-4z"/><path d="M15.5 5l3.5-1 3 15-3.5 1z"/></svg></button><button data-rail="set" title="Настройки"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button><span class="sep"></span><button data-rail="fold" title="Скрий / покажи лявата колона"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button></nav>
+  <nav class="rail" id="rail" aria-label="Панели"><button data-rail="room" title="Стая — стени, прозорци, текстури"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></button><button data-rail="cab" title="Шкафове и параметри"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M12 3v18M10 12h-1M15 12h-1"/></svg></button><button data-rail="hw" title="Обков — панти, водачи, дръжки, крачета…"><svg viewBox="0 0 24 24"><circle cx="6.5" cy="12" r="4"/><path d="M10.5 10.2h6v3.6h-6"/><rect x="16.5" y="5.5" width="4" height="13" rx="1"/><path d="M18.5 8.3v.01M18.5 15.7v.01"/></svg></button><button data-rail="acc" title="Аксесоари и декорации"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></button><span class="sep"></span><button data-rail="det" title="Детайли (таблицата отдолу)"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></button><button data-rail="lib" title="Библиотека — декори и тапицерии"><svg viewBox="0 0 24 24"><path d="M5 4h4v16H5zM10 4h4v16h-4z"/><path d="M15.5 5l3.5-1 3 15-3.5 1z"/></svg></button><button data-rail="set" title="Настройки"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button><span class="sep"></span><button data-rail="fold" title="Скрий / покажи лявата колона"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button></nav>
   <div class="col" id="leftCol">
-    <div class="tabs"><button id="tRoom">Стая</button><button id="tCab" class="on">Шкафове</button><button id="tAcc">Аксесоари</button></div>
+    <div class="tabs"><button id="tRoom">Стая</button><button id="tCab" class="on">Шкафове</button><button id="tHw">Обков</button><button id="tAcc">Аксесоари</button></div>
 
     <div class="col" id="paneCab">
       <section class="card">
@@ -217,6 +217,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
       </section>
     </div>
 
+    <div class="col" id="paneHw" hidden><div class="panel"><div class="ph"><h2>Обков</h2><span class="seg" id="hwSeg"><button data-hws="cab">Шкаф</button><button data-hws="room" class="on">Стая</button><button data-hws="proj">Проект</button></span></div><div id="hwBody" style="padding:8px 12px"></div></div></div>
     <div class="col" id="paneRoom" hidden>
       <section class="card">
         <h2>Форма на стаята<span class="sp"><button class="btn sm" id="bUndo" disabled>↶ Назад</button></span></h2>
@@ -1822,14 +1823,22 @@ function hwList(cabs){const S=P.settings,M=new Map(),C=id=>String(S['hwC_'+id]||
     if(k.type==='wardrobe'&&k.wDoor==='slide')put('slSys_'+Math.max(2,k.doors|0)+'_'+Math.round(k.W),'Система плъзгащи врати — '+Math.max(2,k.doors|0)+' врати, '+Math.round(k.W)+' мм',C('slSys'),1,'к-т',k);
     /* легло */
     if(k.type==='bed'&&k.bMech!==false&&k.bMech!=='off')put('bed_'+Math.round(k.W)+'x'+Math.round(k.D),'Механизъм за легло '+Math.round(k.W)+' × '+Math.round(k.D),C('bedMech'),1,'к-т',k)}
-  const ORD=['hinge','hingePush','hingeAlu','sl_','lf_','handle','handleP','golaL','golaC','leg','clip','rod','rodH','slSys','bed'],ix=key=>{const i=ORD.findIndex(o=>o.endsWith('_')?key.startsWith(o):key===o||key.startsWith(o+'_'));return i<0?99:i};
-  return[...M.values()].sort((a,b)=>ix(a.key)-ix(b.key)||a.name.localeCompare(b.name,'bg',{numeric:true})).map(r=>({...r,q:r.unit==='м'?Math.round(r.q*100)/100:Math.round(r.q)}))}
-let tblMode='parts';
+  return hwSort([...M.values()]).map(r=>({...r,q:r.unit==='м'?Math.round(r.q*100)/100:Math.round(r.q)}))}
+const hwSort=L=>{const ORD=['hinge','hingePush','hingeAlu','sl_','lf_','handle','handleP','golaL','golaC','leg','clip','rod','rodH','slSys','bed'],ix=key=>{const i=ORD.findIndex(o=>o.endsWith('_')?key.startsWith(o):key===o||key.startsWith(o+'_'));return i<0?99:i};return L.sort((a,b)=>ix(a.key)-ix(b.key)||a.name.localeCompare(b.name,'bg',{numeric:true}))};
+let tblMode='parts',hwScope='room';
+function hwRows(sc){if(sc==='cab')return hwList(P.cabinets.filter(c=>c.id===sel));if(sc==='room')return hwList(P.cabinets);
+  const M=new Map();(P.rooms||[{}]).forEach((r,i)=>withRoom(i,()=>{for(const x of hwList(P.cabinets)){const o=M.get(x.key);if(o){o.q+=x.q;for(const c of x.cabs)o.cabs.add((r.name?r.name+': ':'')+c)}else M.set(x.key,{...x,cabs:new Set([...x.cabs].map(c=>(r.name?r.name+': ':'')+c))})}}));return hwSort([...M.values()]).map(r=>({...r,q:r.unit==='м'?Math.round(r.q*100)/100:Math.round(r.q)}))}
+function renderHwPane(){const b=$('#hwBody');if(!b)return;for(const x of document.querySelectorAll('#hwSeg [data-hws]'))x.classList.toggle('on',x.dataset.hws===hwScope);
+  const k=cab(sel),rs=hwScope==='cab'&&!k?[]:hwRows(hwScope),ttl=hwScope==='cab'?(k?k.name:'избери шкаф'):hwScope==='room'?(P.rooms?.[P.ri|0]?.name||'стаята'):'целия проект';
+  b.innerHTML=`<div style="font-size:12px;color:var(--muted);margin-bottom:6px">${esc(ttl)}</div>`+(rs.length?`<table class="tbl" style="width:100%"><tbody>${rs.map(r=>`<tr><td>${esc(r.name)}</td><td class="n" style="white-space:nowrap">${fmt(r.q)} ${r.unit}</td></tr>`).join('')}</tbody></table>`:`<div style="color:var(--muted);font-size:13px">Няма обков.</div>`)+
+    `<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm" id="hwCopy2" ${rs.length?'':'disabled'}>Копирай обкова</button></div><div style="font-size:11.5px;color:var(--muted);margin-top:8px">Броят — Настройки → „Обков — брой“. Без дръжка/Gola/Push — от забележката на шкафа.</div>`;
+  $('#hwCopy2').onclick=()=>{const t=rs.map(r=>[r.name,String(r.q).replace('.',','),r.unit].join('\t')).join('\n');navigator.clipboard?.writeText(t).then(()=>toast('Обковът е копиран'),()=>toast('Не можах да копирам'))}}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#hwSeg [data-hws]');if(!b)return;hwScope=b.dataset.hws;renderHwPane()});
 function renderHw(list){const rs=hwList(list);const cs=r=>[...r.cabs].filter(Boolean).join(', ');
   $('#tbl').innerHTML=`<thead><tr><th>Обков</th><th class="n">Количество</th><th>Шкафове</th></tr></thead><tbody>`+(rs.length?rs.map(r=>`<tr><td>${esc(r.name)}</td><td class="n">${fmt(r.q)} ${r.unit}</td><td style="color:var(--muted);font-size:12px">${esc(cs(r))}</td></tr>`).join(''):`<tr><td colspan="3" style="color:var(--muted)">Няма обков.</td></tr>`)+
     `</tbody><tfoot><tr><td colspan="3" style="padding-top:8px"><button class="btn sm" id="hwCopy">Копирай обкова</button> <span style="color:var(--muted);font-size:12px">Броят пантите и крачетата — от Настройки → „Обков — брой“. Без дръжка/Gola/Push — от забележката на шкафа.</span></td></tr></tfoot>`;
   $('#sum').innerHTML='';$('#hwCopy').onclick=()=>{const t=rs.map(r=>[r.name,String(r.q).replace('.',','),r.unit].join('\t')).join('\n');navigator.clipboard?.writeText(t).then(()=>toast('Обковът е копиран'),()=>toast('Не можах да копирам'))}}
-function renderTable(){if(tblMode==='hw'){renderHw(scope==='all'?P.cabinets:P.cabinets.filter(c=>c.id===sel));return}
+function renderTable(){if(tab==='hw')setTimeout(renderHwPane,0);if(tblMode==='hw'){renderHw(scope==='all'?P.cabinets:P.cabinets.filter(c=>c.id===sel));return}
   const list=scope==='all'?P.cabinets:P.cabinets.filter(c=>c.id===sel);
   const rs=rows(list,true);
   $('#tbl').innerHTML=`<thead><tr><th>Детайл</th><th class="n">Дължина</th><th class="n">Ширина</th><th class="n">Бр.</th>${scope==='cab'?'<th>Шарка</th>':''}<th>Кант${scope==='cab'?' <span style="font-weight:400">(клик по страна)</span>':''}</th><th>Материал</th><th>Коментар</th></tr></thead><tbody>`+
@@ -3568,11 +3577,11 @@ function setView(v){
   ['tDoors','tWalls','tOnly'].forEach(id=>$('#'+id).parentElement.hidden=v!=='3d');$('#tDims').parentElement.hidden=v==='3d';
   $('#hint').textContent=v==='3d'?HINTS['3d']:v==='wall'?HINTS.wall:tab==='room'?HINTS.room:HINTS.plan;
   if(v==='3d')resize();else renderPlan()}
-function setTab(t){if(t!=='room'&&drawRoom){if(drawRoom.pts.length>=2)drawFinish(true);drawRoom=null}const was=tab;tab=t;setTimeout(railSync,0);$('#tCab').classList.toggle('on',t==='cab');$('#tRoom').classList.toggle('on',t==='room');$('#tAcc').classList.toggle('on',t==='acc');
+function setTab(t){if(t!=='room'&&drawRoom){if(drawRoom.pts.length>=2)drawFinish(true);drawRoom=null}const was=tab;tab=t;setTimeout(railSync,0);$('#tCab').classList.toggle('on',t==='cab');$('#tRoom').classList.toggle('on',t==='room');$('#tAcc').classList.toggle('on',t==='acc');$('#tHw').classList.toggle('on',t==='hw');$('#paneHw').hidden=t!=='hw';if(t==='hw')renderHwPane();
   $('#paneCab').hidden=t!=='cab'&&t!=='acc';$('#paneRoom').hidden=t!=='room';$('#accAdd').hidden=t!=='acc';$('#lsBar').hidden=t==='acc';
   if((t==='acc'||t==='cab')&&was!==t){const k=cab(sel);if(!k||isAcc(k)!==(t==='acc')){const f=P.cabinets.find(q=>isAcc(q)===(t==='acc'));sel=f?f.id:null;multiSel=new Set(sel?[sel]:[])}renderList();renderEditor();renderTable();rebuild3D()}
   if(t==='room'){renderRoom();setView(view==='wall'?'wall':'plan')}else{selWall=null;setView(view)}renderPlan()}
-$('#tCab').onclick=()=>setTab('cab');$('#tRoom').onclick=()=>setTab('room');$('#tAcc').onclick=()=>setTab('acc');
+$('#tHw').onclick=()=>setTab('hw');$('#tCab').onclick=()=>setTab('cab');$('#tRoom').onclick=()=>setTab('room');$('#tAcc').onclick=()=>setTab('acc');
 $('#accAdd').innerHTML=Object.entries(ACC).filter(([,a])=>!a.deco).map(([id,a])=>`<button class="btn sm" data-addacc="${id}">+ ${a.name.replace(' (свободностоящ)','').replace(' (свободностояща)',' своб.')}</button>`).join('')+`<div style="flex-basis:100%;font-size:12px;font-weight:600;color:var(--muted);margin-top:6px">Декорация (само за картинката)</div>`+Object.entries(ACC).filter(([,a])=>a.deco).map(([id,a])=>`<button class="btn sm" data-addacc="${id}">+ ${a.name}</button>`).join('');
 $('#accAdd').addEventListener('click',e=>{const id=e.target.dataset.addacc;if(!id)return;const a=ACC[id];
   if(a.deco){const tp=!a.floor&&P.cabinets.find(t=>t.type==='top'&&t.wall!==null),n=P.cabinets.filter(q=>isAcc(q)&&accOf(q).deco).length; // декорация — на плота (или на пода до стената)
@@ -3604,7 +3613,7 @@ addEventListener('resize',()=>fitStage());
 function applyVw(){$('.wrap').classList.toggle('noLeft',!$('#tLeft').checked);$('#detCard').hidden=!$('#tDet').checked;fitStage();railSync()}
 function railSync(){const r=$('#rail');if(!r)return;const L=$('#tLeft').checked;for(const b of r.querySelectorAll('[data-rail]')){const a=b.dataset.rail;b.classList.toggle('on',L&&a===tab||a==='det'&&$('#tDet').checked)}const f=r.querySelector('[data-rail="fold"] svg');if(f)f.style.transform=L?'':'scaleX(-1)'}
 $('#rail').addEventListener('click',e=>{const b=e.target.closest('[data-rail]');if(!b)return;const a=b.dataset.rail,L=$('#tLeft');
-  if(a==='room'||a==='cab'||a==='acc'){if(L.checked&&tab===a)L.checked=false;else{L.checked=true;setTab(a)}applyVw();saveVw()} /* същата икона пак — прибира панела */
+  if(a==='room'||a==='cab'||a==='acc'||a==='hw'){if(L.checked&&tab===a)L.checked=false;else{L.checked=true;setTab(a)}applyVw();saveVw()} /* същата икона пак — прибира панела */
   else if(a==='det'){$('#tDet').checked=!$('#tDet').checked;applyVw();saveVw()}else if(a==='lib')$('#bLib').click();else if(a==='set')$('#bSet').click();else if(a==='fold'){L.checked=!L.checked;applyVw();saveVw()}});
 $('#tLeft').onchange=()=>{applyVw();saveVw()};$('#tDet').onchange=()=>{applyVw();saveVw()};
 function toggleView(open){const m=$('#viewMenu');open=open??m.hidden;m.hidden=!open;$('#bView').setAttribute('aria-expanded',String(open))}
