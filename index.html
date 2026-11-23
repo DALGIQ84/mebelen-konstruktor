@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 22:20 · Механизми, които се изчисляват сами (Blum HF)</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 22:30 · Механизмите (долен/горен ред) — махнати засега</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1812,7 +1812,7 @@ function hwList(cabs){const S=P.settings,M=new Map(),C=id=>String(S['hwC_'+id]||
       for(const q of sd){const qb=q.box0||q.box,NL=Math.round(+q.slL>0?+q.slL:(qb[3]-qb[2])+(met?+sl.bD||0:+sl.lenDed||0)); /* дължината на водача — както е избрана при правенето на чекмеджето */by.set(NL,(by.get(NL)||0)+(met?1:0.5))}
       for(const[NL,n]of by)put('sl_'+sl.id+'_'+NL+(pushD?'p':''),'Водачи '+sl.name+' '+NL+' мм'+(pushD?' (push)':''),C('sl_'+sl.id),Math.round(n),'чифт',k)}
     /* повдигащи врати — механизъм */
-    if(+k.lift>0){const ci=libAll().items.find(i=>i.hw&&i.calc&&(i.row||'low')===(k.upper?'up':'low')&&LIFT[i.calc]&&!(i.calc==='hf'&&+k.lift!==2)),L=liftCalc(k,ci?.calc); /* механизмът от каталога за реда — програмата сама избира кой точно */
+    if(+k.lift>0){const ci=null,L=liftCalc(k,ci?.calc); /* механизмът от каталога за реда — програмата сама избира кой точно */
       if(L&&ci&&L.code){const nm=ci.name||L.name;put('lf_'+L.mech+'_'+L.code,nm+' — механизъм '+L.code,L.code,1,'к-т',k);if(L.arm)put('lf_'+L.mech+'_arm_'+L.arm,nm+' — телескопично рамо '+L.arm,L.arm,1,'к-т',k)}
       else if(L&&ci&&L.mech==='gas')put('lf_gas_'+L.short,(ci.name||'Газов амортисьор')+' — '+L.short.replace('газови амортисьори ',''),'',1,'к-т',k);
       else if(L)put('lf_'+L.mech+'_'+L.short,L.short,C('lf_'+L.mech),1,'к-т',k);for(const d of ps.filter(p=>p.name==='Врата повдигаща'))handle(d.box[1]-d.box[0])}
@@ -1854,7 +1854,7 @@ function hwRows(sc){if(sc==='cab')return hwList(P.cabinets.filter(c=>c.id===sel)
 function renderHwPane(){const b=$('#hwBody');if(!b)return;for(const x of document.querySelectorAll('#hwSeg [data-hws]'))x.classList.toggle('on',x.dataset.hws===hwScope);
   const k=cab(sel),rs=hwScope==='cab'&&!k?[]:hwRows(hwScope),ttl=hwScope==='cab'?(k?k.name:'избери шкаф'):hwScope==='room'?(P.rooms?.[P.ri|0]?.name||'стаята'):'целия проект';
   b.innerHTML=`<div style="font-size:12px;color:var(--muted);margin-bottom:6px">${esc(ttl)}</div>`+(rs.length?`<table class="tbl" style="width:100%"><tbody>${rs.map(r=>`<tr><td>${esc(r.name)}</td><td class="n" style="white-space:nowrap">${fmt(r.q)} ${r.unit}</td></tr>`).join('')}</tbody></table>`:`<div style="color:var(--muted);font-size:13px">Няма обков.</div>`)+
-    `<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm" id="hwCopy2" ${rs.length?'':'disabled'}>Копирай обкова</button></div><div style="font-size:11.5px;color:var(--muted);margin-top:8px">Броят — Настройки → „Обков — брой“. Без дръжка/Gola/Push — от забележката на шкафа.</div>`+hwCatHtml();
+    `<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm" id="hwCopy2" ${rs.length?'':'disabled'}>Копирай обкова</button></div><div style="font-size:11.5px;color:var(--muted);margin-top:8px">Броят — Настройки → „Обков — брой“. Без дръжка/Gola/Push — от забележката на шкафа.</div>`;
   $('#hwCopy2').onclick=()=>{const t=rs.map(r=>[r.name,String(r.q).replace('.',','),r.unit].join('\t')).join('\n');navigator.clipboard?.writeText(t).then(()=>toast('Обковът е копиран'),()=>toast('Не можах да копирам'))}}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#hwSeg [data-hws]');if(!b)return;hwScope=b.dataset.hws;renderHwPane()});
 function renderHw(list){const rs=hwList(list);const cs=r=>[...r.cabs].filter(Boolean).join(', ');
