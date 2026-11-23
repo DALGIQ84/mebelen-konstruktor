@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 03:30 · Врата отстрани — фугата от Настройки</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 09:30 · Коментар към детайла (и в KRAFTCUT)</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1721,8 +1721,9 @@ function rows(list,forTable,withAlu){
     if(p.kind==='hw'||p.kind==='appl'||p.kind==='vis'||p.kind==='virt')continue;if((p.kind==='alu'||p.kind==='glass')&&!forTable&&!withAlu)continue; // профил и стъкло — не за разкроя на плоскости
     const tag=forTable&&scope==='cab'&&p.sd?' ('+(p.sd==='L'?'лява':'дясна')+')':'',ovKey=tag?p.name+'|'+p.sd:p.name;
     const type=(P.settings.cabInType&&scope==='all'?k.name+' ':'')+p.name+(p.fp&&k.type==='wpanel'?' (скосен)':'')+tag;
-    const key=[type,p.L,p.Wd,p.e.join(''),p.m].join('|');
-    if(map.has(key)) map.get(key).n++; else map.set(key,{...p,type,ovKey,n:1});
+    const no=k.noteOv||{},note=String((p.sd&&no[p.name+'|'+p.sd])||no[p.name]||'').trim(); /* коментар към детайла — от таблицата, отива и в KRAFTCUT */
+    const key=[type,p.L,p.Wd,p.e.join(''),p.m,note].join('|');
+    if(map.has(key)) map.get(key).n++; else map.set(key,{...p,type,ovKey,note,n:1});
   }}
   return [...map.values()];
 }
@@ -1756,12 +1757,13 @@ $('#tbl').addEventListener('click',e=>{const k=cab(sel);if(!k||scope!=='cab')ret
   const h=e.target.closest('[data-ep]');if(!h)return;const name=h.dataset.ep,i=+h.dataset.es;
   const[nm,sd]=name.split('|'),cur=build(k).parts.find(p=>p.name===nm&&(!sd||p.sd===sd));if(!cur)return;const ne=[...cur.e];ne[i]=ne[i]?0:1;
   k.edgeOv=k.edgeOv||{};if(sd&&k.edgeOv[nm]){k.edgeOv[nm+'|'+(sd==='L'?'R':'L')]=k.edgeOv[nm];delete k.edgeOv[nm]} /* старото общо → остава за другата страница */k.edgeOv[name]=ne;P.example=false;changed(false)});
+$('#tbl').addEventListener('change',e=>{const t=e.target.closest('input[data-note]');if(!t)return;const k=cab(sel);if(!k)return;pushUndo();const n=t.dataset.note,[nm,sd]=n.split('|'),v=t.value.trim();k.noteOv={...(k.noteOv||{})};if(v)k.noteOv[n]=v;else delete k.noteOv[n];if(sd&&k.noteOv[nm]&&!v){} P.example=false;changed(false)});
 function renderTable(){
   const list=scope==='all'?P.cabinets:P.cabinets.filter(c=>c.id===sel);
   const rs=rows(list,true);
-  $('#tbl').innerHTML=`<thead><tr><th>Детайл</th><th class="n">Дължина</th><th class="n">Ширина</th><th class="n">Бр.</th>${scope==='cab'?'<th>Шарка</th>':''}<th>Кант${scope==='cab'?' <span style="font-weight:400">(клик по страна)</span>':''}</th><th>Материал</th></tr></thead><tbody>`+
-    (rs.length?rs.map(r=>`<tr><td>${esc(r.type)}</td><td class="n">${fmt(r.L)}</td><td class="n">${fmt(r.Wd)}</td><td class="n">${r.n}</td>${scope==='cab'?`<td><button class="btn sm" data-gflip="${esc(r.name)}" title="Обърни шарката — разменя дължина и ширина" aria-label="Обърни шарката на ${esc(r.name)}" style="padding:0 7px;${(cab(sel)?.grainOv||{})[r.name]?'border-color:var(--mark);color:var(--mark)':''}">⇄</button></td>`:''}<td>${scope==='cab'?edgeEdit(r.e,r.ovKey||r.name,!!((cab(sel)?.edgeOv||{})[r.ovKey||r.name]||(cab(sel)?.edgeOv||{})[r.name])):edgeSvg(r.e)}</td><td>${scope==='cab'?matCell(r):esc(mLbl(mat(r.m)))}</td></tr>`).join('')
-      :`<tr><td colspan="7" style="color:var(--muted)">${scope==='cab'&&isAcc(cab(sel))?'Уредите и аксесоарите нямат детайли за разкрой.':'Няма избран шкаф. Добави от меню „Кухни“.'}</td></tr>`)+'</tbody>';
+  $('#tbl').innerHTML=`<thead><tr><th>Детайл</th><th class="n">Дължина</th><th class="n">Ширина</th><th class="n">Бр.</th>${scope==='cab'?'<th>Шарка</th>':''}<th>Кант${scope==='cab'?' <span style="font-weight:400">(клик по страна)</span>':''}</th><th>Материал</th><th>Коментар</th></tr></thead><tbody>`+
+    (rs.length?rs.map(r=>`<tr><td>${esc(r.type)}</td><td class="n">${fmt(r.L)}</td><td class="n">${fmt(r.Wd)}</td><td class="n">${r.n}</td>${scope==='cab'?`<td><button class="btn sm" data-gflip="${esc(r.name)}" title="Обърни шарката — разменя дължина и ширина" aria-label="Обърни шарката на ${esc(r.name)}" style="padding:0 7px;${(cab(sel)?.grainOv||{})[r.name]?'border-color:var(--mark);color:var(--mark)':''}">⇄</button></td>`:''}<td>${scope==='cab'?edgeEdit(r.e,r.ovKey||r.name,!!((cab(sel)?.edgeOv||{})[r.ovKey||r.name]||(cab(sel)?.edgeOv||{})[r.name])):edgeSvg(r.e)}</td><td>${scope==='cab'?matCell(r):esc(mLbl(mat(r.m)))}</td><td>${scope==='cab'&&r.kind!=='alu'&&r.kind!=='glass'?`<input class="f" type="text" maxlength="120" data-note="${esc(r.ovKey||r.name)}" value="${esc(r.note||'')}" placeholder="коментар…" aria-label="Коментар към ${esc(r.name)}" style="min-width:140px;height:28px;font-size:12px">`:esc(r.note||'')}</td></tr>`).join('')
+      :`<tr><td colspan="8" style="color:var(--muted)">${scope==='cab'&&isAcc(cab(sel))?'Уредите и аксесоарите нямат детайли за разкрой.':'Няма избран шкаф. Добави от меню „Кухни“.'}</td></tr>`)+'</tbody>';
   $('#tbl').querySelectorAll('[data-gflip^="Витрина"]').forEach(b=>b.remove());$('#tbl').querySelectorAll('[data-ep^="Витрина"]').forEach(r=>{const sv=r.closest('svg');if(sv)sv.parentElement.remove()}); // профил и стъкло — без шарка и кант
   const agg={};
   for(const r of rs){if(r.kind==='alu'||r.kind==='glass'&&!mat(r.m).glass)continue;const a=agg[r.m]||(agg[r.m]={area:0,edge:0,n:0});a.area+=r.L*r.Wd*r.n/1e6;a.edge+=((r.e[0]+r.e[1])*r.L+(r.e[2]+r.e[3])*r.Wd)*r.n/1000;a.n+=r.n}
@@ -1769,10 +1771,10 @@ function renderTable(){
 }
 function cutRows(sc,withSz){if(sc==='proj'){if(nRooms()<2)return cutRows('all',withSz);const m=new Map();for(let i=0;i<P.rooms.length;i++)for(const r of withRoom(i,()=>cutRows('all',withSz))){const key=r.filter((_,j)=>j!==3).join('\t'),o=m.get(key);if(o)o[3]=+o[3]+ +r[3];else m.set(key,[...r])}return[...m.values()]} // целия проект — всички стаи, еднаквите детайли се събират
   const keep=scope;scope=sc||scope;try{const list=scope==='all'?P.cabinets:P.cabinets.filter(c=>c.id===sel);
-  const S=P.settings;return rows(list).map(r=>{const m=mat(r.m),lb=mLbl(m),q=[r.type,fmt(r.L),fmt(r.Wd),r.n,...r.e.map(v=>v?S.edgeOn:S.edgeOff),lb!==m.name&&+m.t>0?`${lb} ${fmt(m.t)}`:lb];if(withSz&&+m.sheetL>0&&+m.sheetW>0)q.push(`${Math.round(m.sheetL)}×${Math.round(m.sheetW)}`);return q})}finally{scope=keep}} /* размерът на плочата (от библиотеката) — за KRAFTCUT */
+  const S=P.settings;return rows(list).map(r=>{const m=mat(r.m),lb=mLbl(m),q=[r.type,fmt(r.L),fmt(r.Wd),r.n,...r.e.map(v=>v?S.edgeOn:S.edgeOff),lb!==m.name&&+m.t>0?`${lb} ${fmt(m.t)}`:lb];if(r.note)q.push('','','',String(r.note).replace(/[\t\r\n;]+/g,' '));if(withSz&&+m.sheetL>0&&+m.sheetW>0)q.push(`${Math.round(m.sheetL)}×${Math.round(m.sheetW)}`);return q})}finally{scope=keep}} /* размерът на плочата (от библиотеката) — за KRAFTCUT */
 function exportText(sc,withSz){return cutRows(sc,withSz).map(r=>r.join('\t')).join('\n')}
 function exportCSV(sc){const q=v=>/[;"\n]/.test(String(v))?'"'+String(v).replace(/"/g,'""')+'"':String(v);
-  return '\ufeff'+[['Детайл','Дължина','Ширина','Брой','Кант дълга 1','Кант дълга 2','Кант къса 1','Кант къса 2','Материал'],...cutRows(sc)].map(r=>r.map(q).join(';')).join('\r\n')}
+  return '\ufeff'+[['Детайл','Дължина','Ширина','Брой','Кант дълга 1','Кант дълга 2','Кант къса 1','Кант къса 2','Материал','Коментар'],...cutRows(sc).map(r=>[...r.slice(0,9),r[12]||''])].map(r=>r.map(q).join(';')).join('\r\n')}
 const OFFLINE=!window.claude; // инсталираната версия — файл на компютъра, без Claude
 function plainDownload(name,data){const b=data instanceof Blob?data:new Blob([data]);const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
 async function saveFile(name,data){if(OFFLINE){plainDownload(name,data);toast('Запазено: '+name);return true}
