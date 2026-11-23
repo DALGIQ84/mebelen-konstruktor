@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 23:30 · Blum HK-XS TIP-ON — по нашата таблица</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 23:40 · Повдигащи врати: HF — за 2 врати, HK — за 1</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1419,7 +1419,7 @@ function buildRaw(k){
   const n=noIn?0:Math.max(0,k.div|0), Wi=iR-iL, inH=H-c-2*T, dx=divXs(k,Wi,T,n); // dx = лявата страна на всеки делител, от вътрешната страна на лявата страница
   const secs=[...Array(n+1).keys()].map(j=>{const a=j?dx[j-1]+T:0,b=j<n?dx[j]:Wi;return[a,b-a]}),s=Math.min(...secs.map(q=>q[1]));
   if(s<100) warn.push(s<0?'Делителите не се побират — провери разстоянията.':'Секциите стават по-тесни от 100 мм.');
-  const hfS=up&&+k.lift>0&&k.liftMech==='hf'?+(S.hfSet??40):0; // Blum HF: рафтове и делители по-плитки отпред (механизмът минава там)
+  const hfS=up&&+k.lift>0&&liftMechOf(k)==='hf'?+(S.hfSet??40):0; // Blum HF: рафтове и делители по-плитки отпред (механизмът минава там)
   const syD=bIn?bIn+S.shelfGap:0,dvY0=hfS?syD:bIn,dvY1=hfS?Dk-hfS:Dk; // при HF делителят е колкото рафта
   for(let i=0;i<n;i++){const x=iL+dx[i]; add('Делител',inH,dvY1-dvY0,k.mc,[1,0,0,0],[x,x+T,dvY0,dvY1,c+T,H-T])}
   const sy=bIn?bIn+S.shelfGap:0; // рафтът започва след гърба (ако е вътре) + луфт
@@ -2029,7 +2029,8 @@ function renderEditor(){
     if(t==='color')return `<label>${l}<input id="${id}" data-f="${f}" type="color" value="${esc(k[f]||'#8e8a84')}" style="height:34px;padding:2px"></label>`;
     if(t==='mat') return `<label>${l}<select id="${id}" data-f="${f}">${f==='mb'?`<option value="none" ${k.mb==='none'?'selected':''}>Без гръб</option>`:''}${P.materials.filter(m=>!m.glass).map(m=>`<option value="${m.id}" ${m.id===(f==='mx'&&!mxOwn(k)?k.mc:k[f])?'selected':''}>${esc(m.name)}${String(m.name).trim().endsWith(' '+m.t)?'':' '+m.t} мм</option>`).join('')}</select></label>`;
     if(t==='matG'){const df=f==='mGs'?'gl6':'gl4',cur=k[f]||df;return `<label>${l}<select id="${id}" data-f="${f}">${P.materials.filter(m=>m.glass).map(m=>`<option value="${m.id}" ${m.id===cur?'selected':''}>${esc(m.name)}${String(m.name).trim().endsWith(' '+m.t)?'':' '+m.t} мм</option>`).join('')}</select></label>`}
-    if(t==='sel') return `<label>${l}<select id="${id}" data-f="${f}">${x.map(([v,n])=>`<option value="${v}" ${String(v)===String(f==='divRef'?divMode(k):k[f])?'selected':''}>${n}</option>`).join('')}</select></label>`;
+    if(t==='sel'){const xs=f==='liftMech'?x.filter(([v])=>+k.lift===2?(v==='gas'||v==='hf'):v!=='hf'):x,cur=f==='liftMech'?liftMechOf(k):f==='divRef'?divMode(k):k[f]; /* 2 врати — само HF (или газ); 1 врата — без HF */
+      return `<label>${l}<select id="${id}" data-f="${f}">${xs.map(([v,n])=>`<option value="${v}" ${String(v)===String(cur)?'selected':''}>${n}</option>`).join('')}</select></label>`}
     if(t==='wall') return `<label>${l}<select id="${id}" data-f="wall"><option value="">Свободно</option>${P.room.pts.map((_,i)=>`<option value="${i}" ${k.wall===i?'selected':''}>Стена ${i+1} · ${Math.round(wallInfo(i).len)}</option>`).join('')}</select></label>`;
     if((f==='off'||f==='gap')&&!onWall)return '';
     if((f==='px'||f==='py'||f==='rot')&&onWall)return '';
@@ -2482,7 +2483,8 @@ function miterPts(f){const{x0,x1,z0,z1,aw,sd}=f;return sd==='L'?[[x0,z0],[x0+aw,
 /* ---------- Повдигащи се врати: механизъм и сила ---------- */
 
 function liftInfoHtml(k){const r=liftCalc(k);if(!r)return '';return r.msg.map(m=>`<span>${esc(m)}</span>`).join('')+r.warn.map(m=>`<span style="color:var(--mark)">${esc(m)}</span>`).join('')}
-function liftCalc(k,mo){if(!(+k.lift>0))return null;const S=P.settings,ds=+(S.boardDens??680),hw=+(S.handleKg??0.3),mech=LIFT[mo]?mo:LIFT[k.liftMech]?k.liftMech:'gas',M=LIFT[mech];
+const liftMechOf=(k,mo)=>{let m=LIFT[mo]?mo:LIFT[k.liftMech]?k.liftMech:'gas';if(+k.lift===2&&m!=='gas'&&m!=='hf')m='hf';if(+k.lift===1&&m==='hf')m='hk';return m}; // HF — за 2 сгъващи се врати; HK top/HK-S/HK-XS — за 1 врата
+function liftCalc(k,mo){if(!(+k.lift>0))return null;const S=P.settings,ds=+(S.boardDens??680),hw=+(S.handleKg??0.3),mech=liftMechOf(k,mo),M=LIFT[mech];
   const bp=build(k).parts,ds2=bp.filter(p=>p.name==='Врата повдигаща'),hc=Math.round(+k.H-+k.c);let doors;
   if(ds2.length){const wt=p=>p.L*p.Wd/1e6*(+mat(p.m).t||18)/1000*ds;doors=ds2.map(p=>({L:p.L,Wd:p.Wd,kg:wt(p)}))}
   else{const fs=bp.filter(p=>p.fr&&p.fr.sd==='B');if(!fs.length)return null; // ал. врата: стъкло ~10 кг/м² + профил ~0,5 кг/м
@@ -2490,8 +2492,7 @@ function liftCalc(k,mo){if(!(+k.lift>0))return null;const S=P.settings,ds=+(S.bo
   const r={mech,name:M.name,hc,doors,msg:[],warn:[]};
   if(mech==='gas'){for(const d of doors){const F=9.81*(d.kg+hw)*(d.L/1000)/(4*0.1);const n=GASN.find(x=>x>=F)||GASN.at(-1);d.n=n;r.msg.push(`врата ${fmt(d.L)}×${fmt(d.Wd)}: ~${fmt(d.kg)} кг → 2 амортисьора по ~${Math.round(F)} N, вземи ${n} N`);if(F>GASN.at(-1))r.warn.push(`Вратата иска ~${Math.round(F)} N — повече от 120 N. Сложи механизъм (напр. Blum Aventos) или раздели на 2 врати.`)}
     r.short=`газови амортисьори ${doors.map(d=>'2 × '+d.n+' N').join(' + ')}`;return r}
-  if(M.h&&(hc<M.h[0]||hc>M.h[1]))r.warn.push(`${M.name} е за корпус ${M.h[0]}–${M.h[1]} мм, а този е ${hc} мм.`);
-  if(mech==='hf'&&doors.length!==2)r.warn.push('HF е за 2 сгъващи се врати — избери „2 повдигащи“.');
+  if(M.h&&!['hk','hks','hkxs'].includes(mech)&&(hc<M.h[0]||hc>M.h[1]))r.warn.push(`${M.name} е за корпус ${M.h[0]}–${M.h[1]} мм, а този е ${hc} мм.`); /* HK — по таблицата (височината на вратата) */
   if(mech==='hkxs'){const fd=bp.filter(p=>p.name==='Врата повдигаща'),fh=fd.length?fd[0].box[5]-fd[0].box[4]:hc,fw=fd.length?fd[0].box[1]-fd[0].box[0]:+k.W,n=hkxSet(fh,fw);r.hkxSet=n;r.fh=Math.round(fh);r.fw=Math.round(fw);r.hinges=Math.ceil((fw-400-0.5)/100)>=6?3:2;r.msg.unshift(n?`по нашата таблица: фронт ${r.fh} × ${r.fw} мм → комплект HK-XS ${n}T, ${r.hinges} панти`:`по нашата таблица: фронт ${r.fh} × ${r.fw} мм — HK-XS не става`);if(!n)r.warn.push(`Фронт ${r.fh} × ${r.fw} мм е извън таблицата за HK-XS.`)}
   if(mech==='hk'){const fd=bp.filter(p=>p.name==='Врата повдигаща'),fh=fd.length?fd[0].box[5]-fd[0].box[4]:hc,fw=fd.length?fd[0].box[1]-fd[0].box[0]:+k.W,n=hkSet(fh,fw);r.hkSet=n;r.fh=Math.round(fh);r.fw=Math.round(fw);r.msg.unshift(n?`по нашата таблица: фронт ${r.fh} × ${r.fw} мм → комплект HK${n}`:`по нашата таблица: фронт ${r.fh} × ${r.fw} мм — HK top не става`);if(!n)r.warn.push(`Фронт ${r.fh} × ${r.fw} мм е извън таблицата за HK top.`)}
   if(mech==='hks'){const fd=bp.filter(p=>p.name==='Врата повдигаща'),fh=fd.length?fd[0].box[5]-fd[0].box[4]:hc,fw=fd.length?fd[0].box[1]-fd[0].box[0]:+k.W,n=hksSet(fh,fw);r.hksSet=n;r.fh=Math.round(fh);r.fw=Math.round(fw);r.msg.unshift(n?`по нашата таблица: фронт ${r.fh} × ${r.fw} мм → комплект HK-S${n}`:`по нашата таблица: фронт ${r.fh} × ${r.fw} мм — HK-S не става`);if(!n)r.warn.push(`Фронт ${r.fh} × ${r.fw} мм е извън таблицата за HK-S.`)}
