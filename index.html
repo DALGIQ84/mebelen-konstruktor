@@ -169,7 +169,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.24 · 00:15 · По-кратко меню с десния бутон</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.24 · 00:25 · Копие отляво/отдясно</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2848,7 +2848,7 @@ function openCtx(id,x,y){ctx.dataset.door='';if(!(multiSel.size>1&&multiSel.has(
     (((k.type==='wardrobe'&&k.wDoor!=='slide'&&k.wDoor!=='none')||((k.type||'doors')==='doors'&&!k.upper&&!k.open))&&k.antr&&(k.doors|0)>0?(k.wCD?it('wcdOff','Отделни врати','за долната част и за надстройката'):it('wcdOn','Обща врата','една за долната част и надстройката')):'')+
     (grp.some(q=>build(q).parts.some(p=>p.kind==='door'||p.kind==='alu'))?(grp.every(q=>q.hideD)?it('showD','Покажи вратите','само в картинката'):it('hideD','Скрий вратите','само в картинката — остават в разкроя')):'')+
     (!isAcc(k)?it('pedit','Редактирай детайлите…','всеки детайл поотделно'):'')+
-    (on?it('detach','Откачи от стената'):'')+it('dup','Копие','до него')+((P.rooms||[]).length>1?P.rooms.map((r,i)=>i===(P.ri|0)?'':it('mvr'+i,`Премести в „${esc(r.name)}“`,grp.length>1?`избраните ${grp.length}`:'в другата стая')).join(''):'')+'<div style="border-top:1px solid var(--line);margin:4px 0"></div>'+it('del','Изтрий');
+    (on?it('detach','Откачи от стената'):'')+row('Копие',[['dupL','← отляво','копие вляво от него'],['dupR','отдясно →','копие вдясно от него']])+((P.rooms||[]).length>1?P.rooms.map((r,i)=>i===(P.ri|0)?'':it('mvr'+i,`Премести в „${esc(r.name)}“`,grp.length>1?`избраните ${grp.length}`:'в другата стая')).join(''):'')+'<div style="border-top:1px solid var(--line);margin:4px 0"></div>'+it('del','Изтрий');
   ctx.hidden=false;const w=ctx.offsetWidth,h=ctx.offsetHeight;ctx.style.left=Math.min(x,innerWidth-w-8)+'px';ctx.style.top=Math.max(8,Math.min(y,innerHeight-h-8))+'px';ctx.dataset.id=id}
 ctx.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-ctx]');if(!b)return;const k=cab(ctx.dataset.id);if(!k){ctx.hidden=true;return}const a=b.dataset.ctx;
   if(/^mvr\d+$/.test(a)){ctx.hidden=true;const g=multiSel.has(k.id)&&multiSel.size>1?[...multiSel].map(cab).filter(Boolean):[k];moveToRoom(g,+a.slice(3));return}
@@ -2859,7 +2859,7 @@ ctx.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[
   if(a==='wall0'){k.gap=0;place(k)}
   if(a==='detach'){k.wall=null;k.gap=0}
   if(a==='rot90'||a==='rot180'){const b0=bbox(k),cx=(b0[0]+b0[1])/2,cy=(b0[2]+b0[3])/2;k.wall=null;k.gap=0;k.rot=((+k.rot||0)+(a==='rot90'?90:180))%360;const b1=bbox(k);k.x+=cx-(b1[0]+b1[1])/2;k.y+=cy-(b1[2]+b1[3])/2}
-  if(a==='dup'){$('#bDup').click();return}
+  if(a==='dup'||a==='dupR'||a==='dupL'){ctx.hidden=true;dupDir=a==='dupL'?-1:1;$('#bDup').click();return}
   if(a==='pedit'){openPed(k.id);return}
   if(a==='hideD'||a==='showD'){for(const q of groupOf(k.id))q.hideD=a==='hideD';save();rebuild3D();renderPlan();renderList();return}
   if(a==='wcdOn'||a==='wcdOff'){pushUndo();k.wCD=a==='wcdOn';toast(k.wCD?'Обща врата за долната част и надстройката':'Отделни врати — долна част и надстройка')}
@@ -3807,8 +3807,8 @@ function addCab(o){
     if(hb){k.wall=hb.wall;k.off=Math.max(0,hb.off+(hb.W-k.W)/2);k.gap=(+hb.gap||0)+(+hb.D||18);place(k)}
     else if(bd){k.wall=bd.wall;k.off=Math.max(0,bd.off+(bd.W-k.W)/2);k.gap=+bd.gap||0;place(k);bd.gap=(+bd.gap||0)+(+k.D||18);place(bd)}}
   P.cabinets.push(k);P.example=false;sel=k.id;if(tab!=='cab')setTab('cab');changed(true)};
-$('#bDup').onclick=()=>{const s=cab(sel);if(!s)return;const k={...s,id:uid(),name:s.name+' копие',secs:s.secs?JSON.parse(JSON.stringify(s.secs)):s.secs,dh:[...(s.dh||[])],bh:[...(s.bh||[])],edgeOv:JSON.parse(JSON.stringify(s.edgeOv||{})),matOv:{...(s.matOv||{})},grainOv:{...(s.grainOv||{})}};
-  if(k.wall!==null){k.off=s.off+s.W;place(k)}else{const b=bbox(s);k.x+=b[1]-b[0];snapFree(k)}
+let dupDir=1;$('#bDup').onclick=()=>{const dl=dupDir<0;dupDir=1;const s=cab(sel);if(!s)return;const k={...s,id:uid(),name:s.name+' копие',secs:s.secs?JSON.parse(JSON.stringify(s.secs)):s.secs,dh:[...(s.dh||[])],bh:[...(s.bh||[])],edgeOv:JSON.parse(JSON.stringify(s.edgeOv||{})),matOv:{...(s.matOv||{})},grainOv:{...(s.grainOv||{})}};
+  if(k.wall!==null){k.off=dl?s.off-s.W:s.off+s.W;place(k)}else{const b=bbox(s);k.x+=dl?-(b[1]-b[0]):b[1]-b[0];snapFree(k)} /* копие отляво или отдясно */
   P.cabinets.push(k);sel=k.id;changed(true)};
 
 /* ---------- Рулетка: мерене от точка до точка (3D, план, стени) ---------- */
