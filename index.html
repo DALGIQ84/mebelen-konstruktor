@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 09:50 · Кутиите на чекмеджетата следват корпуса</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 17:40 · Обков</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -264,7 +264,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
     <section class="card" id="detCard">
       <h2>Детайли
         <span class="sp">
-          <span class="seg"><button id="sCab" class="on">Избран шкаф</button><button id="sAll">Целия проект</button></span>
+          <span class="seg"><button id="sCab" class="on">Избран шкаф</button><button id="sAll">Целия проект</button></span><span class="seg" style="margin-left:6px"><button id="tParts" class="on">Детайли</button><button id="tHw">Обков</button></span>
           <button class="btn sm primary" id="bCopy">Копирай за разкроя</button>
         </span>
       </h2>
@@ -407,7 +407,7 @@ const SLIDES=[
   {id:'s1',name:'Телескопични',kind:'side',clear:26,lens:'250,300,350,400,450,500,550,600',lenDed:0,hOff:40,bottom:'under',bottomDed:5,groove:6},
   {id:'s2',name:'Скрити (Tandem/Movento)',kind:'under',clear:10,lens:'270,300,350,400,450,500,550,600',lenDed:10,hOff:50,bottom:'groove',botWAdd:20,botLenDed:5,fbRaise:10},
   {id:'s3',name:'Метални кутии (Tandembox)',kind:'metal',lens:'270,300,350,400,450,500,550,600',bW:75,bD:24,bkW:87,bkH:68,sideH:83}];
-const SETTINGS={hbDedH:0,hbDedW:0,slides:SLIDES,golaTop:35,golaMid:35,golaLw:26,golaLh:56,golaCw:26,golaCh:73,idrSet:2,ubRaise:20,ubPw:20,ubPh:30,golaOvB:20,golaDeadB:60,golaDeadSh:10,golaDeadF:100,fuga:3,drFuga:5,wDrSd:2,wDrIns:32,wDrFw:7,wDrGrip:35,wDrGapH:3,wSlOv:30,wSlHd:40,wSlTrack:100,cdFuga:5,doorGap:2,rail:100,backIn:5,backTot:5,shelfFront:20,shelfGap:2,shelfClear:1,plinthBack:50,edgeOn:'1',edgeOff:'',cabInType:true,fillAllow:50,hfSet:40,boardDens:680,handleKg:0.3,alFuga:3,alW:42,alT:25,glassDed:7};
+const SETTINGS={hwHinge:'900:2; 1600:3; 2200:4; 5',hwLegsW:900,hwLegs:4,hwLegsWide:6,hwClips:2,hbDedH:0,hbDedW:0,slides:SLIDES,golaTop:35,golaMid:35,golaLw:26,golaLh:56,golaCw:26,golaCh:73,idrSet:2,ubRaise:20,ubPw:20,ubPh:30,golaOvB:20,golaDeadB:60,golaDeadSh:10,golaDeadF:100,fuga:3,drFuga:5,wDrSd:2,wDrIns:32,wDrFw:7,wDrGrip:35,wDrGapH:3,wSlOv:30,wSlHd:40,wSlTrack:100,cdFuga:5,doorGap:2,rail:100,backIn:5,backTot:5,shelfFront:20,shelfGap:2,shelfClear:1,plinthBack:50,edgeOn:'1',edgeOff:'',cabInType:true,fillAllow:50,hfSet:40,boardDens:680,handleKg:0.3,alFuga:3,alW:42,alT:25,glassDed:7};
 const ITEM={
   window:{name:'Прозорец',color:'#5aa9d6',w:1200,h:1300,z:950},
   door:{name:'Врата',color:'#9b7b5a',w:900,h:2050,z:0,hinge:'L'},
@@ -553,7 +553,7 @@ document.addEventListener('contextmenu',e=>{const b=e.target.closest&&e.target.c
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#ctxMenu [data-rctx]');if(!b)return;e.stopPropagation();const i=+ctx.dataset.room,a=b.dataset.rctx;ctx.hidden=true;if(a==='ren')renameRoom(i);else if(a==='copy')addRoom(i);else if(a==='del')delRoom(i)},true);
 function moveToRoom(grp,i){if(!P.rooms[i]||i===(P.ri|0))return;const t=P.rooms[i],nw=(t.room.pts||[]).length-(t.room.open?1:0),ids=new Set(grp.map(q=>q.id));
   const tm=t.materials||(t.materials=matsCopy(P.materials));for(const k of grp){if(k.wall!=null&&k.wall>=nw){k.wall=null;k.x=600;k.y=600;k.rot=0}for(const v of Object.values(k))if(typeof v==='string'&&!tm.some(m=>m.id===v)){const m=P.materials.find(m=>m.id===v);if(m)tm.push(...matsCopy([m]))}t.cabinets.push(k)}P.cabinets=P.cabinets.filter(c=>!ids.has(c.id));sel=P.cabinets[0]?.id||null;multiSel=new Set(sel?[sel]:[]);undoStack.length=0;updUndo();changed(true);toast(`${grp.length>1?grp.length+' шкафа са преместени':'Преместен'} в „${t.name}“`)}
-function migrate(){if(!Array.isArray(P.rooms)||!P.rooms.length){P.rooms=[{name:'Стая 1'}];P.ri=0}P.ri=Math.max(0,Math.min(P.rooms.length-1,P.ri|0));delete P.rooms[P.ri].room;delete P.rooms[P.ri].cabinets;delete P.rooms[P.ri].materials;for(const r of P.rooms)if(r.room&&!r.materials)r.materials=matsCopy(P.materials);mergeCorners();for(const g of MATS.filter(m=>m.glass))if(!P.materials.some(m=>m.id===g.id))P.materials.push({...g});for(const q of P.cabinets)if(q.type==='wardrobe'&&q.wPl==null)q.wPl=true;for(const q of P.cabinets)if(q.type==='endShelf'&&q.eFloor==null)q.eFloor=true;for(const q of P.cabinets)if(q.upper&&q.hood&&!q.hsV2){if(q.hoodStrip!=null&&+q.c===1490)q.c=1450;q.hsV2=true}for(const[kk,vv]of[['wDrSd',2],['wDrGrip',35],['wDrFw',7],['wDrIns',32],['wSlOv',30],['wSlHd',40],['wSlTrack',100],['backTot',5],['cdFuga',5],['drFuga',5],['wDrGapH',3],['hfSet',40],['boardDens',680],['handleKg',0.3],['alFuga',3],['alW',42],['alT',25],['glassDed',7]])if(P.settings[kk]==null)P.settings[kk]=vv;if(+P.settings.glassDed===70)P.settings.glassDed=7;if(+P.settings.alT===20)P.settings.alT=25; // стъклото = вратата − 7 мм
+function migrate(){if(!Array.isArray(P.rooms)||!P.rooms.length){P.rooms=[{name:'Стая 1'}];P.ri=0}P.ri=Math.max(0,Math.min(P.rooms.length-1,P.ri|0));delete P.rooms[P.ri].room;delete P.rooms[P.ri].cabinets;delete P.rooms[P.ri].materials;for(const r of P.rooms)if(r.room&&!r.materials)r.materials=matsCopy(P.materials);mergeCorners();for(const g of MATS.filter(m=>m.glass))if(!P.materials.some(m=>m.id===g.id))P.materials.push({...g});for(const q of P.cabinets)if(q.type==='wardrobe'&&q.wPl==null)q.wPl=true;for(const q of P.cabinets)if(q.type==='endShelf'&&q.eFloor==null)q.eFloor=true;for(const q of P.cabinets)if(q.upper&&q.hood&&!q.hsV2){if(q.hoodStrip!=null&&+q.c===1490)q.c=1450;q.hsV2=true}for(const[kk,vv]of[['wDrSd',2],['wDrGrip',35],['wDrFw',7],['wDrIns',32],['wSlOv',30],['wSlHd',40],['wSlTrack',100],['backTot',5],['cdFuga',5],['drFuga',5],['wDrGapH',3],['hfSet',40],['boardDens',680],['handleKg',0.3],['alFuga',3],['alW',42],['alT',25],['glassDed',7],['hwHinge','900:2; 1600:3; 2200:4; 5'],['hwLegsW',900],['hwLegs',4],['hwLegsWide',6],['hwClips',2]])if(P.settings[kk]==null)P.settings[kk]=vv;if(+P.settings.glassDed===70)P.settings.glassDed=7;if(+P.settings.alT===20)P.settings.alT=25; // стъклото = вратата − 7 мм
   for(const m of MATS.filter(m=>m.id.startsWith('pl')))if(!P.materials.some(q=>q.id===m.id))P.materials.push({...m});
   if(!P.materials.some(m=>m.id==='p8'||m.name==='ПДЧ 8'))P.materials.push({id:'p8',name:'ПДЧ 8',t:8,color:'#cfc8bb'});
   P.settings={...SETTINGS,...P.settings};if(!P.settings.faFix){if(+P.settings.fillAllow===20)P.settings.fillAllow=50;P.settings.faFix=true}if(!P.settings.eoFix){if(P.settings.edgeOff==='0')P.settings.edgeOff='';P.settings.eoFix=true} // без кант = празно поле (OptiCut)if(P.settings.slides===SLIDES)P.settings.slides=SLIDES.map(x=>({...x}));
@@ -710,12 +710,12 @@ function buildWardrobe(k){
         const hd=!!k.wDrHdl,gF=hd?+(S.wDrFw??7):+(S.wDrGrip??35),z0F=hd?fz+gF/2:fz;add('Чело вътрешно'+lbl,dh-gF,fwF,k.mc,[1,1,1,1],[x0+(sw-fwF)/2,x1-(sw-fwF)/2,yF,yF+T,z0F,z0F+dh-gF],'drawer'); /* с дръжки — фуга между челата (Настройки) */ // без дръжка — фуга над челото за пръстите
         if(!NLu||!sl)continue;const NL=NLu;
         if(sl.kind==='metal'){const bw=iW-sl.bW+26,bd=NL-sl.bD,bx=xa+T+(iW-bw)/2,y0=yF-NL,zb2=fz+15;
-          add('Дъно чекм.',bw,bd,mx,[0,0,0,0],[bx,bx+bw,y0+12,y0+12+bd,zb2,zb2+xt],'drawer');
+          add('Дъно чекм.',bw,bd,mx,[0,0,0,0],[bx,bx+bw,y0+12,y0+12+bd,zb2,zb2+xt],'drawer');parts.at(-1).slL=bd+(+sl.bD||0);
           add('Гръб чекм.',bw-12,sl.bkH,mx,[1,0,0,0],[bx+6,bx+bw-6,y0,y0+xt,zb2+xt,zb2+xt+sl.bkH],'drawer');
           for(const xx of[bx-13,bx+bw])parts_hw(add,'Метална страница',[xx,xx+13,y0,yF,zb2,zb2+sl.sideH]);continue}
         const BW=iW-(+sl.clear||26),BL=NL-(+sl.lenDed||0),bx0=xa+T+(iW-BW)/2,bx1=bx0+BW,y0=yF-BL,under=sl.bottom!=='groove',zbb=fz+15,zs=under?zbb+bB:zbb;
-        add('Страница чекм.',BL,BH,mx,[1,0,0,0],[bx0,bx0+xt,y0,yF,zs,zs+BH],'drawer');parts.at(-1).sd='L';
-        add('Страница чекм.',BL,BH,mx,[1,0,0,0],[bx1-xt,bx1,y0,yF,zs,zs+BH],'drawer');parts.at(-1).sd='R';
+        add('Страница чекм.',BL,BH,mx,[1,0,0,0],[bx0,bx0+xt,y0,yF,zs,zs+BH],'drawer');parts.at(-1).slL=BL+(+sl.lenDed||0);parts.at(-1).sd='L';
+        add('Страница чекм.',BL,BH,mx,[1,0,0,0],[bx1-xt,bx1,y0,yF,zs,zs+BH],'drawer');parts.at(-1).slL=BL+(+sl.lenDed||0);parts.at(-1).sd='R';
         const rz=sl.bottom==='groove'?+(sl.fbRaise??(sl.kind==='under'?10:0))||0:0,fbD=sl.bottom==='groove'?rz+bB:0;
         add('Предна/задна чекм.',BW-2*xt,BH-fbD,mx,[1,0,0,0],[bx0+xt,bx1-xt,yF-xt,yF,zs+fbD,zs+BH],'drawer');
         add('Предна/задна чекм.',BW-2*xt,BH-fbD,mx,[1,0,0,0],[bx0+xt,bx1-xt,y0,y0+xt,zs+fbD,zs+BH],'drawer');
@@ -738,10 +738,10 @@ function buildWardrobe(k){
     const Jx=c+hs.reduce((a,b)=>a+b,0);
     hs.forEach((h,j)=>{const lo=Math.max(fz,z0),hi=j===hs.length-1?Jx-(k._exLow?T:T/2)-5:fz+h+10,zbb=lo+15,zs0=zbb+(sl.bottom!=='groove'?bB:0),BH=+bxs[j]>0?+bxs[j]:exBl(k.wBoxH).length===1&&exBl(k.wBoxH)[0]>0?exBl(k.wBoxH)[0]:Math.max(50,Math.min(h-(+sl?.hOff||40),hi-zs0)) /* кутията = челото − отстъпа на водача; горе — до следващата кутия / до рафта */,yF=Di,NL=NLx;fz+=h;
       if(sl.kind==='metal'){const bw=iW-sl.bW+26,bd=NL-sl.bD,bx=L+(iW-bw)/2,y0=yF-NL;
-        add('Дъно чекм.',bw,bd,mx,[0,0,0,0],[bx,bx+bw,y0+12,y0+12+bd,zbb,zbb+xt],'drawer');add('Гръб чекм.',bw-12,sl.bkH,mx,[1,0,0,0],[bx+6,bx+bw-6,y0,y0+xt,zbb+xt,zbb+xt+sl.bkH],'drawer');
+        add('Дъно чекм.',bw,bd,mx,[0,0,0,0],[bx,bx+bw,y0+12,y0+12+bd,zbb,zbb+xt],'drawer');parts.at(-1).slL=bd+(+sl.bD||0);add('Гръб чекм.',bw-12,sl.bkH,mx,[1,0,0,0],[bx+6,bx+bw-6,y0,y0+xt,zbb+xt,zbb+xt+sl.bkH],'drawer');
         for(const xx of[bx-13,bx+bw])parts_hw(add,'Метална страница',[xx,xx+13,y0,yF,zbb,zbb+sl.sideH]);return}
       const BW=iW-(+sl.clear||26),BL=NL-(+sl.lenDed||0),bx0=L+(iW-BW)/2,bx1=bx0+BW,y0=yF-BL,under=sl.bottom!=='groove',zs=under?zbb+bB:zbb;
-      add('Страница чекм.',BL,BH,mx,[1,0,0,0],[bx0,bx0+xt,y0,yF,zs,zs+BH],'drawer');parts.at(-1).sd='L';add('Страница чекм.',BL,BH,mx,[1,0,0,0],[bx1-xt,bx1,y0,yF,zs,zs+BH],'drawer');parts.at(-1).sd='R';
+      add('Страница чекм.',BL,BH,mx,[1,0,0,0],[bx0,bx0+xt,y0,yF,zs,zs+BH],'drawer');parts.at(-1).slL=BL+(+sl.lenDed||0);parts.at(-1).sd='L';add('Страница чекм.',BL,BH,mx,[1,0,0,0],[bx1-xt,bx1,y0,yF,zs,zs+BH],'drawer');parts.at(-1).slL=BL+(+sl.lenDed||0);parts.at(-1).sd='R';
       const rz=sl.bottom==='groove'?+(sl.fbRaise??(sl.kind==='under'?10:0))||0:0,fbD=sl.bottom==='groove'?rz+bB:0;
       add('Предна/задна чекм.',BW-2*xt,BH-fbD,mx,[1,0,0,0],[bx0+xt,bx1-xt,yF-xt,yF,zs+fbD,zs+BH],'drawer');add('Предна/задна чекм.',BW-2*xt,BH-fbD,mx,[1,0,0,0],[bx0+xt,bx1-xt,y0,y0+xt,zs+fbD,zs+BH],'drawer');
       const bd=+(sl.bottomDed??(sl.kind==='side'?5:0))||0;
@@ -980,9 +980,9 @@ function smartDrawers(k,out,a,i){ // чекмеджета в секция (въ�
   let bhs=hs.map((hh,j)=>geo(hh,j).bh);if(hs.every(v=>Math.abs(v-hs[0])<0.5))bhs=bhs.map(()=>Math.min(...bhs));const abl=String(a.bh??'').split(/[,;]/).map(x=>+x.trim()||0),abx=j=>abl.length===1?abl[0]:abl[j]||0; /* една височина или за всяко (отгоре надолу) */
   if(abl.some(x=>x>0)){bhs=bhs.map((v,j)=>{const w=abx(n-1-j);if(w>v+0.5)a._warn=(a._warn?a._warn+'; ':'')+`кутия ${w} мм не се побира (до ${Math.floor(v)} мм)`;return w>0?w:v})} // еднакви чела — еднакви кутии
   hs.forEach((hh,j)=>{const zbb=geo(hh,j).zbb,BH=bhs[j];
-    if(sl.kind==='metal'){const bw=iW-sl.bW+26,bd=NL-sl.bD,bx=Lx+(iW-bw)/2,y0=yF-NL;push('Дъно чекм.',bw,bd,mx,[0,0,0,0],[bx,bx+bw,y0+12,y0+12+bd,zbb,zbb+xt],'drawer');push('Гръб чекм.',bw-12,sl.bkH,mx,[1,0,0,0],[bx+6,bx+bw-6,y0,y0+xt,zbb+xt,zbb+xt+sl.bkH],'drawer');return}
+    if(sl.kind==='metal'){const bw=iW-sl.bW+26,bd=NL-sl.bD,bx=Lx+(iW-bw)/2,y0=yF-NL;push('Дъно чекм.',bw,bd,mx,[0,0,0,0],[bx,bx+bw,y0+12,y0+12+bd,zbb,zbb+xt],'drawer');out.at(-1).slL=bd+(+sl.bD||0);push('Гръб чекм.',bw-12,sl.bkH,mx,[1,0,0,0],[bx+6,bx+bw-6,y0,y0+xt,zbb+xt,zbb+xt+sl.bkH],'drawer');return}
     const BW=iW-(+sl.clear||26),BL=NL-(+sl.lenDed||0),bx0=Lx+(iW-BW)/2,bx1=bx0+BW,y0=yF-BL,under=sl.bottom!=='groove',zs=under?zbb+bB:zbb;
-    push('Страница чекм.',BL,BH,mx,[1,0,0,0],[bx0,bx0+xt,y0,yF,zs,zs+BH],'drawer');push('Страница чекм.',BL,BH,mx,[1,0,0,0],[bx1-xt,bx1,y0,yF,zs,zs+BH],'drawer');
+    push('Страница чекм.',BL,BH,mx,[1,0,0,0],[bx0,bx0+xt,y0,yF,zs,zs+BH],'drawer');out.at(-1).slL=BL+(+sl.lenDed||0);push('Страница чекм.',BL,BH,mx,[1,0,0,0],[bx1-xt,bx1,y0,yF,zs,zs+BH],'drawer');out.at(-1).slL=BL+(+sl.lenDed||0);
     const rz=sl.bottom==='groove'?+(sl.fbRaise??(sl.kind==='under'?10:0))||0:0,fbD=sl.bottom==='groove'?rz+bB:0;
     push('Предна/задна чекм.',BW-2*xt,BH-fbD,mx,[1,0,0,0],[bx0+xt,bx1-xt,yF-xt,yF,zs+fbD,zs+BH],'drawer');push('Предна/задна чекм.',BW-2*xt,BH-fbD,mx,[1,0,0,0],[bx0+xt,bx1-xt,y0,y0+xt,zs+fbD,zs+BH],'drawer');
     const bd=+(sl.bottomDed??(sl.kind==='side'?5:0))||0;
@@ -1391,13 +1391,13 @@ function buildRaw(k){
   else if(ns){const gap=(inH-ns*T)/(ns+1); if(gap<60) warn.push('Рафтовете са твърде нагъсто.');
     for(let j=0;j<=n;j++){const x0=iL+secs[j][0]+S.shelfClear,Sw=secs[j][1]-2*S.shelfClear;
       for(let q=1;q<=ns;q++){const z=c+T+q*gap+(q-1)*T; add('Рафт',Sw,Sd,k.mc,[1,0,0,0],[x0,x0+Sw,sy,sy+Sd,z,z+T])}}}
-  if(isDr)buildDrawers(k,{S,T,B,tF,W,H,D,c,Dk,bIn,Wi,add,warn});
+  if(isDr)buildDrawers(k,{S,T,B,tF,W,H,D,c,Dk,bIn,Wi,add,warn,parts});
   const apF=(ap,z0,z1)=>{if(k.apShow===false||z1-z0<100)return;const w=Math.min(595,W-6),x=(W-w)/2,y=Dk+S.doorGap;add(ap==='oven'?'Фурна':'Микровълнова',0,0,'k1',[0,0,0,0],[x,x+w,y,y+tF,z0+2,z1-2],'appl');parts.at(-1).ap=ap}; // уредът — само за картинката
   if(isOv)apF('oven',dTop,H-gOv);
   if(isOv){const h=Math.floor(H-c-gOv-(+k.ovenH||600)-S.fuga+1e-6); // чело = габарит без цокъл − фурна − фуга
     if(dTop-T<c+T+40)warn.push('Отворът за фурната е твърде висок — не остава място за чекмедже.');
     add('Делител',W-2*T,Dk-bIn,k.mc,[1,0,0,0],[T,W-T,bIn,Dk,dTop-T,dTop]);
-    if(h>=40)buildDrawers(k,{S,T,B,tF,W,H,D,c,Dk,bIn,Wi,add,warn},{hs:[h],z1:gOv?c+h:c+S.fuga/2+h,zMax:dTop-T})}
+    if(h>=40)buildDrawers(k,{S,T,B,tF,W,H,D,c,Dk,bIn,Wi,add,warn,parts},{hs:[h],z1:gOv?c+h:c+S.fuga/2+h,zMax:dTop-T})}
   let colA=0,colTop=0;
   if(isCol){ // колона над отделен долен шкаф: фурна (стъпва на дъното) · микровълнова · горна врата
     // зоните се мерят отпред от долния ръб на корпуса: фурна + микровълнова + горна зона = височината
@@ -1556,9 +1556,9 @@ function innerDrawers(k,parts){ /* вътрешни чекмеджета зад 
   L.forEach((q,i)=>{const h=Math.max(40,+q.h||150),z0=zB+Math.max(0,+q.z||0),z1=z0+h;zmin=Math.min(zmin,z0);zmax=Math.max(zmax,z1);
     add('Чело вътр. чекм.',h,Wi-2*g,mF,[1,1,1,1],[iL+g,iR-g,yF,yF+tf,z0,z1],'');
     if(!NL)return;
-    if(sl.kind==='metal'){const bw=Wi-sl.bW,bd=NL-sl.bD,x0=iL+(Wi-bw)/2,zb=z0+15,y0=yF-NL;add('Дъно вътр. чекм.',bw,bd,k.mx,[0,0,0,0],[x0,x0+bw,y0+12,y0+12+bd,zb,zb+bt]);add('Гръб вътр. чекм.',Wi-sl.bkW,sl.bkH,k.mx,[1,0,0,0],[iL+sl.bkW/2,iR-sl.bkW/2,y0,y0+bt,zb+bt,zb+bt+sl.bkH]);for(const x of[x0-13,x0+bw])parts_hw(add,'Метална страница',[x,x+13,y0,yF,zb,zb+sl.sideH]);return}
+    if(sl.kind==='metal'){const bw=Wi-sl.bW,bd=NL-sl.bD,x0=iL+(Wi-bw)/2,zb=z0+15,y0=yF-NL;add('Дъно вътр. чекм.',bw,bd,k.mx,[0,0,0,0],[x0,x0+bw,y0+12,y0+12+bd,zb,zb+bt]);parts.at(-1).slL=bd+(+sl.bD||0);add('Гръб вътр. чекм.',Wi-sl.bkW,sl.bkH,k.mx,[1,0,0,0],[iL+sl.bkW/2,iR-sl.bkW/2,y0,y0+bt,zb+bt,zb+bt+sl.bkH]);for(const x of[x0-13,x0+bw])parts_hw(add,'Метална страница',[x,x+13,y0,yF,zb,zb+sl.sideH]);return}
     const BH=+q.bh>0?+q.bh:Math.max(50,h-sl.hOff),BW=Wi-sl.clear,BL=NL-(+sl.lenDed||0),x0=iL+(Wi-BW)/2,x1=x0+BW,y0=yF-BL,under=sl.bottom!=='groove',zb=z0+(h-BH)/2-(under?bB:0),zs=under?zb+bB:zb;
-    add('Страница вътр. чекм.',BL,BH,k.mx,[1,0,0,0],[x0,x0+bt,y0,yF,zs,zs+BH]);add('Страница вътр. чекм.',BL,BH,k.mx,[1,0,0,0],[x1-bt,x1,y0,yF,zs,zs+BH]);
+    add('Страница вътр. чекм.',BL,BH,k.mx,[1,0,0,0],[x0,x0+bt,y0,yF,zs,zs+BH]);parts.at(-1).slL=BL+(+sl.lenDed||0);add('Страница вътр. чекм.',BL,BH,k.mx,[1,0,0,0],[x1-bt,x1,y0,yF,zs,zs+BH]);parts.at(-1).slL=BL+(+sl.lenDed||0);
     const rz=sl.bottom==='groove'?+(sl.fbRaise??(sl.kind==='under'?10:0))||0:0,fbD=sl.bottom==='groove'?rz+bB:0;
     add('Предна/задна вътр. чекм.',BW-2*bt,BH-fbD,k.mx,[1,0,0,0],[x0+bt,x1-bt,yF-bt,yF,zs+fbD,zs+BH]);add('Предна/задна вътр. чекм.',BW-2*bt,BH-fbD,k.mx,[1,0,0,0],[x0+bt,x1-bt,y0,y0+bt,zs+fbD,zs+BH]);
     const bd=+(sl.bottomDed??(sl.kind==='side'?5:0))||0;
@@ -1603,7 +1603,7 @@ function frontHeights(k){ // въвеждат се реални размери (
   let diff=0;if(!autos){diff=avail-fixed;nom[n-1]+=diff}
   return{hs:nom.map(v=>v-S.fuga),nom,diff,a,autos,isSet,gg};
 }
-function buildDrawers(k,{S,T,tF,W,H,c,Dk,bIn,Wi,add,warn},ov){ // ov: чекмедже под фурна {hs,z1,zMax}
+function buildDrawers(k,{S,T,tF,W,H,c,Dk,bIn,Wi,add,warn,parts},ov){ // ov: чекмедже под фурна {hs,z1,zMax}
   const sl=slideOf(k);if(!sl){warn.push('Няма зададени водачи в Настройки.');return}
   const {hs,diff,autos,gg}=ov?{hs:ov.hs,diff:0,autos:1}:frontHeights(k);
   if(!autos&&Math.abs(diff)>0.5)warn.push(`Сборът на челата не съвпада с височината — последното е коригирано с ${fmt(diff)} мм.`);
@@ -1622,15 +1622,15 @@ function buildDrawers(k,{S,T,tF,W,H,c,Dk,bIn,Wi,add,warn},ov){ // ov: чекме
     if(NL){
       if(sl.kind==='metal'){
         const bw=Wi-sl.bW,bd=NL-sl.bD,x0=(W-bw)/2,zb=Math.max(c+T+15,z0+15),y0=Dk-NL;
-        add('Дъно чекм.',bw,bd,k.mx,[0,0,0,0],[x0,x0+bw,y0+12,y0+12+bd,zb,zb+bt],'drawer');
+        add('Дъно чекм.',bw,bd,k.mx,[0,0,0,0],[x0,x0+bw,y0+12,y0+12+bd,zb,zb+bt],'drawer');parts.at(-1).slL=bd+(+sl.bD||0);
         add('Гръб чекм.',Wi-sl.bkW,sl.bkH,k.mx,[1,0,0,0],[(W-(Wi-sl.bkW))/2,(W+(Wi-sl.bkW))/2,y0,y0+bt,zb+bt,zb+bt+sl.bkH],'drawer');
         for(const x of[x0-13,x0+bw])parts_hw(add,'Метална страница',[x,x+13,y0,Dk-2,zb,zb+sl.sideH]);
       }else{
         const BH=bhSet(i)?+k.bh[i]:bhDef(h);if(BH>h-5)warn.push(`Кутия ${i+1} е по-висока от челото си.`);
         const BW=Wi-sl.clear,BL=NL-(+sl.lenDed||0),x0=(W-BW)/2,x1=x0+BW,y0=Dk-BL;
         const under=sl.bottom!=='groove',zb=Math.min(Math.max(c+T+5,z0+(h-BH)/2-(under?bB:0)),zTop-BH-bB),zs=under?zb+bB:zb;if(ov&&zs+BH>zTop)warn.push('Кутията на чекмеджето не влиза под делителя — намали височината ѝ.');
-        add('Страница чекм.',BL,BH,k.mx,[1,0,0,0],[x0,x0+bt,y0,Dk,zs,zs+BH],'drawer');
-        add('Страница чекм.',BL,BH,k.mx,[1,0,0,0],[x1-bt,x1,y0,Dk,zs,zs+BH],'drawer');
+        add('Страница чекм.',BL,BH,k.mx,[1,0,0,0],[x0,x0+bt,y0,Dk,zs,zs+BH],'drawer');parts.at(-1).slL=BL+(+sl.lenDed||0);
+        add('Страница чекм.',BL,BH,k.mx,[1,0,0,0],[x1-bt,x1,y0,Dk,zs,zs+BH],'drawer');parts.at(-1).slL=BL+(+sl.lenDed||0);
         const rz=sl.bottom==='groove'?+(sl.fbRaise??(sl.kind==='under'?10:0))||0:0,fbD=sl.bottom==='groove'?rz+bB:0; // предна/задна стъпват върху дъното
         add('Предна/задна чекм.',BW-2*bt,BH-fbD,k.mx,[1,0,0,0],[x0+bt,x1-bt,Dk-bt,Dk,zs+fbD,zs+BH],'drawer');
         add('Предна/задна чекм.',BW-2*bt,BH-fbD,k.mx,[1,0,0,0],[x0+bt,x1-bt,y0,y0+bt,zs+fbD,zs+BH],'drawer');
@@ -1686,7 +1686,7 @@ function buildNstand(k){const S=P.settings,parts=[],warn=[],add=(name,L,Wd,m,e,b
     else if(q.t==='door2'){const dw=Math.floor((W-2*fu)/2);add('Врата',hh,dw,k.mf,[1,1,1,1],[fu/2,fu/2+dw,yF,yF+tF,f0,f1],'door');parts.at(-1).hg='L';add('Врата',hh,dw,k.mf,[1,1,1,1],[W-fu/2-dw,W-fu/2,yF,yF+tF,f0,f1],'door');parts.at(-1).hg='R';nDoor+=2} // две врати — фуга и между тях
     else if(q.t==='fix'){const a0=i===sc.length-1?zb:f0,a1=a0+Math.floor((i===0&&lid?zt2:f1)-a0); /* без десети */add('Чело (неподвижно)',a1-a0,W,k.mf,[1,1,1,1],[0,W,yF,yF+tF,a0,a1],'door')} // ракла с капак — челото е неподвижно, на цялата ширина
     else if(q.t==='flap'){add(isChest(k)?'Клапа отпред':'Клапа',hh,W-fu,k.mf,[1,1,1,1],[fu/2,W-fu/2,yF,yF+tF,f0,f1],'door');warn.push(`${lb}Секция ${i+1}: падаща клапа — панти и механизъм (ограничител) за клапа.`)}
-    else if(q.t==='dr'){const iz=inner(i),cc=sc[i+1]&&sc[i+1].t==='dr'?zb:iz.lo,kk={...k,bh:[+q.bh>0?+q.bh:null],bhAll:0};const n0=parts.length;buildDrawers(kk,{S,T,tF,W,H,c:Math.max(iz.lo,cc)-T,Dk,bIn,Wi:li1-li0,add,warn},{hs:[hh],z1:f1,zMax:sc[i-1]&&sc[i-1].t==='dr'?zt2:iz.hi});const dc=(li0+li1)/2-W/2;if(dc)for(const p of parts.slice(n0))if(p.kind==='drawer'){p.box[0]+=dc;p.box[1]+=dc}nDr++}})};
+    else if(q.t==='dr'){const iz=inner(i),cc=sc[i+1]&&sc[i+1].t==='dr'?zb:iz.lo,kk={...k,bh:[+q.bh>0?+q.bh:null],bhAll:0};const n0=parts.length;buildDrawers(kk,{S,T,tF,W,H,c:Math.max(iz.lo,cc)-T,Dk,bIn,Wi:li1-li0,add,warn,parts},{hs:[hh],z1:f1,zMax:sc[i-1]&&sc[i-1].t==='dr'?zt2:iz.hi});const dc=(li0+li1)/2-W/2;if(dc)for(const p of parts.slice(n0))if(p.kind==='drawer'){p.box[0]+=dc;p.box[1]+=dc}nDr++}})};
   const cols=k.skrin&&Array.isArray(k.nsCols)&&k.nsCols.length>1?k.nsCols:null;
   if(!cols)fronts(k.skrin&&Array.isArray(k.nsCols)&&k.nsCols.length===1?nsSecsC(k,0):nsSecs(k),W,T,W-T,''); // скрин с 1 колона — секциите са в колоната
   else{const n=cols.length,fixW=cols.reduce((a,q)=>a+(+q.w>0?+q.w:0),0),nA=cols.filter(q=>!(+q.w>0)).length,aw=nA?(W-fixW)/nA:0;let ws=cols.map(q=>+q.w>0?+q.w:aw);if(!nA)ws[n-1]+=W-fixW; // ширината на колоната — по осите на делителите (празно = равно)
@@ -1759,7 +1759,44 @@ $('#tbl').addEventListener('click',e=>{const k=cab(sel);if(!k||scope!=='cab')ret
   const[nm,sd]=name.split('|'),cur=build(k).parts.find(p=>p.name===nm&&(!sd||p.sd===sd));if(!cur)return;const ne=[...cur.e];ne[i]=ne[i]?0:1;
   k.edgeOv=k.edgeOv||{};if(sd&&k.edgeOv[nm]){k.edgeOv[nm+'|'+(sd==='L'?'R':'L')]=k.edgeOv[nm];delete k.edgeOv[nm]} /* старото общо → остава за другата страница */k.edgeOv[name]=ne;P.example=false;changed(false)});
 $('#tbl').addEventListener('change',e=>{const t=e.target.closest('input[data-note]');if(!t)return;const k=cab(sel);if(!k)return;pushUndo();const n=t.dataset.note,[nm,sd]=n.split('|'),v=t.value.trim();k.noteOv={...(k.noteOv||{})};if(v)k.noteOv[n]=v;else delete k.noteOv[n];if(sd&&k.noteOv[nm]&&!v){} P.example=false;changed(false)});
-function renderTable(){
+/* ---------- Обков: панти, водачи, дръжки, Gola, механизми, крачета, лостове, плъзгащи системи, легла ---------- */
+function hingeN(h){const R=String(P.settings.hwHinge||'900:2;1600:3;2200:4;5').split(/[;,]+/).map(x=>x.trim()).filter(Boolean);for(const r of R){const m=r.split(':');if(m.length<2)return +m[0]||2;if(h<=+m[0])return +m[1]||2}return 2}
+const NOLEG=new Set(['dw','wardrobe','nstand','bed','hboard','wpanel','wshelf','top','splash','filler','raster','ubottom','plinthRun','endPanel','ceilFill']);
+function hwList(cabs){const S=P.settings,M=new Map(),C=id=>String(S['hwC_'+id]||'').trim();
+  const put=(key,name,code,q,unit,k)=>{if(!(q>0))return;const r=M.get(key)||{key,name,code,q:0,unit,cabs:new Set()};r.q+=q;r.cabs.add(k.name||'');M.set(key,r)};
+  for(const k of cabs){if(isAcc?.(k))continue;let ps;try{ps=build(k).parts.filter(p=>!p.hidden&&p.box)}catch(e){continue}const nt=String(k.note||'').toLowerCase(),pushH=nt.includes('push панти'),pushD=nt.includes('push водачи'),noH=nt.includes('без дръжка')||!!k.gola,prof=nt.includes('дръжка профил');
+    const handle=(w,inner)=>{if(inner&&!k.wDrHdl)return;if(prof)put('handleP','Дръжка профил',C('handleP'),w/1000,'м',k);else if(!noH&&!(pushH&&!inner))put('handle','Дръжка',C('handle'),1,'бр.',k)};
+    /* врати на панти */
+    for(const d of ps.filter(p=>p.kind==='door'&&/хладилник/.test(p.name)))handle(d.box[1]-d.box[0]); /* вратата на хладилника — пантите са на уреда, дръжката се брои */
+    for(const d of ps.filter(p=>p.kind==='door'&&/^([АБ] )?Врата/.test(p.name)&&!/повдигаща|хладилник|плъзгаща|съдомиял/.test(p.name))){if(k.type==='dw'){handle(d.box[1]-d.box[0]);continue} /* съдомиялна — вратата е на машината */const h=d.box[5]-d.box[4],n=hingeN(h);
+      if(pushH)put('hingePush','Панта push',C('hingePush'),n,'бр.',k);else put('hinge','Панта',C('hinge'),n,'бр.',k);handle(d.sdor?0:d.box[1]-d.box[0])}
+    for(const g of vitGroups(ps)){const h=g.fr.z1-g.fr.z0;if(k.type==='wardrobe'&&k.wDoor==='slide')continue;put('hingeAlu','Панта за ал. витрина',C('hingeAlu'),hingeN(h),'бр.',k);handle(g.fr.x1-g.fr.x0)}
+    /* чела на чекмеджета — дръжки */
+    for(const f of ps.filter(p=>/^Чело/.test(p.name)&&!/неподвижно/.test(p.name)))handle(f.box[1]-f.box[0],/вътр/.test(f.name));
+    /* водачи */
+    const sl=slideOf(k);if(sl){const met=sl.kind==='metal',sd=ps.filter(p=>met?/^Дъно (вътр\. )?чекм/.test(p.name):/^Страница (вътр\. )?чекм/.test(p.name)),by=new Map();
+      for(const q of sd){const qb=q.box0||q.box,NL=Math.round(+q.slL>0?+q.slL:(qb[3]-qb[2])+(met?+sl.bD||0:+sl.lenDed||0)); /* дължината на водача — както е избрана при правенето на чекмеджето */by.set(NL,(by.get(NL)||0)+(met?1:0.5))}
+      for(const[NL,n]of by)put('sl_'+sl.id+'_'+NL+(pushD?'p':''),'Водачи '+sl.name+' '+NL+' мм'+(pushD?' (push)':''),C('sl_'+sl.id),Math.round(n),'чифт',k)}
+    /* повдигащи врати — механизъм */
+    if(+k.lift>0){const L=liftCalc(k);if(L)put('lf_'+L.mech+'_'+L.short,L.short,C('lf_'+L.mech),1,'к-т',k);for(const d of ps.filter(p=>p.name==='Врата повдигаща'))handle(d.box[1]-d.box[0])}
+    /* Gola */
+    for(const g of ps.filter(p=>/^Gola (L|C) профил/.test(p.name))){const L=/^Gola L/.test(g.name),b=g.box,len=Math.max(b[1]-b[0],b[3]-b[2],b[5]-b[4]);put(L?'golaL':'golaC','Gola '+(L?'L':'C')+' профил',C(L?'golaL':'golaC'),len/1000,'м',k)}
+    /* крачета и щипки */
+    if(!NOLEG.has(k.type)&&!k.upper&&+k.c>0&&!isAcc?.(k)){const n=+k.W>+(S.hwLegsW??900)?+(S.hwLegsWide??6):+(S.hwLegs??4);put('leg','Краче за шкаф',C('leg'),n,'бр.',k);put('clip','Щипка за цокъл',C('clip'),+(S.hwClips??2),'бр.',k)}
+    if(k.type==='nstand'&&(k.nsMount||'legs')==='legs'&&!isChest?.(k))put('leg','Краче за шкаф',C('leg'),4,'бр.',k);
+    /* гардероб */
+    for(const r of ps.filter(p=>p.name==='Лост')){put('rod','Лост',C('rod'),(+r.L)/1000,'м',k);put('rodH','Държач за лост',C('rodH'),2,'бр.',k)}
+    if(k.type==='wardrobe'&&k.wDoor==='slide')put('slSys_'+Math.max(2,k.doors|0)+'_'+Math.round(k.W),'Система плъзгащи врати — '+Math.max(2,k.doors|0)+' врати, '+Math.round(k.W)+' мм',C('slSys'),1,'к-т',k);
+    /* легло */
+    if(k.type==='bed'&&k.bMech!==false&&k.bMech!=='off')put('bed_'+Math.round(k.W)+'x'+Math.round(k.D),'Механизъм за легло '+Math.round(k.W)+' × '+Math.round(k.D),C('bedMech'),1,'к-т',k)}
+  const ORD=['hinge','hingePush','hingeAlu','sl_','lf_','handle','handleP','golaL','golaC','leg','clip','rod','rodH','slSys','bed'],ix=key=>{const i=ORD.findIndex(o=>o.endsWith('_')?key.startsWith(o):key===o||key.startsWith(o+'_'));return i<0?99:i};
+  return[...M.values()].sort((a,b)=>ix(a.key)-ix(b.key)||a.name.localeCompare(b.name,'bg',{numeric:true})).map(r=>({...r,q:r.unit==='м'?Math.round(r.q*100)/100:Math.round(r.q)}))}
+let tblMode='parts';
+function renderHw(list){const rs=hwList(list);const cs=r=>[...r.cabs].filter(Boolean).join(', ');
+  $('#tbl').innerHTML=`<thead><tr><th>Обков</th><th>Код</th><th class="n">Количество</th><th>Шкафове</th></tr></thead><tbody>`+(rs.length?rs.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.code||'—')}</td><td class="n">${fmt(r.q)} ${r.unit}</td><td style="color:var(--muted);font-size:12px">${esc(cs(r))}</td></tr>`).join(''):`<tr><td colspan="4" style="color:var(--muted)">Няма обков.</td></tr>`)+
+    `</tbody><tfoot><tr><td colspan="4" style="padding-top:8px"><button class="btn sm" id="hwCopy">Копирай обкова</button> <span style="color:var(--muted);font-size:12px">Броят пантите и крачетата — от Настройки → „Обков — брой“; кодовете — „Обков — кодове“. Без дръжка/Gola/Push — от забележката на шкафа.</span></td></tr></tfoot>`;
+  $('#sum').innerHTML='';$('#hwCopy').onclick=()=>{const t=rs.map(r=>[r.name,r.code||'',String(r.q).replace('.',','),r.unit].join('\t')).join('\n');navigator.clipboard?.writeText(t).then(()=>toast('Обковът е копиран'),()=>toast('Не можах да копирам'))}}
+function renderTable(){if(tblMode==='hw'){renderHw(scope==='all'?P.cabinets:P.cabinets.filter(c=>c.id===sel));return}
   const list=scope==='all'?P.cabinets:P.cabinets.filter(c=>c.id===sel);
   const rs=rows(list,true);
   $('#tbl').innerHTML=`<thead><tr><th>Детайл</th><th class="n">Дължина</th><th class="n">Ширина</th><th class="n">Бр.</th>${scope==='cab'?'<th>Шарка</th>':''}<th>Кант${scope==='cab'?' <span style="font-weight:400">(клик по страна)</span>':''}</th><th>Материал</th><th>Коментар</th></tr></thead><tbody>`+
@@ -3558,6 +3595,7 @@ $('#tClear').onchange=e=>{showClear=e.target.checked;if(showClear&&view!=='wall'
 $('#bFit').onclick=()=>{toggleView(false);if(view==='3d')fit();else{camV=null;renderPlan()}};
 $('#sCab').onclick=()=>{scope='cab';$('#sCab').classList.add('on');$('#sAll').classList.remove('on');renderTable()};
 $('#sAll').onclick=()=>{scope='all';$('#sAll').classList.add('on');$('#sCab').classList.remove('on');renderTable()};
+$('#tParts').onclick=()=>{tblMode='parts';$('#tParts').classList.add('on');$('#tHw').classList.remove('on');renderTable()};$('#tHw').onclick=()=>{tblMode='hw';$('#tHw').classList.add('on');$('#tParts').classList.remove('on');renderTable()};
 /* ---------- Меню Кухни ---------- */
 const KITCHEN_UP={cat:'Горни шкафове',items:[
     {name:'Горен с врати',p:{upper:true,W:600,c:1450,H:2170,D:320,doors:1,div:0,sh:2,plinth:false}},
@@ -4074,17 +4112,20 @@ const SETF=[['settings.fuga','Фуга между врати, мм'],['settings.
   ['settings.cdFuga','Обща врата (2 шкафа един върху друг): по-къса с, мм'],['settings.drFuga','Чела и врати в секция (Детайли): фуга, мм'],
   ['settings.golaDeadB','Gola ъгъл с мъртво: бленда за пантите (на Г с вътрешното парче), мм'],['settings.golaDeadF','Gola ъгъл с мъртво: бленда отпред в ъгъла — видима ширина по подразбиране, мм'],['settings.golaDeadSh','Gola ъгъл с мъртво: луфт между рафта и блендата за пантите, мм'],['settings.golaOvB','Gola: шкаф за фурна — дъното по-плитко отпред (хват отдолу), мм'],['settings.ubRaise','Цяло дъно под горния ред: корпусът по-нисък с, мм'],['settings.ubPw','Цяло дъно: ал. профил дръжка — дълбочина, мм'],['settings.ubPh','Цяло дъно: ал. профил дръжка — височина, мм'],['settings.idrSet','Вътрешни чекмеджета: челото е навътре от ръба на корпуса с, мм'],['settings.golaTop','Gola: вратата/челото горе — под горния ръб на шкафа, мм'],['settings.golaMid','Gola: между челата (C-профил), мм'],['settings.golaLw','Gola L (горе): изрез в страницата — дълбочина, мм'],['settings.golaLh','Gola L (горе): изрез — височина, мм'],['settings.golaCw','Gola C (средата): изрез — дълбочина, мм'],['settings.golaCh','Gola C (средата): изрез — височина, мм'],
   ['settings.alFuga','Витрина: фуга на ал. вратите, мм'],['settings.alW','Витрина: ширина на ал. профил, мм'],['settings.alT','Витрина: корпусът е по-плитък с, мм'],['settings.glassDed','Витрина: стъклото = размерът на ал. вратата минус, мм'],
-  ['settings.hbDedH','Тапицирана табла: полето по-ниско с, мм (платът го увеличава)'],['settings.hbDedW','Тапицирана табла: полето по-тясно с, мм (платът го увеличава)'],['settings.edgeOn','Означение „има кант“','t'],['settings.edgeOff','Означение „няма кант“ (празно = нищо)','t']];
+  ['settings.hbDedH','Тапицирана табла: полето по-ниско с, мм (платът го увеличава)'],['settings.hbDedW','Тапицирана табла: полето по-тясно с, мм (платът го увеличава)'],['settings.hwHinge','Панти по височина на вратата (до мм:бр.; …; последното — над)','t'],['settings.hwLegs','Крачета на шкаф, бр.'],['settings.hwLegsW','Крачета: повече при шкаф по-широк от, мм'],['settings.hwLegsWide','Крачета на широк шкаф, бр.'],['settings.hwClips','Щипки за цокъл на шкаф, бр.'],
+  ...[['hinge','панта'],['hingePush','панта push'],['hingeAlu','панта за ал. витрина'],['handle','дръжка'],['handleP','дръжка профил (м)'],['golaL','Gola L профил (м)'],['golaC','Gola C профил (м)'],['leg','краче'],['clip','щипка за цокъл'],['rod','лост (м)'],['rodH','държач за лост'],['slSys','система плъзгащи врати'],['bedMech','механизъм за легло']].map(([k,l])=>['settings.hwC_'+k,'Код: '+l,'t']),
+  ['settings.edgeOn','Означение „има кант“','t'],['settings.edgeOff','Означение „няма кант“ (празно = нищо)','t']];
 const getP=p=>p.split('.').reduce((o,k)=>o[k],P);
 const setP=(p,v)=>{const a=p.split('.');a.slice(0,-1).reduce((o,k)=>o[k],P)[a.at(-1)]=v};
 const SETG=[['Врати и фуги',['fuga','doorGap','cdFuga','drFuga','wDrFw']],['Корпус, гръб, цокъл, пълнеж',['rail','backTot','plinthBack','fillAllow']],['Рафтове',['shelfFront','shelfGap','shelfClear','hfSet']],
   ['Вътрешни чекмеджета (гардероб и колона)',['wDrIns','wDrSd','wDrGrip','idrSet']],['Гардероб — плъзгащи врати',['wSlOv','wSlHd','wSlTrack']],['Gola',['golaTop','golaMid','golaLw','golaLh','golaCw','golaCh','golaOvB','golaDeadB','golaDeadF','golaDeadSh']],
-  ['Ал. витрина',['alFuga','alW','alT','glassDed']],['Цяло дъно под горния ред',['ubRaise','ubPw','ubPh']],['Тегло на вратите',['boardDens','handleKg']],['Тапицирани табли',['hbDedH','hbDedW']],['Копиране за разкроя',['edgeOn','edgeOff']]]; // групи в Настройки — затворени, отваряш нужната
+  ['Ал. витрина',['alFuga','alW','alT','glassDed']],['Цяло дъно под горния ред',['ubRaise','ubPw','ubPh']],['Тегло на вратите',['boardDens','handleKg']],['Тапицирани табли',['hbDedH','hbDedW']],['Обков — брой',['hwHinge','hwLegs','hwLegsW','hwLegsWide','hwClips']],['Обков — кодове',['hwC_hinge','hwC_hingePush','hwC_hingeAlu','hwC_handle','hwC_handleP','hwC_golaL','hwC_golaC','hwC_leg','hwC_clip','hwC_rod','hwC_rodH','hwC_slSys','hwC_bedMech','#hwSl']],['Копиране за разкроя',['edgeOn','edgeOff']]]; // групи в Настройки — затворени, отваряш нужната
 let setOpen=new Set(),setQv='';
 function setFilter(){const q=setQv.trim().toLowerCase();for(const d of document.querySelectorAll('#setForm details.setg')){let any=false;for(const l of d.querySelectorAll('label')){const ok=!q||l.textContent.toLowerCase().includes(q)||d.dataset.g.toLowerCase().includes(q);l.style.display=ok?'':'none';any=any||ok}d.style.display=any?'':'none';if(q&&any)d.open=true;else if(!q)d.open=setOpen.has(d.dataset.g)}}
 function renderSettings(){
-  const fld=([p,l,t])=>`<label>${l}<input id="s_${p.replace('.','_')}" data-p="${p}" type="${t?'text':'number'}" value="${esc(getP(p))}"></label>`,used=new Set(),grp=SETG.map(([nm,keys])=>{const fs=SETF.filter(f=>keys.includes(f[0].split('.')[1]));fs.forEach(f=>used.add(f[0]));
-      return fs.length?`<details class="full setg" data-g="${esc(nm)}" ${setOpen.has(nm)?'open':''} style="grid-column:1/-1;border:1px solid var(--line);border-radius:6px;padding:4px 10px"><summary style="cursor:pointer;font-weight:600;font-size:13px;padding:4px 0">${esc(nm)} <span style="color:var(--muted);font-weight:400">(${fs.length})</span></summary><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;padding:6px 0 8px">${fs.map(fld).join('')}</div></details>`:''}).join(''),rest=SETF.filter(f=>!used.has(f[0]));
+  const SF=[...SETF,...P.settings.slides.map(x=>['settings.hwC_sl_'+x.id,'Код: водачи „'+x.name+'“','t']),...Object.entries(LIFT).map(([id,o])=>['settings.hwC_lf_'+id,'Код: '+o.name,'t'])],dyn=f=>/^settings\.hwC_(sl|lf)_/.test(f[0]); /* кодовете за водачите и механизмите — по един за всеки вид */
+  const fld=([p,l,t])=>`<label>${l}<input id="s_${p.replace('.','_')}" data-p="${p}" type="${t?'text':'number'}" value="${esc(getP(p)??'')}"></label>`,used=new Set(),grp=SETG.map(([nm,keys])=>{const fs=SF.filter(f=>keys.includes(f[0].split('.')[1])||keys.includes('#hwSl')&&dyn(f));fs.forEach(f=>used.add(f[0]));
+      return fs.length?`<details class="full setg" data-g="${esc(nm)}" ${setOpen.has(nm)?'open':''} style="grid-column:1/-1;border:1px solid var(--line);border-radius:6px;padding:4px 10px"><summary style="cursor:pointer;font-weight:600;font-size:13px;padding:4px 0">${esc(nm)} <span style="color:var(--muted);font-weight:400">(${fs.length})</span></summary><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;padding:6px 0 8px">${fs.map(fld).join('')}</div></details>`:''}).join(''),rest=SF.filter(f=>!used.has(f[0]));
   $('#setForm').innerHTML=`<input id="setQ" class="full" style="grid-column:1/-1" placeholder="Търси настройка…" value="${esc(setQv)}">`+grp+(rest.length?`<details class="full setg" data-g="Други" open style="grid-column:1/-1;border:1px solid var(--line);border-radius:6px;padding:4px 10px"><summary style="cursor:pointer;font-weight:600;font-size:13px;padding:4px 0">Други</summary><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;padding:6px 0 8px">${rest.map(fld).join('')}</div></details>`:'')+
     `<label class="chk full"><input type="checkbox" id="s_cab" ${P.settings.cabInType?'checked':''}> Името на шкафа пред детайла при „Целия проект“</label>`;
   $('#mats').innerHTML='<span class="h">Име</span><span class="h">Код на плочата</span><span class="h">Дебелина</span><span class="h">Цвят</span><span class="h">Повърхност (Фото)</span><span class="h">Структура</span><span></span>'+P.materials.map((m,i)=>
