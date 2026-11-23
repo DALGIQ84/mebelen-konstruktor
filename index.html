@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 20:35 · Делителят не се прекъсва от рафт, сложен после</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 20:45 · Секции под скосения таван</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1022,8 +1022,9 @@ function pedCell(k,ps,x,z){ // свободната секция (клетка) 
   const v=pedVert(ps,z,z);let L=v.filter(q=>(q.box[0]+q.box[1])/2<x).sort((u,w)=>w.box[1]-u.box[1])[0],Rr=v.filter(q=>(q.box[0]+q.box[1])/2>x).sort((u,w)=>u.box[0]-w.box[0])[0];
   if(!L||!Rr){const lv=ps.filter(q=>!q.hidden&&q.box&&q.kind!=='door'&&q.kind!=='alu'&&q.kind!=='glass'&&q.kind!=='hw'&&q.kind!=='appl'&&!q.pl);if(!lv.length)return null; /* изтрита страница (шкафът опира в стена/съсед) — секцията стига до края на шкафа */
     const e=[0,1,2,3,4,5].map(i=>i%2?Math.max(...lv.map(q=>q.box[i])):Math.min(...lv.map(q=>q.box[i]))),eg=xx=>({key:null,kind:'edge',name:'край',box:[xx,xx,Math.max(0,e[2]),e[3],e[4],e[5]]});if(!L)L=eg(e[0]);if(!Rr)Rr=eg(e[1])}
-  const h=pedHor(ps,x),B=h.filter(q=>(q.box[4]+q.box[5])/2<z).sort((u,w)=>w.box[5]-u.box[5])[0],T=h.filter(q=>(q.box[4]+q.box[5])/2>z).sort((u,w)=>u.box[4]-w.box[4])[0];if(!B||!T)return null;
-  const x0=L.box[1],x1=Rr.box[0],z0=B.box[5],z1=T.box[4];if(x1-x0<20||z1-z0<20)return null;return{x0,x1,z0,z1,bk:B.key,L,R:Rr,B,T}}
+  const sf=(q,top)=>{if(q.fp&&q.tilt){const P=q.fp,zs=[];for(let i=0;i<P.length;i++){const A=P[i],C=P[(i+1)%P.length];if((A[0]-x)*(C[0]-x)<=0&&A[0]!==C[0])zs.push(A[1]+(C[1]-A[1])*(x-A[0])/(C[0]-A[0]))}if(zs.length)return top?Math.max(...zs):Math.min(...zs)}return top?q.box[5]:q.box[4]}; /* наклонен (и скосеният таван) — повърхността му точно при x */
+  const h=pedHor(ps,x),B=h.filter(q=>sf(q,true)<=z).sort((u,w)=>sf(w,true)-sf(u,true))[0],T=h.filter(q=>sf(q,false)>=z).sort((u,w)=>sf(u,false)-sf(w,false))[0];if(!B||!T)return null;
+  const x0=L.box[1],x1=Rr.box[0],z0=sf(B,true),z1=sf(T,false);if(x1-x0<20||z1-z0<20)return null;return{x0,x1,z0,z1,bk:B.key,L,R:Rr,B,T}}
 const pedBelow=(ps,p,cx,z)=>pedHor(ps,cx,p).filter(q=>q.box[5]<=z+1).sort((u,w)=>w.box[5]-u.box[5])[0]; // детайлът точно под рафта (дъно/рафт)
 const pedAbove=(ps,p,cx,z)=>pedHor(ps,cx,p).filter(q=>q.box[4]>=z-1).sort((u,w)=>u.box[4]-w.box[4])[0];
 function smartDiv(k,ps,a,p){ // умен делител: между рафта отдолу и рафта отгоре, дълбочината — колкото тях
