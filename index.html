@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 20:55 · Светло отдолу/отгоре и на рафтовете от параметрите</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 21:00 · Разделеният рафт — лявата и дясната част поотделно</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -921,7 +921,8 @@ function applyPOv(k,r){for(const a of k.pAdd||[])if(!a.mOwn&&a.smart&&a.smart!==
   {const dvs=out.filter(p=>p.added&&p.smart&&p.box&&!p.hidden&&p.kind!=='virt'&&(k.pAdd||[])[parseInt(p.key.split('#')[1])]?.smart==='dv'); /* рафт от параметрите, през който минава делител от „Детайли“ — става два рафта */
     for(const d of dvs){const[a0,a1,,,c0,c1]=d.box;for(let i=out.length-1;i>=0;i--){const q=out[i];if(q.added||q.hidden||!q.box||!/^Рафт/.test(q.name)||q.box[5]-q.box[4]>40)continue;const b=q.box;if(!(b[0]<a0-5&&b[1]>a1+5&&b[4]>=c0-1&&b[5]<=c1+1))continue;
       const cl=1,L=[b[0],a0-cl],R=[a1+cl,b[1]],ax=partAxes(q),mk=(r,sfx)=>{const n={...q,box:[r[0],r[1],b[2],b[3],b[4],b[5]],key:q.key+sfx};const dl=(r[1]-r[0])-(b[1]-b[0]);if(ax[0]===0)n.L=r1(q.L+dl);else if(ax[1]===0)n.Wd=r1(q.Wd+dl);return n};
-      out.splice(i,1,mk(L,''),mk(R,'·д'))}}}
+      const lp=mk(L,''),rp=mk(R,'·д'),b0=q.box0||b;rp.box=[R[0],R[1],b0[2],b0[3],b0[4],b0[5]];delete rp.ov;delete rp.box0; /* дясната част — от мястото по програмата, със свои промени */
+      const ro=(k.pOv||{})[rp.key];if(ro&&!ovOne(k,rp,ro)){out.splice(i,1,lp);continue}out.splice(i,1,lp,rp)}}}
   for(const p of out){if(!p.key||!/[↓↑]/.test(p.key))continue;const o=ov[p.key];if(!o)continue; // частите на разделена врата (над/под чекмеджета) — също се трият и сменят от „Детайли“
     if(o.hide){if(k._showHidden)p.hidden=true;else p._kill=true}if(o.m){p.m=o.m;p.t=+mat(o.m).t}if(o.e)p.e=[...o.e];if(o.name)p.name=o.name;p.ov=true}
   {const mo=k.matOv||{};for(const p of out)if((p.added||p.grp!=null)&&p.m0===undefined){const id=(p.sd&&mo[p.name+'|'+p.sd])||mo[p.name];if(id&&id!==p.m&&P.materials.some(m=>m.id===id)){p.m0=p.m;p.m=id;p.t=+mat(id).t}}} // добавени в „Детайли“ (и групите врати/чекмеджета) — и те слушат материала от таблицата
