@@ -249,6 +249,18 @@
    "ar": 0.5625,
    "rot": 0,
    "img": "lib/img/62b3s35.jpg"
+  },
+  {
+   "hw": true,
+   "folder": "Обков",
+   "row": "up",
+   "name": "AVENTOS HF",
+   "brand": "BLUM",
+   "code": "",
+   "calc": "hf",
+   "id": "i4lvmax",
+   "ts": 1795461152284,
+   "img": "lib/img/i4lvmax.jpg"
   }
  ]
 }
