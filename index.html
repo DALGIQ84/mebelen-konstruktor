@@ -167,7 +167,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 20:10 · Скосен гардероб с надстройка</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 20:20 · Скосен гардероб: и делителите от Детайли</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -848,7 +848,7 @@ function slopeClip(k,parts){ /* скосен гардероб (под скосе
   const kill=new Set(),add=[];
   for(const p of parts){if(!p.box||p.hidden)continue;const b=p.box,u0=B?b[2]:b[0],u1=B?b[3]:b[1];if(b[5]<=Math.min(zI(u0),zI(u1))-0.5&&p.kind!=='back')continue;const ax=partAxes(p),setZ=(a,c)=>{const ol=b[5]-b[4];p.box=b.slice();p.box[4]=a;p.box[5]=c;const dl=(c-a)-ol;if(ax[0]===2)p.L=r1(p.L+dl);else if(ax[1]===2)p.Wd=r1(p.Wd+dl)};
     const xThin=b[1]-b[0]<=40&&b[5]-b[4]>40,yThin=b[3]-b[2]<=40&&b[5]-b[4]>40,flat=b[5]-b[4]<=40||p.kind==='hw';
-    if(/^Страница/.test(p.name)&&xThin||/^Делител/.test(p.name)&&xThin){const top=/^Страница/.test(p.name)?zO:zI;
+    if(xThin&&!['door','back','glass','alu','hw','virt'].includes(p.kind)&&!p.vitOf){ /* страници — до скоса; делители (и от „Детайли“) — до тавана */const top=/^Страница/.test(p.name)?zO:zI;
       if(!B){setZ(b[4],top(hi(b)))}else{const poly=half([[b[2],b[4]],[b[3],b[4]],[b[3],b[5]],[b[2],b[5]]],/^Страница/.test(p.name)?0:T/ci);if(poly.length<3){kill.add(p);continue}p.sp=poly;p.shp=true;p.box=[b[0],b[1],b[2],b[3],b[4],Math.max(...poly.map(q=>q[1]))];if(!/скос/.test(p.name))p.name+=/^Делител/.test(p.name)?' (скосен)':' (скосена)'}continue}
     if(/^Таван/.test(p.name)&&flat&&b[5]>H-T-1){const ua=u0,ub=u1,poly=[[ua,zO(ua)],[ub,zO(ub)],[ub,zI(ub)],[ua,zI(ua)]],zs=poly.map(q=>q[1]),len=(ub-ua)/ci;
       if(B){p.sp=poly;p.tiltV='s';p.Wd=r1(len)}else{p.fp=poly;p.tiltV='f';p.L=r1(len)}p.tilt=B?deg:sd==='R'?-deg:deg;p.box=B?[b[0],b[1],ua,ub,Math.min(...zs),Math.max(...zs)]:[ua,ub,b[2],b[3],Math.min(...zs),Math.max(...zs)];p.name='Таван (скосен '+deg+'°)';continue}
