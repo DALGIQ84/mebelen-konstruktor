@@ -169,7 +169,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.23 · 23:35 · Тикче за шарка в библиотеката</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.24 · 18:45 · Водач за всяко чекмедже</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -1661,8 +1661,9 @@ function buildDrawers(k,{S,T,tF,W,H,c,Dk,bIn,Wi,add,warn,parts},ov){ // ov: че
   const bhDef=h=>+k.bhAll>0?+k.bhAll:Math.max(50,h-sl.hOff); // обща за всички или авто
   const bt=+mat(k.mx).t,bB=+mat(k.mxb).t;
   const gl=!ov&&isGola(k);let z1=ov?ov.z1:gl&&gg?c+hs.reduce((a,b)=>a+b,0)+gg.reduce((a,b)=>a+b,0):H-S.fuga/2;const zTop=ov?ov.zMax:H-T;
+  const nlOf=i=>{const v=+(k.nlA&&k.nlA[i])||0;if(!(v>0))return NL;if(v>room)warn.push(`Чекмедже ${i+1}: водач ${v} мм не се побира — в корпуса има ${Math.floor(room)} мм.`);return v}; /* водач за всяко чекмедже поотделно; празно — общият */
   hs.forEach((h,i)=>{
-    const z0=z1-h;
+    const z0=z1-h;const NL=nlOf(i);
     add('Чело',h,W-S.fuga,k.mf,[1,1,1,1],[S.fuga/2,W-S.fuga/2,Dk+S.doorGap,Dk+S.doorGap+tF,z0,z1],'door');
     if(NL){
       if(sl.kind==='metal'){
@@ -1731,7 +1732,7 @@ function buildNstand(k){const S=P.settings,parts=[],warn=[],add=(name,L,Wd,m,e,b
     else if(q.t==='door2'){const dw=Math.floor((W-2*fu)/2);add('Врата',hh,dw,k.mf,[1,1,1,1],[fu/2,fu/2+dw,yF,yF+tF,f0,f1],'door');parts.at(-1).hg='L';add('Врата',hh,dw,k.mf,[1,1,1,1],[W-fu/2-dw,W-fu/2,yF,yF+tF,f0,f1],'door');parts.at(-1).hg='R';nDoor+=2} // две врати — фуга и между тях
     else if(q.t==='fix'){const a0=i===sc.length-1?zb:f0,a1=a0+Math.floor((i===0&&lid?zt2:f1)-a0); /* без десети */add('Чело (неподвижно)',a1-a0,W,k.mf,[1,1,1,1],[0,W,yF,yF+tF,a0,a1],'door')} // ракла с капак — челото е неподвижно, на цялата ширина
     else if(q.t==='flap'){add(isChest(k)?'Клапа отпред':'Клапа',hh,W-fu,k.mf,[1,1,1,1],[fu/2,W-fu/2,yF,yF+tF,f0,f1],'door');warn.push(`${lb}Секция ${i+1}: падаща клапа — панти и механизъм (ограничител) за клапа.`)}
-    else if(q.t==='dr'){const iz=inner(i),cc=sc[i+1]&&sc[i+1].t==='dr'?zb:iz.lo,kk={...k,bh:[+q.bh>0?+q.bh:null],bhAll:0};const n0=parts.length;buildDrawers(kk,{S,T,tF,W,H,c:Math.max(iz.lo,cc)-T,Dk,bIn,Wi:li1-li0,add,warn,parts},{hs:[hh],z1:f1,zMax:sc[i-1]&&sc[i-1].t==='dr'?zt2:iz.hi});const dc=(li0+li1)/2-W/2;if(dc)for(const p of parts.slice(n0))if(p.kind==='drawer'){p.box[0]+=dc;p.box[1]+=dc}nDr++}})};
+    else if(q.t==='dr'){const iz=inner(i),cc=sc[i+1]&&sc[i+1].t==='dr'?zb:iz.lo,kk={...k,bh:[+q.bh>0?+q.bh:null],bhAll:0,nlA:null};const n0=parts.length;buildDrawers(kk,{S,T,tF,W,H,c:Math.max(iz.lo,cc)-T,Dk,bIn,Wi:li1-li0,add,warn,parts},{hs:[hh],z1:f1,zMax:sc[i-1]&&sc[i-1].t==='dr'?zt2:iz.hi});const dc=(li0+li1)/2-W/2;if(dc)for(const p of parts.slice(n0))if(p.kind==='drawer'){p.box[0]+=dc;p.box[1]+=dc}nDr++}})};
   const cols=k.skrin&&Array.isArray(k.nsCols)&&k.nsCols.length>1?k.nsCols:null;
   if(!cols)fronts(k.skrin&&Array.isArray(k.nsCols)&&k.nsCols.length===1?nsSecsC(k,0):nsSecs(k),W,T,W-T,''); // скрин с 1 колона — секциите са в колоната
   else{const n=cols.length,fixW=cols.reduce((a,q)=>a+(+q.w>0?+q.w:0),0),nA=cols.filter(q=>!(+q.w>0)).length,aw=nA?(W-fixW)/nA:0;let ws=cols.map(q=>+q.w>0?+q.w:aw);if(!nA)ws[n-1]+=W-fixW; // ширината на колоната — по осите на делителите (празно = равно)
@@ -1985,8 +1986,10 @@ function renderEditor(){
       return `<label>${l}<select id="${id}" data-f="nl"><option value="0">Авто (най-дългите, които влизат)</option>${ls.map(v=>`<option value="${v}" ${+k.nl===v?'selected':''}>${v} мм</option>`).join('')}</select></label>`}
     if(t==='bh'&&k.type==='oven'){if(slideOf(k).kind==='metal')return '';const sl=slideOf(k);
       return `<label>Височина на кутията, мм<input id="f_bhAll" data-bh="all" type="number" step="1" placeholder="чело − ${sl.hOff}" value="${+k.bhAll>0?k.bhAll:''}"></label>`}
-    if(t==='bh'){if(slideOf(k).kind==='metal')return '';const sl=slideOf(k),fh=frontHeights(k),bs=i=>k.bh&&k.bh[i]!=null&&k.bh[i]!==''&&+k.bh[i]>0;
-      return `<label>Височина на кутиите (за всички), мм<input id="f_bhAll" data-bh="all" type="number" step="1" placeholder="чело − ${sl.hOff}" value="${+k.bhAll>0?k.bhAll:''}"></label>
+    if(t==='bh'){const sl=slideOf(k),fh=frontHeights(k),bs=i=>k.bh&&k.bh[i]!=null&&k.bh[i]!==''&&+k.bh[i]>0,ls=String(sl.lens).split(/[,; ]+/).map(Number).filter(x=>x>0),nc=Math.min(4,Math.max(1,k.dr|0));
+      const nlRow=fh.hs.length>1?`<div class="full" style="grid-column:1/-1;display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)">Водач за всяко чекмедже (отгоре надолу)<div style="display:grid;grid-template-columns:repeat(${nc},1fr);gap:6px">${fh.hs.map((h,i)=>`<select data-nla="${i}" aria-label="Водач ${i+1}"><option value="0">общ ${+k.nl>0?k.nl:k._nl||''}</option>${ls.map(v=>`<option value="${v}" ${+(k.nlA&&k.nlA[i])===v?'selected':''}>${v} мм</option>`).join('')}</select>`).join('')}</div></div>`:'';
+      if(sl.kind==='metal')return nlRow;
+      return nlRow+`<label>Височина на кутиите (за всички), мм<input id="f_bhAll" data-bh="all" type="number" step="1" placeholder="чело − ${sl.hOff}" value="${+k.bhAll>0?k.bhAll:''}"></label>
         <div class="full" style="grid-column:1/-1;display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)">Отделно за всяко чекмедже (отгоре надолу), мм<div style="display:grid;grid-template-columns:repeat(${Math.min(4,Math.max(1,k.dr|0))},1fr);gap:6px">${fh.hs.map((h,i)=>`<input id="f_bh${i}" data-bh="${i}" type="number" step="1" placeholder="${fmt(+k.bhAll>0?+k.bhAll:Math.max(50,h-sl.hOff))}" value="${bs(i)?k.bh[i]:''}" aria-label="Кутия ${i+1}">`).join('')}</div><span>Празно поле взима общата височина, а ако и тя е празна — челото − ${sl.hOff} мм.</span></div>`}
     if(t==='idrs'){const L=idrList(k);return `<div class="full" style="grid-column:1/-1;display:flex;flex-direction:column;gap:5px"><div class="sub" style="margin:4px 0 0">${l}</div>
       <div style="display:grid;grid-template-columns:16px repeat(3,minmax(0,1fr)) 26px;gap:6px;font-size:11px;color:var(--muted)"><span></span><span>от дъното</span><span>чело</span><span>кутия</span><span></span></div>
@@ -2074,6 +2077,7 @@ $('#ed').addEventListener('input',e=>{
   if(e.target.dataset.bh==='all'){const k=cab(sel);k.bhAll=e.target.value===''?0:+e.target.value;const sl=slideOf(k),fh=frontHeights(k);
     fh.hs.forEach((h,j)=>{const b=$('#f_bh'+j);if(b)b.placeholder=fmt(+k.bhAll>0?+k.bhAll:Math.max(50,h-sl.hOff))});P.example=false;changed(false);return}
   if(e.target.dataset.hbw!==undefined||e.target.dataset.hbh!==undefined){const k=cab(sel);if(!k)return;const w=e.target.dataset.hbw!==undefined,i=+(w?e.target.dataset.hbw:e.target.dataset.hbh),v=+e.target.value;k.hbSz=(k.hbSz||[]).slice();k.hbSz[i]={...(k.hbSz[i]||{}),[w?'w':'h']:v>0?v:0};P.example=false;edPending=true;changed(false);return} // размер на всяко поле на тапицираната табла
+  if(e.target.dataset.nla!==undefined){const k=cab(sel),i=+e.target.dataset.nla;k.nlA=k.nlA||[];k.nlA[i]=+e.target.value>0?+e.target.value:null;P.example=false;changed(false);return}
   if(e.target.dataset.bh!==undefined){const k=cab(sel),i=+e.target.dataset.bh;k.bh=k.bh||[];const v=e.target.value;k.bh[i]=v===''?null:+v;P.example=false;changed(false);return}
   const f=e.target.dataset.f,k=cab(sel);if(!f||!k)return;
   let v=e.target.type==='checkbox'?e.target.checked:e.target.value;
@@ -2101,7 +2105,7 @@ $('#ed').addEventListener('input',e=>{
   else k[f]=v;
   if(k.type==='bed')bedDims(k);if(k.type==='nstand')nsGeom(k);
   place(k);P.example=false;if(f==='dr')k.dr=Math.min(12,Math.max(1,k.dr|0));
-  if(f==='slide')k.nl=0;
+  if(f==='slide'){k.nl=0;k.nlA=null}
   if(f==='frDoors')k.frDoors=+v;
   const full=['gola','plinth','nsPl','rDir','idrOn','chOpen','hbType','hbPat','bClad','bMat','bRail','bHead','nsMount','nsTop','nsBot','bHB','wExSep','wExM','wLsh','wCorner','wDoor','antr','eShape','eFloor','diag','hoodStrip','hoodH','liftMech','upper','lift','hood','vitrine','vdoors','split','sh','open','half','deadOpen','div','divRef','mb','backPos','type','dr','slide','deadSide','lowType','frDoors','mwOn','toFloor'].includes(f);
   const typing=e.target.tagName==='INPUT'&&e.target.type!=='checkbox'&&e.target.type!=='radio'; // докато пишеш в полето — не прерисувай редактора (губи се фокусът); прерисува се при излизане/Enter
