@@ -2107,7 +2107,7 @@ $('#ed').addEventListener('input',e=>{
   place(k);P.example=false;if(f==='dr')k.dr=Math.min(12,Math.max(1,k.dr|0));
   if(f==='slide'){k.nl=0;k.nlA=null}
   if(f==='frDoors')k.frDoors=+v;
-  const full=['gola','plinth','nsPl','rDir','idrOn','chOpen','hbType','hbPat','bClad','bMat','bRail','bHead','nsMount','nsTop','nsBot','bHB','wExSep','wExM','wLsh','wCorner','wDoor','antr','eShape','eFloor','diag','hoodStrip','hoodH','liftMech','upper','lift','hood','vitrine','vdoors','split','sh','open','half','deadOpen','div','divRef','mb','backPos','type','dr','slide','deadSide','lowType','frDoors','mwOn','toFloor'].includes(f);
+  const full=['gola','plinth','nsPl','rDir','idrOn','chOpen','hbType','hbPat','bClad','bMat','bRail','bHead','nsMount','nsTop','nsBot','bHB','wExSep','wExM','wLsh','wCorner','wDoor','antr','eShape','eFloor','diag','hoodStrip','hoodH','liftMech','upper','lift','hood','vitrine','vdoors','split','sh','open','half','deadOpen','div','divRef','mb','backPos','type','dr','slide','deadSide','lowType','frDoors','mwOn','toFloor','nl'].includes(f); /* nl — да се обнови и „общ“ при отделните водачи */
   const typing=e.target.tagName==='INPUT'&&e.target.type!=='checkbox'&&e.target.type!=='radio'; // докато пишеш в полето — не прерисувай редактора (губи се фокусът); прерисува се при излизане/Enter
   if(f==='hbN'&&k.type==='hboard'){const b=$('#hbSzBox');if(b)b.outerHTML=hbSzHtml(k)} // редовете за всяко поле — веднага, докато пишеш броя
   if(full&&typing){edPending=true;changed(false)}else changed(full);
