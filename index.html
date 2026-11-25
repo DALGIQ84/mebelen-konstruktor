@@ -169,7 +169,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.26 · 01:00 · Фото — кадър на цялата кухня</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.26 · 00:25 · Фото — винаги от стаята</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -2615,8 +2615,14 @@ let ptLoad=null;const loadPT=()=>ptLoad||(ptLoad=new Promise((ok,no)=>{if(window
 let weakGpuV=null;function weakGPU(){if(weakGpuV!=null)return weakGpuV;try{const gl=renderer.getContext(),x=gl.getExtension('WEBGL_debug_renderer_info'),n=String(x?gl.getParameter(x.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER));weakGpuV=/Intel|HD Graphics|UHD|Iris|Mali|Adreno|PowerVR|SwiftShader|llvmpipe|Microsoft Basic/i.test(n)&&!/Arc/i.test(n)}catch(e){weakGpuV=false}return weakGpuV} // вградена видеокарта — фото HD по-леко
 function splitGroups(geo){const g=geo.index?geo.toNonIndexed():geo,out=[];const gr=g.groups.length?g.groups:[{start:0,count:g.attributes.position.count,materialIndex:0}];
   for(const q of gr){const n=new THREE.BufferGeometry();for(const k in g.attributes){const a=g.attributes[k],sz=a.itemSize;n.setAttribute(k,new THREE.BufferAttribute(a.array.slice(q.start*sz,(q.start+q.count)*sz),sz,a.normalized))}out.push([n,q.materialIndex||0])}return out}
+function photoInside(c){ /* „както е в 3D“ — ако камерата е извън стаята, влиза в нея по посоката на погледа (да не се вижда извън стаята) */
+  const M=1/1000,p=P.room.pts.map(([x,y])=>[x*M,y*M]),rh=(P.room.h||2600)*M,inP=(x,z)=>{let o=false;for(let i=0,j=p.length-1;i<p.length;j=i++){const[a,b]=p[i],[e,f]=p[j];if((b>z)!==(f>z)&&x<(e-a)*(z-b)/(f-b)+a)o=!o}return o},
+    dE=(x,z)=>{let m=1e9;for(let i=0;i<p.length;i++){const[a,b]=p[i],[e,f]=p[(i+1)%p.length],dx=e-a,dy=f-b,L=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((x-a)*dx+(z-b)*dy)/L));m=Math.min(m,Math.hypot(x-a-t*dx,z-b-t*dy))}return m},ok=(x,y,z)=>inP(x,z)&&dE(x,z)>0.25&&y>0.3&&y<rh-0.15;
+  const q=c.position;if(ok(q.x,q.y,q.z))return c;const d=new THREE.Vector3();c.getWorldDirection(d);
+  for(let t=0.05;t<40;t+=0.05){const x=q.x+d.x*t,y=q.y+d.y*t,z=q.z+d.z*t;if(ok(x,y,z)){c.position.set(x+d.x*0.15,y+d.y*0.15,z+d.z*0.15);if(c.fov<62){c.fov=Math.min(70,c.fov+18);c.updateProjectionMatrix()}c.updateMatrixWorld(true);c._in=true;return c}}
+  return c}
 function photoCam(aspect){ /* кадър за снимката — от стаята, на височина на очите, кухнята пълни кадъра */
-  const v=$('#phV')?.value||'kit',c=camera.clone();c.aspect=aspect;c.updateProjectionMatrix();if(v==='cur'||!P.cabinets.length)return c;
+  const v=$('#phV')?.value||'kit',c=camera.clone();c.aspect=aspect;c.updateProjectionMatrix();if(v==='cur'||!P.cabinets.length)return photoInside(c);
   const M=1/1000,N=P.room.pts.length,sum=new Array(N).fill(0);for(const k of P.cabinets)if(!isAcc(k)&&k.wall!=null&&k.wall<N)sum[k.wall]+=+k.W||0;
   const wi=sum.indexOf(Math.max(...sum));if(!(sum[wi]>0))return c;const w=wallInfo(wi),ks=P.cabinets.filter(k=>!isAcc(k)&&k.wall===wi);
   const s0=Math.min(...ks.map(k=>+k.off||0)),s1=Math.max(...ks.map(k=>(+k.off||0)+(+k.W||0))),top=Math.max(...ks.map(k=>(+k.H||0)+(+k.over||0))),dep=Math.max(...ks.map(k=>+k.D||0));
@@ -2626,8 +2632,8 @@ function photoCam(aspect){ /* кадър за снимката — от стая
   const maxD=Math.max(1.2,(far<1e8?far*M:6)-0.25);let fv=48,hf=r=>2*Math.atan(Math.tan(r*Math.PI/360)*aspect);
   const need=f=>Math.max(Wk/2*1.1/Math.tan(hf(f)/2),Hk/2*1.12/Math.tan(f*Math.PI/360))+dep*M;let d=need(fv);
   while(d>maxD&&fv<80){fv+=2;d=need(fv)}d=Math.min(d,maxD); /* стаята е малка — по-широк обектив */
-  const ey=Math.min(1.55,Hk*0.62),tz=Hk*0.5,side=v==='kl'?-1:v==='kr'?1:0,sh=side*Math.min(Wk*0.42,d*0.6),ccp=[base[0]+n[0]*d*1000+w.u[0]*sh*1000,base[1]+n[1]*d*1000+w.u[1]*sh*1000];
-  c.fov=side?Math.min(80,fv+6):fv;c.position.set(ccp[0]*M,ey,ccp[1]*M);c.up.set(0,1,0);c.lookAt(base[0]*M-w.u[0]*sh*0.25,tz,base[1]*M-w.u[1]*sh*0.25);c.updateProjectionMatrix();c.updateMatrixWorld(true);return c}
+  const ey=Math.min(1.55,(P.room.h||2600)*M-0.3),tz=Math.min(Hk*0.5,1.1),side=v==='kl'?-1:v==='kr'?1:0,sh=side*Math.min(Wk*0.42,d*0.6),ccp=[base[0]+n[0]*d*1000+w.u[0]*sh*1000,base[1]+n[1]*d*1000+w.u[1]*sh*1000];
+  c.fov=side?Math.min(80,fv+6):fv;c.position.set(ccp[0]*M,ey,ccp[1]*M);c.up.set(0,1,0);c.lookAt(base[0]*M-w.u[0]*sh*0.25,tz,base[1]*M-w.u[1]*sh*0.25);c.updateProjectionMatrix();c.updateMatrixWorld(true);c._in=true;return c}
 async function photoHD(){ /* истински фото-рендер: лъчите се проследяват — отражения, отразена светлина, меки сенки */
   if(photoBusy)return;photoBusy=true;photoStop=false;const NFq=+$('#phQ').value||320,warm=$('#phL').value==='warm';
   $('#ovPhoto').hidden=false;$('#phSave').disabled=true;$('#phInfo').textContent='зареждам…';
@@ -2645,7 +2651,7 @@ async function photoHD(){ /* истински фото-рендер: лъчит�
       else{const mm=new THREE.Mesh(o.geometry.clone(),cm(o.material,ud));mm.matrixAutoUpdate=false;mm.matrix.copy(o.matrixWorld);grp.add(mm)}});
     const M=1/1000,rb=roomBox(),cx=(rb[0]+rb[1])/2*M,cz=(rb[2]+rb[3])/2*M,rh=P.room.h*M,rw=(rb[1]-rb[0])*M,rd=(rb[3]-rb[2])*M;
     const lights=[{p:[cx,rh-0.02,cz],t:[cx,0,cz],w:Math.max(.6,rw*.45),h:Math.max(.6,rd*.45),i:warm?4.5:5}]; // таванна светлина
-    if($('#phV').value!=='cur'){const p=P.room.pts,sh=new THREE.Shape(p.map(([x,y])=>new THREE.Vector2(x*M,y*M))),cg=new THREE.ShapeGeometry(sh);cg.rotateX(Math.PI/2);const cl=new THREE.Mesh(cg,new THREE.MeshStandardMaterial({color:0xf4f2ee,roughness:.95,side:THREE.DoubleSide}));cl.position.y=rh+0.001;cl.updateMatrix();cl.matrixAutoUpdate=false;cl.userData={keepR:1};grp.add(cl)} /* таван на стаята — камерата е вътре */
+    if(pcam._in){const p=P.room.pts,sh=new THREE.Shape(p.map(([x,y])=>new THREE.Vector2(x*M,y*M))),cg=new THREE.ShapeGeometry(sh);cg.rotateX(Math.PI/2);const cl=new THREE.Mesh(cg,new THREE.MeshStandardMaterial({color:0xf4f2ee,roughness:.95,side:THREE.DoubleSide}));cl.position.y=rh+0.001;cl.updateMatrix();cl.matrixAutoUpdate=false;cl.userData={keepR:1};grp.add(cl)} /* таван на стаята — камерата е вътре */
     const json=grp.toJSON(),q=pcam.quaternion;
     const total=window.KP_SAMPLES||Math.round((NFq>=1400?1200:NFq>=700?600:NFq>=320?260:90)*(wk?.6:1)),pc=$('#phC');pc.width=W;pc.height=H;const g=pc.getContext('2d');const t0=performance.now();
     await window.KPT.render({json,W,H,cam:{p:pcam.position.toArray(),q:[q.x,q.y,q.z,q.w],fov:pcam.fov},warm,samples:total,lights,tiles:wk?4:2,pause:wk?40:0,envI:warm?.7:.85,exp:warm?1:1.05,
