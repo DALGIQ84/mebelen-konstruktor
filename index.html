@@ -169,7 +169,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.26 · 00:45 · Делители зад втория гръб</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.26 · 01:00 · Фото — кадър на цялата кухня</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -329,11 +329,12 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
       <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
         <label class="tog">Вид <select id="phM"><option value="hd" selected>реалистично (лъчи)</option><option value="fast">бързо</option></select></label>
         <label class="tog">Качество <select id="phQ"><option value="96">бързо</option><option value="320" selected>добро</option><option value="700">най-добро (по-бавно)</option><option value="1400">максимално (бавно, по-голяма снимка)</option></select></label>
+        <label class="tog">Кадър <select id="phV"><option value="kit" selected>цялата кухня отпред</option><option value="kl">от левия ъгъл</option><option value="kr">от десния ъгъл</option><option value="cur">както е в 3D</option></select></label>
         <label class="tog">Светлина <select id="phL"><option value="day" selected>дневна</option><option value="warm">топла вечерна</option></select></label>
         <button class="btn sm" id="phAgain">Снимай пак</button>
         <button class="btn sm primary" id="phSave" style="margin-left:auto">Запази снимката</button>
       </div>
-      <p>Снимката е от изгледа, който е в 3D в момента. За друг ъгъл затвори, завърти 3D и натисни „Фото“ пак.</p>
+      <p>„Цялата кухня отпред“ и ъглите — камерата е в стаята, на височина на очите, и хваща кухнята като на снимка. „Както е в 3D“ — от изгледа, който е в 3D в момента.</p>
     </div>
   </div>
 </div>
@@ -2614,14 +2615,27 @@ let ptLoad=null;const loadPT=()=>ptLoad||(ptLoad=new Promise((ok,no)=>{if(window
 let weakGpuV=null;function weakGPU(){if(weakGpuV!=null)return weakGpuV;try{const gl=renderer.getContext(),x=gl.getExtension('WEBGL_debug_renderer_info'),n=String(x?gl.getParameter(x.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER));weakGpuV=/Intel|HD Graphics|UHD|Iris|Mali|Adreno|PowerVR|SwiftShader|llvmpipe|Microsoft Basic/i.test(n)&&!/Arc/i.test(n)}catch(e){weakGpuV=false}return weakGpuV} // вградена видеокарта — фото HD по-леко
 function splitGroups(geo){const g=geo.index?geo.toNonIndexed():geo,out=[];const gr=g.groups.length?g.groups:[{start:0,count:g.attributes.position.count,materialIndex:0}];
   for(const q of gr){const n=new THREE.BufferGeometry();for(const k in g.attributes){const a=g.attributes[k],sz=a.itemSize;n.setAttribute(k,new THREE.BufferAttribute(a.array.slice(q.start*sz,(q.start+q.count)*sz),sz,a.normalized))}out.push([n,q.materialIndex||0])}return out}
+function photoCam(aspect){ /* кадър за снимката — от стаята, на височина на очите, кухнята пълни кадъра */
+  const v=$('#phV')?.value||'kit',c=camera.clone();c.aspect=aspect;c.updateProjectionMatrix();if(v==='cur'||!P.cabinets.length)return c;
+  const M=1/1000,N=P.room.pts.length,sum=new Array(N).fill(0);for(const k of P.cabinets)if(!isAcc(k)&&k.wall!=null&&k.wall<N)sum[k.wall]+=+k.W||0;
+  const wi=sum.indexOf(Math.max(...sum));if(!(sum[wi]>0))return c;const w=wallInfo(wi),ks=P.cabinets.filter(k=>!isAcc(k)&&k.wall===wi);
+  const s0=Math.min(...ks.map(k=>+k.off||0)),s1=Math.max(...ks.map(k=>(+k.off||0)+(+k.W||0))),top=Math.max(...ks.map(k=>(+k.H||0)+(+k.over||0))),dep=Math.max(...ks.map(k=>+k.D||0));
+  const sc=(s0+s1)/2,Wk=(s1-s0)*M,Hk=Math.max(top,900)*M,base=[w.A[0]+w.u[0]*sc,w.A[1]+w.u[1]*sc],n=w.n;
+  let far=1e9;{const p=P.room.pts;for(let i=0;i<p.length;i++){if(i===wi)continue;const A=p[i],B=p[(i+1)%p.length],ex=B[0]-A[0],ey=B[1]-A[1],den=n[0]*ey-n[1]*ex;if(Math.abs(den)<1e-9)continue;
+    const t=((A[0]-base[0])*ey-(A[1]-base[1])*ex)/den,u=((A[0]-base[0])*n[1]-(A[1]-base[1])*n[0])/den;if(t>1&&u>=-0.01&&u<=1.01)far=Math.min(far,t)}}
+  const maxD=Math.max(1.2,(far<1e8?far*M:6)-0.25);let fv=48,hf=r=>2*Math.atan(Math.tan(r*Math.PI/360)*aspect);
+  const need=f=>Math.max(Wk/2*1.1/Math.tan(hf(f)/2),Hk/2*1.12/Math.tan(f*Math.PI/360))+dep*M;let d=need(fv);
+  while(d>maxD&&fv<80){fv+=2;d=need(fv)}d=Math.min(d,maxD); /* стаята е малка — по-широк обектив */
+  const ey=Math.min(1.55,Hk*0.62),tz=Hk*0.5,side=v==='kl'?-1:v==='kr'?1:0,sh=side*Math.min(Wk*0.42,d*0.6),ccp=[base[0]+n[0]*d*1000+w.u[0]*sh*1000,base[1]+n[1]*d*1000+w.u[1]*sh*1000];
+  c.fov=side?Math.min(80,fv+6):fv;c.position.set(ccp[0]*M,ey,ccp[1]*M);c.up.set(0,1,0);c.lookAt(base[0]*M-w.u[0]*sh*0.25,tz,base[1]*M-w.u[1]*sh*0.25);c.updateProjectionMatrix();c.updateMatrixWorld(true);return c}
 async function photoHD(){ /* истински фото-рендер: лъчите се проследяват — отражения, отразена светлина, меки сенки */
   if(photoBusy)return;photoBusy=true;photoStop=false;const NFq=+$('#phQ').value||320,warm=$('#phL').value==='warm';
   $('#ovPhoto').hidden=false;$('#phSave').disabled=true;$('#phInfo').textContent='зареждам…';
   const keep={sel,onlySel,showDoors,ms:multiSel};let ok=false;
   try{await loadPT();
     const wk=weakGPU(),r=canvas.getBoundingClientRect(),W=wk?(NFq>=700?1400:1100):NFq>=1400?2400:NFq>=700?1920:NFq>=320?1600:1200,H=Math.round(W*Math.max(0.4,Math.min(1.1,r.height/Math.max(1,r.width))));
-    sel=null;multiSel=new Set();onlySel=false;showDoors=true;rebuild3D();
-    for(const w of wallGroups)w.g.visible=showWalls&&((camera.position.x-w.cx)*w.ox+(camera.position.z-w.cz)*w.oz<0);
+    sel=null;multiSel=new Set();onlySel=false;showDoors=true;rebuild3D();const pcam=photoCam(W/H);
+    for(const w of wallGroups)w.g.visible=showWalls&&((pcam.position.x-w.cx)*w.ox+(pcam.position.z-w.cz)*w.oz<0);
     world.updateMatrixWorld(true);
     const grp=new THREE.Group(),mc=new Map(),cm=(m,ud)=>{const kk=m.uuid+JSON.stringify(ud);if(mc.has(kk))return mc.get(kk);const n=m.clone();n.userData={...ud};if(!ud.keepR){const F=FIN[ud.fin]||FIN.mat;n.roughness=F[1];n.metalness=F[2]}mc.set(kk,n);return n};
     world.traverse(o=>{if(!o.isMesh||!o.visible)return;let v=o;while(v){if(!v.visible)return;v=v.parent}
@@ -2631,9 +2645,10 @@ async function photoHD(){ /* истински фото-рендер: лъчит�
       else{const mm=new THREE.Mesh(o.geometry.clone(),cm(o.material,ud));mm.matrixAutoUpdate=false;mm.matrix.copy(o.matrixWorld);grp.add(mm)}});
     const M=1/1000,rb=roomBox(),cx=(rb[0]+rb[1])/2*M,cz=(rb[2]+rb[3])/2*M,rh=P.room.h*M,rw=(rb[1]-rb[0])*M,rd=(rb[3]-rb[2])*M;
     const lights=[{p:[cx,rh-0.02,cz],t:[cx,0,cz],w:Math.max(.6,rw*.45),h:Math.max(.6,rd*.45),i:warm?4.5:5}]; // таванна светлина
-    const json=grp.toJSON(),q=camera.quaternion;
+    if($('#phV').value!=='cur'){const p=P.room.pts,sh=new THREE.Shape(p.map(([x,y])=>new THREE.Vector2(x*M,y*M))),cg=new THREE.ShapeGeometry(sh);cg.rotateX(Math.PI/2);const cl=new THREE.Mesh(cg,new THREE.MeshStandardMaterial({color:0xf4f2ee,roughness:.95,side:THREE.DoubleSide}));cl.position.y=rh+0.001;cl.updateMatrix();cl.matrixAutoUpdate=false;cl.userData={keepR:1};grp.add(cl)} /* таван на стаята — камерата е вътре */
+    const json=grp.toJSON(),q=pcam.quaternion;
     const total=window.KP_SAMPLES||Math.round((NFq>=1400?1200:NFq>=700?600:NFq>=320?260:90)*(wk?.6:1)),pc=$('#phC');pc.width=W;pc.height=H;const g=pc.getContext('2d');const t0=performance.now();
-    await window.KPT.render({json,W,H,cam:{p:camera.position.toArray(),q:[q.x,q.y,q.z,q.w],fov:camera.fov},warm,samples:total,lights,tiles:wk?4:2,pause:wk?40:0,envI:warm?.7:.85,exp:warm?1:1.05,
+    await window.KPT.render({json,W,H,cam:{p:pcam.position.toArray(),q:[q.x,q.y,q.z,q.w],fov:pcam.fov},warm,samples:total,lights,tiles:wk?4:2,pause:wk?40:0,envI:warm?.7:.85,exp:warm?1:1.05,
       onFrame:(cv,n,tt,end)=>{g.drawImage(cv,0,0,W,H);$('#phInfo').textContent=end?'':`${Math.round(n/tt*100)} % · ${((performance.now()-t0)/1000).toFixed(0)} сек${wk?' · вградена видеокарта — по-леко, може да се ползва компютърът':''}`;if(photoStop)window.KPT.stop()}});
     const tx=(pName()?pName()+' · ':'')+'М Плюс Мебели';g.font='500 22px "IBM Plex Sans",Arial,sans-serif';const tw=g.measureText(tx).width;g.fillStyle='rgba(255,255,255,.75)';g.fillRect(W-tw-36,H-46,tw+24,32);g.fillStyle='#1a2227';g.fillText(tx,W-tw-24,H-22);
     $('#phSave').disabled=false;$('#phInfo').textContent=photoStop?'спряно':`готово · ${((performance.now()-t0)/1000).toFixed(0)} сек`;ok=true}
@@ -2658,7 +2673,7 @@ async function photoRender(){
   const NF=+$('#phQ').value||160,warm=$('#phL').value==='warm';
   const keep={sel,onlySel,showDoors,ms:multiSel},bg=scene.background,pr=renderer.getPixelRatio();
   const r=canvas.getBoundingClientRect(),W=NF>=1400?2600:NF>=700?2200:1800,H=Math.round(W*Math.max(0.4,Math.min(1.1,r.height/Math.max(1,r.width))));
-  const cam=camera.clone();cam.aspect=W/H;cam.updateProjectionMatrix();
+  const cam=photoCam(W/H);
   sel=null;multiSel=new Set();onlySel=false;showDoors=true;rebuild3D();
   for(const w of wallGroups)w.g.visible=showWalls&&((cam.position.x-w.cx)*w.ox+(cam.position.z-w.cz)*w.oz<0);
   const lineMat=new THREE.LineBasicMaterial({color:0x1c1c1c,transparent:true,opacity:.28});
