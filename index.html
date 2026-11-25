@@ -169,7 +169,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.24 · 19:20 · Водач за всяко чекмедже — навсякъде</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.25 · 11:30 · По-кратък работен PDF</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -3319,19 +3319,38 @@ function frontViews(){ // изгледи откъм лицето на кухня
   return[-0.65,0,0.65].map(r=>{const c=Math.cos(r),s=Math.sin(r),dx=nx*c-nz*s,dz=nx*s+nz*c;
     return{t:tgt,p:[tgt[0]+dx*dist,1.7+dist*0.45,tgt[2]+dz*dist]}});
 }
-async function exportSet(){
-  const out=[],views=frontViews();views.forEach((v,i)=>out.push({c:shot3D(2400,1500,v,views.length>1?`3D изглед ${i+1} от ${views.length}`:'3D изглед'),name:fname('3D изглед '+(i+1))}));
-  const r=withExport(planSvg);out.push({c:await svgCanvas(r.s,r.vb,2400),name:fname('поглед отгоре')});
-  for(let i=0;i<N();i++){const q=withExport(()=>{wv=i;return wallSvg()});out.push({c:await svgCanvas(q.s,q.vb,2400),name:fname('стена '+(i+1))});
-    if(P.cabinets.some(k=>k.type==='wardrobe'&&k.wall===i)){const kc=showClear;showClear=true;try{const q2=withExport(()=>{wv=i;return wallSvg()});out.push({c:await svgCanvas(q2.s,q2.vb,2400),name:fname('стена '+(i+1)+' светли отвори')})}finally{showClear=kc}}} // гардероби: още една страница — без врати, със светлите отвори
-  const AS=asmList();if(P.cabinets.length)out.push({c:cabListPage(),name:fname('шкафове')});
-  if(AS.length){for(let i=0;i<AS.length;){const nq=AS.slice(i,i+4),quad=nq.length>2&&nq.every(k=>cabRows(k).length<=QMAX);const n=quad?nq.length:Math.min(2,AS.length-i);
+async function exportSet(){ /* работен PDF — по-малко листи: 1 голям 3D, план + списък, стена + светли отвори, без празни стени, еднаквите шкафове веднъж */
+  const out=[];out.push({c:shot3D(PGW,PGH,roomView(),'3D изглед'),name:fname('3D изглед')});
+  const r=withExport(planSvg),pc=await svgCanvas(r.s,r.vb,2400);
+  if(P.cabinets.length&&cabListN()<=44)out.push({c:planListPage(pc),name:fname('план и шкафове')});
+  else{out.push({c:pc,name:fname('поглед отгоре')});if(P.cabinets.length)out.push({c:cabListPage(),name:fname('шкафове')})}
+  for(let i=0;i<N();i++){if(!P.cabinets.some(k=>k.wall===i))continue; // празна стена — не влиза
+    const q=withExport(()=>{wv=i;return wallSvg()}),wc=await svgCanvas(q.s,q.vb,2400);
+    if(P.cabinets.some(k=>k.type==='wardrobe'&&k.wall===i)){const kc=showClear;showClear=true;let cc;try{const q2=withExport(()=>{wv=i;return wallSvg()});cc=await svgCanvas(q2.s,q2.vb,2400)}finally{showClear=kc}
+      out.push({c:twoUp(wc,cc,'с вратите','светли отвори'),name:fname('стена '+(i+1)+' и светли отвори')})}
+    else out.push({c:wc,name:fname('стена '+(i+1))})}
+  const AS=asmGroups();
+  if(AS.length){for(let i=0;i<AS.length;){const nq=AS.slice(i,i+4),quad=nq.length>2&&nq.every(o=>cabRows(o.k).length<=QMAX);const n=quad?nq.length:Math.min(2,AS.length-i);
     out.push({c:cabPageN(i,n,quad),name:fname('шкафове '+(i+1))});i+=n}}
   if(extraList().length)extraPages().forEach((c,j)=>out.push({c,name:fname('плотове и пълнежи'+(j?' '+(j+1):''))}));
   cutPanelPages().forEach((c,j)=>out.push({c,name:fname('скосени панели'+(j?' '+(j+1):''))}));
   return out;
 }
-
+function roomView(){ // един голям изглед в перспектива — вижда се цялата стая
+  const M=1/1000,rb=roomBox(),cs=P.cabinets;let nx=0,nz=0;
+  for(const k of cs){const a=k.rot*Math.PI/180;nx+=-Math.sin(a);nz+=Math.cos(a)}
+  const cx=(rb[0]+rb[1])/2,cz=(rb[2]+rb[3])/2;let L=Math.hypot(nx,nz);if(L<0.2){nx=0;nz=1;L=1}nx/=L;nz/=L;
+  const r=-0.5,dx=nx*Math.cos(r)-nz*Math.sin(r),dz=nx*Math.sin(r)+nz*Math.cos(r),h=(P.room.h||2600)*M,W=(rb[1]-rb[0])*M,Lr=(rb[3]-rb[2])*M;
+  const R=0.5*Math.hypot(W,Lr,h),fv=(camera.fov||45)*Math.PI/360,dist=R/Math.sin(fv)*0.92,ey=0.62,nn=Math.hypot(dx,ey,dz); /* цялата стая влиза в кадъра; стените откъм камерата се скриват */
+  const tgt=[cx*M,h*0.42,cz*M];return{t:tgt,p:[tgt[0]+dx/nn*dist,tgt[1]+ey/nn*dist,tgt[2]+dz/nn*dist]}}
+function twoUp(a,b,la,lb){ // две картинки на един лист — една до друга или една под друга, по-едро
+  const c=document.createElement('canvas');c.width=PGW;c.height=PGH;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,PGW,PGH);
+  const M=40,G=40,fit=(im,x,y,w,h)=>{const k=Math.min(w/im.width,h/im.height),W=im.width*k,H=im.height*k;g.drawImage(im,x+(w-W)/2,y+(h-H)/2,W,H);return k*im.width*im.height*k};
+  const sideW=(PGW-2*M-G)/2,sideH=PGH-2*M,stH=(PGH-2*M-G)/2,stW=PGW-2*M;
+  const aS=Math.min(sideW/a.width,sideH/a.height),aT=Math.min(stW/a.width,stH/a.height);
+  if(aS>=aT){fit(a,M,M,sideW,sideH);fit(b,M+sideW+G,M,sideW,sideH);g.fillStyle='#d0d7db';g.fillRect(M+sideW+G/2-1,M,2,sideH)}
+  else{fit(a,M,M,stW,stH);fit(b,M,M+stH+G,stW,stH);g.fillStyle='#d0d7db';g.fillRect(M,M+stH+G/2-1,stW,2)}
+  return c}
 /* ---------- Скосени панели: страница в работния PDF и DXF за рутера ---------- */
 function cutPanels(){return P.cabinets.filter(k=>k.type==='wpanel').map(k=>{const p=build(k).parts[0],W=+k.W,h=Math.max(20,+k.fpH||700),c=+k.c||0;
   const fp=(p&&p.fp?p.fp:[[0,c],[W,c],[W,c+h],[0,c+h]]).map(([u,v])=>[u,v-c]);return{k,p,W,h,fp,fc:fcutOf(k,W,h),ov:Math.max(0,+k.fover||0),cut:!!(p&&p.fp)}}).filter(o=>o.cut||o.ov>0)}
@@ -3372,7 +3391,8 @@ function panelsDXF(scope){const cabs=scope==='cab'?P.cabinets.filter(c=>c.id===s
     '0','TABLE','2','LAYER','70','3',...lay('KONTUR',7),...lay('NADMIARKA',8),...lay('TEXT',3),'0','ENDTAB','0','ENDSEC',
     '0','SECTION','2','ENTITIES',...e,'0','ENDSEC','0','EOF'].join('\r\n')}
 /* ---------- Страници за монтаж: списък и всеки шкаф с детайлите ---------- */
-const TYPE_BG={wardrobe:'Гардероб',endShelf:'Крайна етажерка',cornerL:'Ъглов Г',splash:'Гръб кухня',top:'Плот',endPanel:'Завършваща страница',plinthRun:'Цокъл',filler:'Пълнеж',tfill:'Пълнеж до тавана',doors:'Шкаф с врати',drawers:'Шкаф с чекмеджета',oven:'Шкаф за фурна',dw:'Съдомиялна за вграждане',col:'Колона фурна + микровълнова',fridge:'Шкаф за хладилник'};
+const TYPE_BG={wardrobe:'Гардероб',endShelf:'Крайна етажерка',cornerL:'Ъглов Г',splash:'Гръб кухня',top:'Плот',endPanel:'Завършваща страница',plinthRun:'Цокъл',filler:'Пълнеж',tfill:'Пълнеж до тавана',doors:'Шкаф с врати',drawers:'Шкаф с чекмеджета',oven:'Шкаф за фурна',dw:'Съдомиялна за вграждане',col:'Колона фурна + микровълнова',fridge:'Шкаф за хладилник',wpanel:'Панел на стената',wshelf:'Рафт на стената',bed:'Легло',hboard:'Табла',ubot:'Цяло дъно'};
+const tBG=k=>k.type==='nstand'?(k.skrin?'Скрин':isChest(k)?'Ракла':'Нощно шкафче'):TYPE_BG[k.type||'doors']||'Шкаф';
 const PGW=2480,PGH=1754,FF='"IBM Plex Sans",Arial,sans-serif',FC='"IBM Plex Sans Condensed","IBM Plex Sans",Arial,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';
 const NODOOR=['top','splash','plinthRun','filler','tfill','endPanel'];
 function cabInfo(k){const sl=slideOf(k),a=[];if(k.type==='nstand')return (k.skrin?'скрин · ':k.nsTop==='lid'||/ракла/i.test(k.name||'')?'ракла · ':'нощно шкафче · ')+({legs:'на крачета',plinth:'на цокъл',wall:'висящо',sides:'страници до пода'}[k.nsMount||'legs'])+(k.nsTop==='lid'?' · капак отгоре':'')+' · '+nsSecs(k).map(q=>(NS_T.find(x=>x[0]===q.t)||[,''])[1].toLowerCase()).join(' + ');if(k.type==='bed')return `легло с механизъм ${fmt(k.W)} × ${fmt(k.D)} × ${fmt(k.H)}`;
@@ -3414,7 +3434,10 @@ function pageBase(title,sub){const c=document.createElement('canvas');c.width=PG
   g.fillStyle='#d0d7db';g.fillRect(80,190,PGW-160,3);return{c,g}}
 function fitText(g,t,maxW){if(g.measureText(t).width<=maxW)return t;while(t.length>1&&g.measureText(t+'…').width>maxW)t=t.slice(0,-1);return t+'…'}
 const asmList=()=>P.cabinets.filter(k=>!isAcc(k)&&!NODOOR.includes(k.type)); // шкафове — с картинки за сглобяване
-const extraList=()=>P.cabinets.filter(k=>NODOOR.includes(k.type)); // плотове, гърбове, пълнежи, цокли, страници — само в списък
+const extraList=()=>P.cabinets.filter(k=>NODOOR.includes(k.type));
+const SIGSKIP=new Set(['id','name','x','y','rot','wall','off','gap','grp','lock']);
+function cabSig(k){const o={};for(const[a,v]of Object.entries(k))if(!SIGSKIP.has(a)&&a[0]!=='_'&&!(v==null||v===''||typeof v==='object'&&!Object.keys(v).length))o[a]=v;let rs='';try{rs=JSON.stringify(cabRows(k).map(r=>[r.type,r.L,r.Wd,r.n,r.e,r.m]))}catch(e){}return JSON.stringify(o)+rs}
+function asmGroups(){const G=[],by={};for(const k of asmList()){const s=cabSig(k);if(by[s])by[s].ks.push(k);else{by[s]={k,ks:[k]};G.push(by[s])}}return G} // еднаквите шкафове — веднъж, с всички имена // плотове, гърбове, пълнежи, цокли, страници — само в списък
 function extraPages(){ // списък с детайлите им, без картинки
   const EX=extraList(),base=asmList().length,pages=[],cols=[[80,'№'],[170,'Елемент / детайл'],[1080,'Дълж.'],[1290,'Шир.'],[1420,'Бр.'],[1500,'Кант'],[1640,'Материал']];
   let pg=null,y=0;const np=()=>{pg=pageBase('Плотове, гърбове, пълнежи, цокли, страници',`${EX.length} бр. · размерите са в мм · детайли за разкрой`);pages.push(pg);y=250;
@@ -3429,13 +3452,27 @@ function extraPages(){ // списък с детайлите им, без кар
       drawEdge(g,1500,y-28,r.e);g.font=`28px ${FF}`;g.fillText(fitText(g,mLbl(mat(r.m)),PGW-80-1640),1640,y)});
     y+=10});
   return pages.map(p=>p.c)}
+const cabListN=()=>asmList().length+extraList().length+P.cabinets.filter(isAcc).length;
+function planListPage(pc){ // план вляво, списък на шкафовете вдясно
+  const LS=[...asmList(),...extraList(),...P.cabinets.filter(isAcc)],na=P.cabinets.filter(isAcc).length;const{c,g}=pageBase('Поглед отгоре и шкафове',`${asmList().length+extraList().length} бр.${na?' + '+na+' уреда/аксесоара':''} · размерите са в мм, височина без цокъла`);
+  const top=220,PW=1180,ph=PGH-top-50,k0=Math.min(PW/pc.width,ph/pc.height);g.drawImage(pc,80+(PW-pc.width*k0)/2,top+(ph-pc.height*k0)/2,pc.width*k0,pc.height*k0);
+  g.fillStyle='#d0d7db';g.fillRect(80+PW+30,top+10,2,ph-20);
+  const X=80+PW+70,WR=PGW-80-X,cols=[[0,'№'],[0.07,'Шкаф'],[0.30,'Ш × В × Д'],[0.56,'Място'],[0.72,'Тип']];
+  const rh=Math.min(58,(PGH-top-90)/(LS.length+1)),fz=Math.max(17,Math.min(28,rh*0.62));let y=top+40;
+  g.font=`500 ${Math.min(26,fz)}px ${FF}`;g.fillStyle='#5a6870';cols.forEach(([x,t])=>g.fillText(t,X+x*WR,y));y+=12;
+  LS.forEach((k,i)=>{y+=rh;if(i%2===0){g.fillStyle='#f3f5f6';g.fillRect(X-10,y-rh+rh*0.28,WR+20,rh)}
+    g.fillStyle='#1a2227';g.font=`600 ${fz}px ${FF}`;g.fillText(String(i+1),X,y);g.fillText(fitText(g,k.name,WR*0.22),X+0.07*WR,y);
+    g.font=`${fz}px ${FM}`;g.fillText(fitText(g,accIn(k)?`${k.W} × ${k.D}`:`${k.W} × ${r1(k.H-k.c)} × ${k.D}`,WR*0.25),X+0.30*WR,y);
+    g.font=`${fz}px ${FF}`;g.fillText(fitText(g,k.wall!==null?`ст. ${k.wall+1}, от ${Math.round(k.off)}`:'свободен',WR*0.15),X+0.56*WR,y);
+    g.fillStyle='#5a6870';g.fillText(fitText(g,isAcc(k)?accOf(k).name:tBG(k)+(cabInfo(k)?' · '+cabInfo(k):''),WR*0.28),X+0.72*WR,y)});
+  return c}
 function cabListPage(){const LS=[...asmList(),...extraList(),...P.cabinets.filter(isAcc)],na=P.cabinets.filter(isAcc).length;const{c,g}=pageBase('Шкафове в проекта',`${asmList().length+extraList().length} бр.${na?' + '+na+' уреда/аксесоара':''} · размерите са в мм, височина без цокъла`);
   const cols=[[80,'№',90],[170,'Шкаф',420],[590,'Тип',560],[1150,'Ш × В × Д',380],[1530,'Място',300],[1830,'Особености',570]];
   const rh=Math.min(64,(PGH-300)/(LS.length+1));let y=260;
   g.font=`500 28px ${FF}`;g.fillStyle='#5a6870';cols.forEach(([x,t])=>g.fillText(t,x,y));y+=18;
   LS.forEach((k,i)=>{y+=rh;if(i%2===0){g.fillStyle='#f3f5f6';g.fillRect(70,y-rh+14,PGW-140,rh)}
     g.fillStyle='#1a2227';g.font=`600 30px ${FF}`;g.fillText(String(i+1),80,y);g.fillText(fitText(g,k.name,400),170,y);g.font=`30px ${FF}`;
-    g.fillText(fitText(g,isAcc(k)?accOf(k).name+' · '+(ACOL[k.acol]||ACOL.white)[0].toLowerCase():TYPE_BG[k.type||'doors'],540),590,y);g.font=`30px ${FM}`;g.fillText(accIn(k)?`${k.W} × ${k.D}`:`${k.W} × ${r1(k.H-k.c)} × ${k.D}`,1150,y);g.font=`30px ${FF}`;
+    g.fillText(fitText(g,isAcc(k)?accOf(k).name+' · '+(ACOL[k.acol]||ACOL.white)[0].toLowerCase():tBG(k),540),590,y);g.font=`30px ${FM}`;g.fillText(accIn(k)?`${k.W} × ${k.D}`:`${k.W} × ${r1(k.H-k.c)} × ${k.D}`,1150,y);g.font=`30px ${FF}`;
     g.fillText(k.wall!==null?`стена ${k.wall+1}, от ${Math.round(k.off)}`:'свободен',1530,y);g.fillStyle='#5a6870';g.font=`26px ${FF}`;g.fillText(fitText(g,isAcc(k)?(accIn(k)?(k.acc==='sink'?['','1 корито','2 корита','1 корито + отцедник'][+k.bowls||1]+' · ':(+k.zones===22?'двоен (2 домино) · ':(k.zones||4)+' зони · '))+'в плота на '+Math.round(k.c)+' мм':'свободностоящ'):cabInfo(k),560),1830,y)});
   return c}
 function shotCab(k,doors,w,h){
@@ -3454,10 +3491,10 @@ function drawEdge(g,x,y,e){const w=70,h=34;g.strokeStyle='#c7ced2';g.lineWidth=2
   const L=(a,b,c2,d)=>{g.beginPath();g.moveTo(a,b);g.lineTo(c2,d);g.stroke()};if(e[0])L(x,y,x+w,y);if(e[1])L(x,y+h,x+w,y+h);if(e[2])L(x,y,x,y+h);if(e[3])L(x+w,y,x+w,y+h)}
 const QMAX=8; // до толкова реда детайли — шкафът влиза в четвърт лист
 function cabRows(k){const keep=scope;scope='cab';const r=rows([k],false,true);scope=keep;return r}
-function cabBlock(g,k,i,X,Y,W,H,sm){ // един шкаф: заглавие, 2 картинки, детайли (sm = четвърт лист)
-  const q=sm?0.8:1;
-  g.fillStyle='#1a2227';g.font=`600 ${40*q}px ${FC}`;g.fillText(fitText(g,`${i+1}. ${k.name}`,W),X,Y+40*q);
-  g.fillStyle='#5a6870';g.font=`${26*q}px ${FF}`;g.fillText(fitText(g,`${TYPE_BG[k.type||'doors']} · ${k.W} × ${r1(k.H-k.c)} × ${k.D} мм${k.wall!==null?' · стена '+(k.wall+1):''}`,W),X,Y+80*q);
+function cabBlock(g,k,i,X,Y,W,H,sm,ks){ // един шкаф: заглавие, 2 картинки, детайли (sm = четвърт лист); ks — еднаквите шкафове
+  const q=sm?0.8:1,nm=ks&&ks.length>1?ks.map(x=>x.name).join(' = ')+` · ${ks.length} бр.`:k.name;
+  g.fillStyle='#1a2227';g.font=`600 ${40*q}px ${FC}`;g.fillText(fitText(g,`${i+1}. ${nm}`,W),X,Y+40*q);
+  g.fillStyle='#5a6870';g.font=`${26*q}px ${FF}`;g.fillText(fitText(g,`${tBG(k)} · ${k.W} × ${r1(k.H-k.c)} × ${k.D} мм${k.wall!==null?' · стена '+(k.wall+1):''}`,W),X,Y+80*q);
   g.fillStyle='#1a2227';g.font=`${24*q}px ${FF}`;g.fillText(fitText(g,noteInfo(k),W),X,Y+114*q);
   const iw=(W-30)/2,ih=sm?Math.round(iw*0.42):Math.round(iw*0.66),iy=Y+136*q;
   if(NODOOR.includes(k.type)){g.drawImage(shotCab(k,true,Math.round(W),ih),X,iy);g.strokeStyle='#e3e8ea';g.lineWidth=2;g.strokeRect(X,iy,W,ih)} // без врати — една картинка
@@ -3474,15 +3511,15 @@ function cabBlock(g,k,i,X,Y,W,H,sm){ // един шкаф: заглавие, 2 �
     g.save();g.translate(cx[4],y-fz);g.scale(fz/30,fz/30);drawEdge(g,0,0,r.e);g.restore();
     g.font=`${fz}px ${FF}`;g.fillText(fitText(g,mLbl(mat(r.m)),X+W-cx[5]),cx[5],y)});
 }
-function cabPageN(i,cnt,quad){const AS=asmList(),ks=AS.slice(i,i+cnt),n=AS.length;
-  const{c,g}=pageBase('Шкафове — детайли за сглобяване',`шкаф ${i+1}${ks.length>1?'–'+(i+ks.length):''} от ${n} · размерите са в мм, височина без цокъла`);
+function cabPageN(i,cnt,quad){const AG=asmGroups(),gs=AG.slice(i,i+cnt),ks=gs.map(o=>o.k),n=AG.length,same=gs.some(o=>o.ks.length>1);
+  const{c,g}=pageBase('Шкафове — детайли за сглобяване',`шкаф ${i+1}${ks.length>1?'–'+(i+ks.length):''} от ${n} · размерите са в мм, височина без цокъла`+(same?' · бройките в таблицата са за един шкаф':''));
   const W=(PGW-160-80)/2,top=220,fullH=PGH-260;g.fillStyle='#d0d7db';
   if(ks.length>1)g.fillRect(80+W+39,230,2,PGH-290);
   if(quad){const hh=(fullH-50)/2;if(ks.length>2)g.fillRect(80,top+hh+24,PGW-160,2);
-    ks.forEach((k,j)=>cabBlock(g,k,i+j,80+(j%2)*(W+80),top+Math.floor(j/2)*(hh+50),W,hh,true))}
-  else ks.forEach((k,j)=>cabBlock(g,k,i+j,80+j*(W+80),top,W,fullH,false));
+    ks.forEach((k,j)=>cabBlock(g,k,i+j,80+(j%2)*(W+80),top+Math.floor(j/2)*(hh+50),W,hh,true,gs[j].ks))}
+  else ks.forEach((k,j)=>cabBlock(g,k,i+j,80+j*(W+80),top,W,fullH,false,gs[j].ks));
   return c}
-function cabPage(k,i){const{c,g}=pageBase(`${i+1}. ${k.name}`,`${TYPE_BG[k.type||'doors']} · ${k.W} × ${r1(k.H-k.c)} × ${k.D} мм${k.wall!==null?' · стена '+(k.wall+1):''}`);
+function cabPage(k,i){const{c,g}=pageBase(`${i+1}. ${k.name}`,`${tBG(k)} · ${k.W} × ${r1(k.H-k.c)} × ${k.D} мм${k.wall!==null?' · стена '+(k.wall+1):''}`);
   g.fillStyle='#1a2227';g.font=`28px ${FF}`;g.fillText(fitText(g,noteInfo(k),PGW-160),80,240);
   const iw=1000,ih=640;g.drawImage(shotCab(k,true,iw,ih),80,280);g.drawImage(shotCab(k,false,iw,ih),80,280+ih+40);
   g.fillStyle='#5a6870';g.font=`24px ${FF}`;g.fillText('със затворени врати',90,280+ih-12);g.fillText('без врати и чела',90,280+2*ih+28);
