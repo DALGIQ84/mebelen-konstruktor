@@ -169,7 +169,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.25 · 11:30 · По-кратък работен PDF</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.25 · 12:10 · Единичните детайли — по 8 на лист</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -3329,9 +3329,10 @@ async function exportSet(){ /* работен PDF — по-малко листи
     if(P.cabinets.some(k=>k.type==='wardrobe'&&k.wall===i)){const kc=showClear;showClear=true;let cc;try{const q2=withExport(()=>{wv=i;return wallSvg()});cc=await svgCanvas(q2.s,q2.vb,2400)}finally{showClear=kc}
       out.push({c:twoUp(wc,cc,'с вратите','светли отвори'),name:fname('стена '+(i+1)+' и светли отвори')})}
     else out.push({c:wc,name:fname('стена '+(i+1))})}
-  const AS=asmGroups();
+  const AG=asmGroups(),AS=AG.filter(o=>!isOnePart(o.k)),A1=AG.filter(o=>isOnePart(o.k)); // от един детайл — отделно, по 8 на лист с една картинка
   if(AS.length){for(let i=0;i<AS.length;){const nq=AS.slice(i,i+4),quad=nq.length>2&&nq.every(o=>cabRows(o.k).length<=QMAX);const n=quad?nq.length:Math.min(2,AS.length-i);
-    out.push({c:cabPageN(i,n,quad),name:fname('шкафове '+(i+1))});i+=n}}
+    out.push({c:cabPageN(i,n,quad,AS),name:fname('шкафове '+(i+1))});i+=n}}
+  for(let i=0;i<A1.length;i+=8)out.push({c:onePartPage(A1,i,AS.length),name:fname('единични детайли '+(i+1))});
   if(extraList().length)extraPages().forEach((c,j)=>out.push({c,name:fname('плотове и пълнежи'+(j?' '+(j+1):''))}));
   cutPanelPages().forEach((c,j)=>out.push({c,name:fname('скосени панели'+(j?' '+(j+1):''))}));
   return out;
@@ -3491,6 +3492,25 @@ function drawEdge(g,x,y,e){const w=70,h=34;g.strokeStyle='#c7ced2';g.lineWidth=2
   const L=(a,b,c2,d)=>{g.beginPath();g.moveTo(a,b);g.lineTo(c2,d);g.stroke()};if(e[0])L(x,y,x+w,y);if(e[1])L(x,y+h,x+w,y+h);if(e[2])L(x,y,x,y+h);if(e[3])L(x+w,y,x+w,y+h)}
 const QMAX=8; // до толкова реда детайли — шкафът влиза в четвърт лист
 function cabRows(k){const keep=scope;scope='cab';const r=rows([k],false,true);scope=keep;return r}
+const isOnePart=k=>{try{const rs=cabRows(k);return rs.length===1||['wpanel','wshelf'].includes(k.type)&&rs.length<=2}catch(e){return false}}; // панел, рафт на стената и др. — един детайл
+function onePartPage(L,i0,base){const gs=L.slice(i0,i0+8),n=L.length;
+  const{c,g}=pageBase('Единични детайли',`${i0+1}${gs.length>1?'–'+(i0+gs.length):''} от ${n} · размерите са в мм`+(gs.some(o=>o.ks.length>1)?' · бройките в таблицата са за един':''));
+  const cols=4,top=220,cw=(PGW-160-(cols-1)*50)/cols,ch=(PGH-top-60-50)/2;g.fillStyle='#d0d7db';
+  for(let j=1;j<cols;j++)g.fillRect(80+j*(cw+50)-26,top+10,2,PGH-top-80);if(gs.length>cols)g.fillRect(80,top+ch+24,PGW-160,2);
+  gs.forEach((o,j)=>{const X=80+(j%cols)*(cw+50),Y=top+Math.floor(j/cols)*(ch+50),k=o.k,q=0.8;
+    const nm=o.ks.length>1?o.ks.map(x=>x.name).join(' = ')+` · ${o.ks.length} бр.`:k.name;
+    g.fillStyle='#1a2227';g.font=`600 ${36*q}px ${FC}`;g.fillText(fitText(g,`${base+i0+j+1}. ${nm}`,cw),X,Y+34);
+    g.fillStyle='#5a6870';g.font=`${24*q}px ${FF}`;g.fillText(fitText(g,`${tBG(k)} · ${k.W} × ${r1(k.H-k.c)} × ${k.D} мм${k.wall!==null?' · стена '+(k.wall+1):''}`,cw),X,Y+66);
+    const nt=noteInfo(k);if(nt){g.fillStyle='#1a2227';g.fillText(fitText(g,nt,cw),X,Y+94)}
+    const ih=Math.round(ch*0.48),iy=Y+108;g.drawImage(shotCab(k,true,Math.round(cw),ih),X,iy);g.strokeStyle='#e3e8ea';g.lineWidth=2;g.strokeRect(X,iy,cw,ih);
+    const keep=scope;scope='cab';const rs=rows([k],false,true);scope=keep;let y=iy+ih+44;
+    const cx=[X,X+cw*0.50,X+cw*0.66,X+cw*0.74],fz=22;g.font=`500 20px ${FF}`;g.fillStyle='#5a6870';
+    g.fillText('Детайл',X,y);g.textAlign='right';g.fillText('Дълж.',cx[1]+cw*0.02,y);g.fillText('Шир.',cx[2],y);g.fillText('Бр.',cx[3],y);g.textAlign='left';g.fillText('Кант',cx[3]+14,y);y+=8;
+    rs.forEach((r,m)=>{y+=36;if(m%2===0){g.fillStyle='#f3f5f6';g.fillRect(X-6,y-28,cw+12,36)}g.fillStyle='#1a2227';g.font=`${fz}px ${FF}`;g.fillText(fitText(g,r.type,cw*0.36),X,y);
+      g.font=`${fz}px ${FM}`;g.textAlign='right';g.fillText(fmt(r.L),cx[1]+cw*0.02,y);g.fillText(fmt(r.Wd),cx[2],y);g.fillText(String(r.n),cx[3],y);g.textAlign='left';
+      g.save();g.translate(cx[3]+14,y-22);g.scale(0.7,0.7);drawEdge(g,0,0,r.e);g.restore();
+      y+=30;g.fillStyle='#5a6870';g.font=`${fz-2}px ${FF}`;g.fillText(fitText(g,mLbl(mat(r.m)),cw),X,y)})});
+  return c}
 function cabBlock(g,k,i,X,Y,W,H,sm,ks){ // един шкаф: заглавие, 2 картинки, детайли (sm = четвърт лист); ks — еднаквите шкафове
   const q=sm?0.8:1,nm=ks&&ks.length>1?ks.map(x=>x.name).join(' = ')+` · ${ks.length} бр.`:k.name;
   g.fillStyle='#1a2227';g.font=`600 ${40*q}px ${FC}`;g.fillText(fitText(g,`${i+1}. ${nm}`,W),X,Y+40*q);
@@ -3511,7 +3531,7 @@ function cabBlock(g,k,i,X,Y,W,H,sm,ks){ // един шкаф: заглавие, 
     g.save();g.translate(cx[4],y-fz);g.scale(fz/30,fz/30);drawEdge(g,0,0,r.e);g.restore();
     g.font=`${fz}px ${FF}`;g.fillText(fitText(g,mLbl(mat(r.m)),X+W-cx[5]),cx[5],y)});
 }
-function cabPageN(i,cnt,quad){const AG=asmGroups(),gs=AG.slice(i,i+cnt),ks=gs.map(o=>o.k),n=AG.length,same=gs.some(o=>o.ks.length>1);
+function cabPageN(i,cnt,quad,AG0){const AG=AG0||asmGroups(),gs=AG.slice(i,i+cnt),ks=gs.map(o=>o.k),n=AG.length,same=gs.some(o=>o.ks.length>1);
   const{c,g}=pageBase('Шкафове — детайли за сглобяване',`шкаф ${i+1}${ks.length>1?'–'+(i+ks.length):''} от ${n} · размерите са в мм, височина без цокъла`+(same?' · бройките в таблицата са за един шкаф':''));
   const W=(PGW-160-80)/2,top=220,fullH=PGH-260;g.fillStyle='#d0d7db';
   if(ks.length>1)g.fillRect(80+W+39,230,2,PGH-290);
