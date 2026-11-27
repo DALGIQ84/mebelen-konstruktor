@@ -169,7 +169,7 @@ textarea{width:100%;min-height:150px;font-family:var(--f-mono);font-size:12px;ba
 </style>
 
 <header class="top">
-  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.27 · 09:10 · Заобляне и на фигурни детайли</span></small></div>
+  <div class="brand"><svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true" style="vertical-align:-6px;margin-right:6px"><rect width="64" height="64" rx="12" fill="#ffffff"/><path d="M20 12 V52 M24 32 L44 12 M25 33 L45 52" stroke="#1d1d1f" stroke-width="6" stroke-linecap="round"/><path d="M24 32 L44 12" stroke="#e3a21a" stroke-width="6" stroke-linecap="round"/></svg>KRAFT<span style="color:#e3a21a">PLAN</span><b id="hdProj" style="margin-left:10px;font-size:15px;color:#e3a21a"></b><small>шкафове · стая · детайли за разкрой · <span id="appVer">версия 2026.11.27 · 09:20 · Детайли 3D — истинската форма</span></small></div>
   <div class="dd"><button class="btn" id="bFile" aria-haspopup="true" aria-expanded="false">Файл ▾</button>
     <div class="ddm" id="fileMenu" hidden>
       <button class="item" id="fNew"><span>Нов проект</span><small>празна стая 3600 × 3000</small></button>
@@ -4031,11 +4031,16 @@ function ped3dView(v,k){/* бърз изглед */k=k||cab(pedK);if(!P3||!k)ret
   P3.cam.position.copy(c.clone().add(d.multiplyScalar(dist)));P3.cam.up.set(0,1,0);if(P3.ctl){P3.ctl.target.copy(c);P3.ctl.update()}else P3.cam.lookAt(c);P3.st={p:P3.cam.position.clone(),t:c.clone()};ped3dDraw()}
 function ped3dBuild(k){const sc=P3.scene;while(sc.children.length){const o=sc.children.pop();o.geometry?.dispose?.();(o.material?.dispose)&&o.material.dispose();o.children?.forEach(c=>{c.geometry?.dispose?.();c.material?.dispose?.()})}
   P3.meshes=[];const M=1/1000,ps=pedParts(k).filter(p=>!p.hidden&&p.box&&p.kind!=='hw'&&(pedDoors||p.kind!=='door'));
-  for(const p of ps){const b=p.box,w=Math.max(0.5,b[1]-b[0])*M,h=Math.max(0.5,b[5]-b[4])*M,d=Math.max(0.5,b[3]-b[2])*M;
-    const g=new THREE.BoxGeometry(w,h,d),col=new THREE.Color(p.kind==='glass'?'#cfe6ee':(mat(p.m)?.color||'#d8d2c7'));
+  for(const p of ps){const b=p.box,w=Math.max(0.5,b[1]-b[0])*M,h=Math.max(0.5,b[5]-b[4])*M,d=Math.max(0.5,b[3]-b[2])*M,col=new THREE.Color(p.kind==='glass'?'#cfe6ee':(mat(p.m)?.color||'#d8d2c7'));
+    const shp=(q,fn)=>{const ar=q.reduce((a,v,i)=>{const n=q[(i+1)%q.length];return a+v[0]*n[1]-n[0]*v[1]},0),qq=ar<0?q.slice().reverse():q;return new THREE.Shape(qq.map(([u,v])=>new THREE.Vector2(u*M,v*M)))};
+    let g,pos=[(b[0]+b[1])/2*M,(b[4]+b[5])/2*M,(b[2]+b[3])/2*M],rot=null; /* фигурните/заоблените детайли — с истинската си форма */
+    if(p.pl&&p.pl.length>2){g=new THREE.ExtrudeGeometry(shp(p.pl),{depth:h,bevelEnabled:false});rot=['x',Math.PI/2];pos=[0,b[5]*M,0]}
+    else if(p.fp&&p.fp.length>2&&!p.tilt){g=new THREE.ExtrudeGeometry(shp(p.fp),{depth:d,bevelEnabled:false});pos=[0,0,b[2]*M]}
+    else if(p.sp&&p.sp.length>2&&!p.tilt){g=new THREE.ExtrudeGeometry(shp(p.sp),{depth:w,bevelEnabled:false});rot=['y',-Math.PI/2];pos=[b[1]*M,0,0]}
+    else g=new THREE.BoxGeometry(w,h,d);
     const m=new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.16,depthWrite:false,side:THREE.DoubleSide}));
-    m.position.set((b[0]+b[1])/2*M,(b[4]+b[5])/2*M,(b[2]+b[3])/2*M);m.userData={key:p.key,col};
-    const ed=new THREE.LineSegments(new THREE.EdgesGeometry(g),new THREE.LineBasicMaterial({color:0x1a2227}));m.add(ed);m.userData.ed=ed;
+    m.position.set(...pos);if(rot)m.rotation[rot[0]]=rot[1];m.userData={key:p.key,col};
+    const ed=new THREE.LineSegments(new THREE.EdgesGeometry(g,25),new THREE.LineBasicMaterial({color:0x1a2227}));m.add(ed);m.userData.ed=ed;
     if(p.tilt&&p.fp){}sc.add(m);P3.meshes.push(m)}
   ped3dPaint()}
 function ped3dPaint(){if(!P3)return;const on=new Set([...(pedMulti||[]),pedSel].filter(Boolean)),Y=new THREE.Color('#f5b324');
